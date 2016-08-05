@@ -200,8 +200,8 @@ EndFunc
 ; Updated in UpdateAndroidConfig() and $Android&Init() as well
 Global $InitAndroidActive = False
 Func InitAndroidConfig($bRestart = False)
+Global $Android = $AndroidAppConfig[$AndroidConfig][0]
 	If $bRestart = False Then
-	   $Android = $AndroidAppConfig[$AndroidConfig][0]
 	   $AndroidInstance = $AndroidAppConfig[$AndroidConfig][1]
 	   $Title = $AndroidAppConfig[$AndroidConfig][2]
 	EndIf

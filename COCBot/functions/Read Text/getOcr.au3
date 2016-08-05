@@ -9,9 +9,7 @@
 ; Link ..........: https://github.com/MyBotRun/MyBot/wiki
 ; Example .......: No
 ; ===============================================================================================================================
-Func getRemainTrainingTimer($x_start, $y_start);48, 69 -> Gets complete value of gold xxx,xxx while searching, top left, Getresources.au3
-	Return getOcrAndCapture("coc-RemainTrain", $x_start, $y_start, 50, 12, True)
-EndFunc   ;==>getRemainTrainTimer
+
 
 Func getNameBuilding($x_start, $y_start); getNameBuilding(242,520) -> Gets complete name and level of the buildings, bottom of screen
 	Return getOcrAndCapture("coc-build", $x_start, $y_start, 377, 27)
@@ -22,7 +20,7 @@ Func getGoldVillageSearch($x_start, $y_start);48, 69 -> Gets complete value of g
 EndFunc   ;==>getGoldVillageSearch
 
 Func getRemainTrainTimer($x_start, $y_start);
-	Return getOcrAndCapture("coc-RemainTrain", $x_start, $y_start, 70, 11, True)
+	Return getOcrAndCapture("coc-RemainTrain", $x_start, $y_start, 70, 12, True)
 EndFunc   ;==>getRemainTrainTimer
 
 Func getElixirVillageSearch($x_start, $y_start) ;48, 69+29 -> Gets complete value of Elixir xxx,xxx, top left,  Getresources.au3

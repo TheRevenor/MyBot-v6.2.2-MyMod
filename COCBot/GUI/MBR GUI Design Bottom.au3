@@ -65,12 +65,16 @@ $grpButtons = GUICtrlCreateGroup("https://mybot.run " & GetTranslated(602,0, "- 
 		_GUICtrlSetTip(-1, $txtTip)
 		IF $btnColor Then GUICtrlSetBkColor(-1, 0x22C4F5)
 		GUICtrlSetState(-1, $GUI_DISABLE)
-	$chkBackground = GUICtrlCreateCheckbox(GetTranslated(602,14, "Background Mode"), $x + 1, $y + 72, 180, 24)
+	$chkBackground = GUICtrlCreateCheckbox(GetTranslated(602,14, "Background Mode"), $x + 1, $y + 72, 90, 24)
 		$txtTip = GetTranslated(602,16, "Check this to ENABLE the Background Mode of the Bot.") & @CRLF & GetTranslated(602,17, "With this you can also hide the Android Emulator window out of sight.")
 		GUICtrlSetFont(-1, 7)
 		_GUICtrlSetTip(-1, $txtTip)
 		GUICtrlSetOnEvent(-1, "chkBackground")
 		GUICtrlSetState(-1, (($AndroidAdbScreencap = True) ? ($GUI_CHECKED) : ($GUI_UNCHECKED)))
+	$CheckVersionConfig = GUICtrlCreateButton("Check Version", $x + 100, $y + 70, 80, -1)
+		$txtTip = "Use this to check version Mod."
+		_GUICtrlSetTip(-1, $txtTip)
+		IF $btnColor Then GUICtrlSetBkColor(-1, 0x22C4F5)
 	$lblDonate = GUICtrlCreateLabel(GetTranslated(601,19,"Support the development"), $x + 224, $y + 80, 220, 24, $SS_RIGHT)
 		GUICtrlSetCursor(-1, 0) ; https://www.autoitscript.com/autoit3/docs/functions/MouseGetCursor.htm
 		GUICtrlSetFont(-1, 8.5, $FW_BOLD) ;, $GUI_FONTITALIC + $GUI_FONTUNDER)

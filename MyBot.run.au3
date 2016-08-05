@@ -35,7 +35,7 @@ Local $hBotLaunchTime = TimerInit()
 
 Global $sGitHubModOwner = "TheRevenor"
 Global $sGitHubModRepo = "MyBot-v6.2-MyMod"
-Global $sGitHubModLatestReleaseTag = "v1.8.1"
+Global $sGitHubModLatestReleaseTag = "v1.8.2"
 Global $sModSupportUrl = "https://mybot.run/forums/index.php?/topic/20830-mybot-v6121-mod-therevenor-v10-18-06-2016"
 
 $sBotVersion = "v6.2.1" ;~ Don't add more here, but below. Version can't be longer than vX.y.z because it it also use on Checkversion()
@@ -59,7 +59,7 @@ Opt("WinTitleMatchMode", 3) ; Window Title exact match mode
 If Not FileExists(@ScriptDir & "\License.txt") Then
 	$license = InetGet("http://www.gnu.org/licenses/gpl-3.0.txt", @ScriptDir & "\License.txt")
 EndIf
-
+ 
 ;multilanguage
 #include "COCBot\functions\Other\Multilanguage.au3"
 DetectLanguage()
@@ -228,7 +228,6 @@ Func runBot() ;Bot that runs everything in order
 		$Restart = False
 		$fullArmy = False
 		$CommandStop = -1
-		
 		If _Sleep($iDelayRunBot1) Then Return
 		checkMainScreen()
 		If $Restart = True Then ContinueLoop
