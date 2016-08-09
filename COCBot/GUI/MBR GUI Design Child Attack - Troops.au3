@@ -635,14 +635,14 @@ $hGUI_ARMY_TAB_ITEM4 = GUICtrlCreateTabItem(GetTranslated(641,1,"Options"))
 		$lbltxtTrainITDelay = GUICtrlCreateLabel(GetTranslated(636,32, "delay"), $x-10, $y, 37, 30)
 			$txtTip = GetTranslated(636,33, "Increase the delay if your PC is slow or to create human like training click speed")
 			_GUICtrlSetTip(-1, $txtTip)
-		$lbltxtTrainITDelayTime = GUICtrlCreateLabel("40 ms", $x-10, $y+15, 37, 30)
+		$lbltxtTrainITDelayTime = GUICtrlCreateLabel("25 ms", $x-10, $y+15, 37, 30)
 			_GUICtrlSetTip(-1, $txtTip)
 		$sldTrainITDelay = GUICtrlCreateSlider($x + 30, $y, 90, 25, BitOR($TBS_TOOLTIPS, $TBS_AUTOTICKS))
 			_GUICtrlSetTip(-1, GetTranslated(636,33, -1))
 			_GUICtrlSlider_SetTipSide(-1, $TBTS_BOTTOM)
 			_GUICtrlSlider_SetTicFreq(-100, 100)
 			GUICtrlSetLimit(-1, 500, 1) ; change max/min value
-			GUICtrlSetData(-1, 40) ; default value
+			GUICtrlSetData(-1, 25) ; default value
 			GUICtrlSetOnEvent(-1, "sldTrainITDelay")
 	GUICtrlCreateGroup("", -99, -99, 1, 1)
 

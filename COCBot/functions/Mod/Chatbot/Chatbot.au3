@@ -291,7 +291,8 @@ Func ChatbotChatGlobalInput() ; select the textbox for global chat
 EndFunc
 
 Func ChatbotChatInput($message) ; input the text
-   SendText($message)
+   ;SendText($message)
+   AndroidSendText($message)
    Return True
 EndFunc
 
@@ -433,7 +434,7 @@ EndFunc
 ; MAIN SCRIPT ==============================================
 
 Func ChatbotMessage() ; run the chatbot
-If $FoundChatMessage = 1 Then
+If $FoundChatMessage = 1 Or $ChatbotChatGlobal Then
 	If $ChatbotChatGlobal Then
 		SetLog("==== Request Chatbot to Chat Global ====", $COLOR_GREEN)
 	ElseIf $ChatbotChatClan Then

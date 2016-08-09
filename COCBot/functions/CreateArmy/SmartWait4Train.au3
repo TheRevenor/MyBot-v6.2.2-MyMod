@@ -137,11 +137,11 @@ Func SmartWait4Train()
 				For $pMatchMode = $DB To $iModeCount - 1 ; check all attack modes
 					If $debugsetlogTrain = 1 Or $debugSetlog = 1 Then
 						SetLog("$pTroopType: " & NameOfTroop($pTroopType) & ", $pMatchMode: " & $sModeText[$pMatchMode], $COLOR_PURPLE)
-						Setlog("TroopToBeUsed: " & IsSpecialTroopToBeUsed($pMatchMode, $pTroopType) & ", Hero Wait Status: " & (BitAND($iHeroAttack[$pMatchMode], $iHeroWait[$pMatchMode]) = $iHeroAttack[$pMatchMode]), $COLOR_PURPLE)
+						Setlog("TroopToBeUsed: " & IsSpecialTroopToBeUsed($pMatchMode, $pTroopType) & ", Hero Wait Status: " & (BitOR($iHeroAttack[$pMatchMode], $iHeroWait[$pMatchMode]) = $iHeroAttack[$pMatchMode]), $COLOR_PURPLE)
 					EndIf
 					$iActiveHero = -1
 					If IsSpecialTroopToBeUsed($pMatchMode, $pTroopType) And _
-							BitAND($iHeroAttack[$pMatchMode], $iHeroWait[$pMatchMode]) = $iHeroAttack[$pMatchMode] Then ; check if Hero enabled to wait
+							BitOR($iHeroAttack[$pMatchMode], $iHeroWait[$pMatchMode]) = $iHeroAttack[$pMatchMode] Then ; check if Hero enabled to wait
 						$iActiveHero = $pTroopType - $eKing ; compute array offset to active hero
 					EndIf
 					If $iActiveHero <> -1 And $aHeroResult[$iActiveHero] > 0 Then ; valid time?
@@ -166,7 +166,7 @@ Func SmartWait4Train()
 	Else
 		$aTimeTrain[2] = 0 ; clear hero remain time if disabled during stop
 	EndIf
-
+	
 	; update CC remaining time till next request if request made and CC not full
 	If $iCCRemainTime = 0 And _ColorCheck(_GetPixelColor($aRequestTroopsAO[0], $aRequestTroopsAO[1], True), Hex($aRequestTroopsAO[3], 6), $aRequestTroopsAO[5]) Then
 		getArmyCCStatus()

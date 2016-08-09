@@ -776,10 +776,13 @@ Func SelectAccount($bAccount)
 
 		$iLoopCount += 1
 		ConsoleWrite($iLoopCount & @CRLF)
-		If $iLoopCount > 120 Then
+		If $iLoopCount > 60 Then
+			PureClick(778, 115, 1, 0, "Click Close") ;Click Close
 			SetLog("No Detect Account, Sory..", $COLOR_PURPLE)
+			If _Sleep(2000) Then Return
+			PureClick(778, 115, 1, 0, "Click Close") ;Click Close
 			If _Sleep(1500) Then Return
-			SelectAccount($bAccount)
+			SwitchAccount($bAccount)
 			ExitLoop
 		EndIf
 	WEnd
@@ -878,9 +881,10 @@ Func LoadAccount2($bAccount)
 
 		$iLoopCount += 1
 		ConsoleWrite($iLoopCount & @CRLF)
-		If $iLoopCount > 5000 Then
+		If $iLoopCount > 4000 Then
 			SetLog("Not Open Window Msg Load, Please Wait..", $COLOR_PURPLE)
-			SelectAccount($bAccount)
+			$Restart = True
+			SwitchAccount($bAccount)
 			ExitLoop
 		EndIf
 	WEnd

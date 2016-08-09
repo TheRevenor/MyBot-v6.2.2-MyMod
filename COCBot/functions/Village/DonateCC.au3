@@ -855,7 +855,7 @@ Func DonateWindow($Open = True)
 	; Will search in $Y column = 410 for the first pure white color and determinate that position the $DonationWindowTemp
 	$DonationWindowY = 0
 
-	Local $aDonWinOffColors[2][3] = [[0xFFFFFF, 0, 2], [0xc7c5bc, 0, 209]]
+	Local $aDonWinOffColors[2][3] = [[0xFFFFFF, 0, 2], [0xD7D5CB, 0, 209]]
 	Local $aDonationWindow = _MultiPixelSearch(409, 0, 410, $DEFAULT_HEIGHT, 1, 1, Hex(0xFFFFFF, 6), $aDonWinOffColors, 10)
 
 	If IsArray($aDonationWindow) Then

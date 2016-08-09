@@ -467,10 +467,11 @@ Global $ichkAlertPBCampFullTest = 0
 
 ;Info Notify - Added By TheRevenor
 Global $pAlertTopGain
-Global $RequestBuilderInfo = 0
-Global $RequestShieldInfo = 0
 Global $ichkAlertBuilderIdle
+Global $RequestScreenshotHD = 0
+Global $RequestBuilderInfo = 0
 Global $iReportIdleBuilder = 0
+Global $RequestShieldInfo = 0
 
 ;Pushbullet Stuff
 Global $StartTime = @HOUR & ":" & @MIN &", " & @MON & "/" & @MDAY

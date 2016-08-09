@@ -32,7 +32,7 @@ Func GetResources($bLog = True, $pMatchMode = -1) ;Reads resources
 				$iNbrOfOoS += 1
 				UpdateStats()
 				SetLog("Disconnected At Search Clouds", $COLOR_RED)
-				PushMsg("OoSResources")
+				PushMsgToPushBullet ("OoSResources")
 			Else
 				SetLog("Stuck At Search Clouds, Restarting CoC and Bot...", $COLOR_RED)
 				$Is_ClientSyncError = False ; disable fast OOS restart if not simple error and restarting CoC
@@ -80,7 +80,7 @@ Func GetResources($bLog = True, $pMatchMode = -1) ;Reads resources
 			$iNbrOfOoS += 1
 			UpdateStats()
 			SetLog("Connection Lost While Searching", $COLOR_RED)
-			PushMsg("OoSResources")
+			PushMsgToPushBullet ("OoSResources")
 		Else
 			SetLog("Attack Is Disabled Or Slow connection issues, Restarting CoC and Bot...", $COLOR_RED)
 			$Is_ClientSyncError = False ; disable fast OOS restart if not simple error and restarting CoC
@@ -92,16 +92,16 @@ Func GetResources($bLog = True, $pMatchMode = -1) ;Reads resources
 	$SearchCount += 1 ; Counter for number of searches
 	
 	;pushbullet searchcount notification every xxx searches so you know bot is still running
-    If $searchcount>0 AND $SearchNotifyCount = 1 AND mod($searchcount,$SearchNotifyCountTXT) = 0 Then
+    If $searchcount > 0 AND $SearchNotifyCount = 1 AND mod($searchcount,$SearchNotifyCountTXT) = 0 Then
         PushMsgToPushBullet ("CurrentSearchCount")
-    ElseIF $searchcount=1 AND $SearchNotifyCount = 1 Then
+    ElseIF $searchcount = 1 AND $SearchNotifyCount = 1 Then
         PushMsgToPushBullet ("CurrentSearchCount")
     EndIf
 
 	;send village stats every xxx attacks
-	If $Villagestatincrement=1 AND mod($Attackcount,$VillageStatIncrementTXT) = 0 AND $AttackCount <>0 Then
+	If $Villagestatincrement = 1 AND mod($Attackcount,$VillageStatIncrementTXT) = 0 AND $AttackCount <>0 Then
 		PushMsgToPushBullet ("AttackCountStats")
-		$attackcount =0
+		$attackcount = 0
 	EndIf
 	If $PersonalBreakNotified = True THEN $PersonalBreakNotified = False
 

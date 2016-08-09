@@ -35,7 +35,7 @@ Local $hBotLaunchTime = TimerInit()
 
 Global $sGitHubModOwner = "TheRevenor"
 Global $sGitHubModRepo = "MyBot-v6.2-MyMod"
-Global $sGitHubModLatestReleaseTag = "v1.8.2"
+Global $sGitHubModLatestReleaseTag = "v1.8.3"
 Global $sModSupportUrl = "https://mybot.run/forums/index.php?/topic/20830-mybot-v6121-mod-therevenor-v10-18-06-2016"
 
 $sBotVersion = "v6.2.1" ;~ Don't add more here, but below. Version can't be longer than vX.y.z because it it also use on Checkversion()
@@ -317,7 +317,7 @@ Func runBot() ;Bot that runs everything in order
 						GUICtrlRead($chkABWardenWait) = $GUI_CHECKED) Then
 					$IsWaitingForHeroesSpells = 0
 				EndIf
-			   
+			   ChkRemainHeroandSpell()
 					If $RunState = False Then Return
 					If $Restart = True Then ContinueLoop
 			   If $iUnbreakableMode >= 1 Then
