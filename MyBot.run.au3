@@ -34,15 +34,13 @@ Global $iBotLaunchTime = 0
 Local $hBotLaunchTime = TimerInit()
 
 Global $sGitHubModOwner = "TheRevenor"
-Global $sGitHubModRepo = "MyBot-v6.2-MyMod"
-Global $sGitHubModLatestReleaseTag = "v1.8.3"
-Global $sModSupportUrl = "https://mybot.run/forums/index.php?/topic/20830-mybot-v6121-mod-therevenor-v10-18-06-2016"
+Global $sGitHubModRepo = "MyBot-v6.2.1-MyMod"
+Global $sGitHubModLatestReleaseTag = "v2.0.1"
+Global $sModSupportUrl = "https://mybot.run/forums/index.php?/topic/22790-v621-mod-therevenor-v201-03-09-2016"
 
 $sBotVersion = "v6.2.1" ;~ Don't add more here, but below. Version can't be longer than vX.y.z because it it also use on Checkversion()
 $sBotTitle = "My Bot " & $sBotVersion & " MOD TheRevenor " & $sGitHubModLatestReleaseTag & " " ;~ Don't use any non file name supported characters like \ / : * ? " < > |
 $sModversion = $sGitHubModLatestReleaseTag
-
-Global $sBotTitleDefault = $sBotTitle
 
 #include "COCBot\functions\Config\DelayTimes.au3"
 #include "COCBot\MBR Global Variables.au3"
@@ -74,9 +72,10 @@ EndIf
 
 
 #include "COCBot\functions\Android\Android.au3"
+#include "COCBot\functions\Android\SecureME.au3"
 
 ; Update Bot title
-$sBotTitle = $sBotTitle & "(" & ($AndroidInstance <> "" ? $AndroidInstance : $Android) & ")" ;Do not change this. If you do, multiple instances will not work.
+$sBotTitle = $sBotTitle & "(" & ($AndroidInstance <> "" ? $AndroidInstance : $Android) & ")" ; Do not change this. If you do, multiple instances will not work.
 
 UpdateSplashTitle($sBotTitle & GetTranslated(500, 20, ", Profile: %s", $sCurrProfile))
 
@@ -106,6 +105,8 @@ EndIf
 
 $sMsg = GetTranslated(500, 5, "My Bot for %s is already running.\r\n\r\n", $sAndroidInfo)
 If $hMutex_BotTitle = 0 Then
+	RemoveFolderFromInUseList()
+	DeletePicturesHostFolder()
 	MsgBox(BitOR($MB_OK, $MB_ICONINFORMATION, $MB_TOPMOST), $sBotTitle, $sMsg & $cmdLineHelp)
 	Exit
 EndIf
@@ -189,6 +190,7 @@ LoadAmountOfResourcesImages()
 
 ;~ InitializeVariables();initialize variables used in extra windows
 CheckVersion() ; check latest version on mybot.run site
+SetComboTroopComp()
 
 ;~ Remember time in Milliseconds bot launched
 $iBotLaunchTime = TimerDiff($hBotLaunchTime)
@@ -275,6 +277,7 @@ Func runBot() ;Bot that runs everything in order
 			checkMainScreen(False)
 				If $Restart = True Then ContinueLoop
 			Local $aRndFuncList[3] = ['Collect', 'CheckTombs', 'ReArm']
+			If $FirstStart Then RunFirstAndDeleteQueuedTroops()
 			While 1
 				If $RunState = False Then Return
 				If $Restart = True Then ContinueLoop 2 ; must be level 2 due to loop-in-loop
@@ -292,7 +295,7 @@ Func runBot() ;Bot that runs everything in order
 				If $RunState = False Then Return
 				If $Restart = True Then ContinueLoop
 			If IsSearchAttackEnabled() Then  ; if attack is disabled skip reporting, requesting, donating, training, and boosting
-			   Local $aRndFuncList[10] = ['ReplayShare', 'ReportNotify', 'DonateCC,Train', 'BoostBarracks', 'BoostSpellFactory', 'BoostDarkSpellFactory', 'BoostKing', 'BoostQueen', 'BoostWarden', 'RequestCC']
+			   Local $aRndFuncList[7] = ['ReplayShare', 'ReportNotify', 'DonateCC,Train', 'BoostBarracks', 'BoostSpellFactories', 'BoostHeroes', 'RequestCC']
 			   While 1
 				   If $RunState = False Then Return
 				   If $Restart = True Then ContinueLoop 2 ; must be level 2 due to loop-in-loop
@@ -307,23 +310,13 @@ Func runBot() ;Bot that runs everything in order
 				   EndIf
 				   If checkAndroidTimeLag() = True Then ContinueLoop 2 ; must be level 2 due to loop-in-loop
 			   WEnd
-			   
-				If $fullArmy And ($iEnableSpellsWait[$iMatchMode] = 1 Or GUICtrlRead($chkDBKingWait) = $GUI_CHECKED Or GUICtrlRead($chkDBQueenWait) = $GUI_CHECKED Or _
-						GUICtrlRead($chkDBWardenWait) = $GUI_CHECKED Or GUICtrlRead($chkABKingWait) = $GUI_CHECKED Or GUICtrlRead($chkABQueenWait) = $GUI_CHECKED Or _
-						GUICtrlRead($chkABWardenWait) = $GUI_CHECKED) Then
-					$IsWaitingForHeroesSpells = 1
-				ElseIf $fullArmy = False And ($iEnableSpellsWait[$iMatchMode] = 1 Or GUICtrlRead($chkDBKingWait) = $GUI_CHECKED Or GUICtrlRead($chkDBQueenWait) = $GUI_CHECKED Or _
-						GUICtrlRead($chkDBWardenWait) = $GUI_CHECKED Or GUICtrlRead($chkABKingWait) = $GUI_CHECKED Or GUICtrlRead($chkABQueenWait) = $GUI_CHECKED Or _
-						GUICtrlRead($chkABWardenWait) = $GUI_CHECKED) Then
-					$IsWaitingForHeroesSpells = 0
-				EndIf
-			   ChkRemainHeroandSpell()
 					If $RunState = False Then Return
 					If $Restart = True Then ContinueLoop
 			   If $iUnbreakableMode >= 1 Then
 					If Unbreakable() = True Then ContinueLoop
 				EndIf
 			EndIf
+			SmartUpgrade()
 			Local $aRndFuncList[3] = ['Laboratory', 'UpgradeHeroes', 'UpgradeBuilding']
 			While 1
 				If $RunState = False Then Return
@@ -397,12 +390,15 @@ Func runBot() ;Bot that runs everything in order
 			If $Restart = True Then ContinueLoop
 		EndIf
 		;Multy-Farming ==============================================================================================================
-		If $ichkMultyFarming = 1 Then
+		If $ichkMultyFarming = 1 And $iMultyFarming = 1 Then
 			SetLog("Multy-Farming Mode Active...", $COLOR_RED)
 			SetLog("Please don't PAUSE/STOP BOT during profile change", $COLOR_RED)
 			$canRequestCC = True
 			$bDonationEnabled = True
+			Sleep(1500)
 			RequestCC()
+			ClickP($aAway, 1, 0, "#0000") ;Click Away
+			Sleep(1500)
 			$FirstStart = True
 			$RunState = True
 			$iSwCount = 0
@@ -592,16 +588,13 @@ Func Idle() ;Sequence that runs until Full Army
 		$iCollectCounter = $iCollectCounter + 1
 		If $CommandStop = -1 Then
 			Train()
-			; TheRevenor
-			If $fullArmy And ($iEnableSpellsWait[$iMatchMode] = 1 Or GUICtrlRead($chkDBKingWait) = $GUI_CHECKED Or GUICtrlRead($chkDBQueenWait) = $GUI_CHECKED Or _
-					GUICtrlRead($chkDBWardenWait) = $GUI_CHECKED Or GUICtrlRead($chkABKingWait) = $GUI_CHECKED Or GUICtrlRead($chkABQueenWait) = $GUI_CHECKED Or _
-					GUICtrlRead($chkABWardenWait) = $GUI_CHECKED) Then
-				$IsWaitingForHeroesSpells = 1
-			ElseIf $fullArmy = False And ($iEnableSpellsWait[$iMatchMode] = 1 Or GUICtrlRead($chkDBKingWait) = $GUI_CHECKED Or GUICtrlRead($chkDBQueenWait) = $GUI_CHECKED Or _
-					GUICtrlRead($chkDBWardenWait) = $GUI_CHECKED Or GUICtrlRead($chkABKingWait) = $GUI_CHECKED Or GUICtrlRead($chkABQueenWait) = $GUI_CHECKED Or _
-					GUICtrlRead($chkABWardenWait) = $GUI_CHECKED) Then
-				$IsWaitingForHeroesSpells = 0
-			EndIf
+			;If ($iEnableSpellsWait[$iMatchMode] = 1 Or GUICtrlRead($chkDBKingWait) = $GUI_CHECKED Or GUICtrlRead($chkDBQueenWait) = $GUI_CHECKED Or _
+			;			GUICtrlRead($chkDBWardenWait) = $GUI_CHECKED Or GUICtrlRead($chkABKingWait) = $GUI_CHECKED Or GUICtrlRead($chkABQueenWait) = $GUI_CHECKED Or _
+			;			GUICtrlRead($chkABWardenWait) = $GUI_CHECKED) Then
+			;	GetReadTimeHeroesAndSpell()
+			;	ClickP($aAway, 1, 0, "#0000") ;Click Away
+			;	Sleep(1500)
+			;EndIf
 				If $Restart = True Then ExitLoop
 				If _Sleep($iDelayIdle1) Then ExitLoop
 				checkMainScreen(False)
@@ -610,17 +603,6 @@ Func Idle() ;Sequence that runs until Full Army
 		If $CommandStop = 0 And $bTrainEnabled = True Then
 			If Not ($fullArmy) Then
 				Train()
-				; TheRevenor
-				If $fullArmy And ($iEnableSpellsWait[$iMatchMode] = 1 Or GUICtrlRead($chkDBKingWait) = $GUI_CHECKED Or GUICtrlRead($chkDBQueenWait) = $GUI_CHECKED Or _
-						GUICtrlRead($chkDBWardenWait) = $GUI_CHECKED Or GUICtrlRead($chkABKingWait) = $GUI_CHECKED Or GUICtrlRead($chkABQueenWait) = $GUI_CHECKED Or _
-						GUICtrlRead($chkABWardenWait) = $GUI_CHECKED) Then
-					$IsWaitingForHeroesSpells = 1
-				ElseIf $fullArmy = False And ($iEnableSpellsWait[$iMatchMode] = 1 Or GUICtrlRead($chkDBKingWait) = $GUI_CHECKED Or GUICtrlRead($chkDBQueenWait) = $GUI_CHECKED Or _
-						GUICtrlRead($chkDBWardenWait) = $GUI_CHECKED Or GUICtrlRead($chkABKingWait) = $GUI_CHECKED Or GUICtrlRead($chkABQueenWait) = $GUI_CHECKED Or _
-						GUICtrlRead($chkABWardenWait) = $GUI_CHECKED) Then
-					$IsWaitingForHeroesSpells = 0
-				EndIf
-				
 					If $Restart = True Then ExitLoop
 					If _Sleep($iDelayIdle1) Then ExitLoop
 					checkMainScreen(False)
@@ -653,7 +635,17 @@ Func Idle() ;Sequence that runs until Full Army
 		If $OutOfGold = 1 Or $OutOfElixir = 1 Then Return  ; Halt mode due low resources, only 1 idle loop
 		If $iChkSnipeWhileTrain = 1 Then SnipeWhileTrain()  ;snipe while train
 
-		If $CommandStop = -1 Then SmartWait4Train()  ; Check if closing bot/emulator while training and not in halt mode
+		If $CommandStop = -1 Then 
+			SmartWait4Train()  ; Check if closing bot/emulator while training and not in halt mode
+			If ($ichkCloseWaitEnable = 1 And $iEnableSpellsWait[$iMatchMode] = 1 Or GUICtrlRead($chkDBKingWait) = $GUI_CHECKED Or GUICtrlRead($chkDBQueenWait) = $GUI_CHECKED Or _
+						GUICtrlRead($chkDBWardenWait) = $GUI_CHECKED Or GUICtrlRead($chkABKingWait) = $GUI_CHECKED Or GUICtrlRead($chkABQueenWait) = $GUI_CHECKED Or _
+						GUICtrlRead($chkABWardenWait) = $GUI_CHECKED) Then
+				If _Sleep(2000) Then return
+				GetReadTimeHeroesAndSpell()
+				ClickP($aAway, 1, 0, "#0000") ;Click Away
+				If _Sleep(1500) Then Return
+			EndIf
+		EndIf
 	WEnd
 EndFunc   ;==>Idle
 
@@ -678,6 +670,15 @@ Func AttackMain() ;Main control for attack functions
 				SetLog(_PadStringCenter(" Hero status check" & BitAND($iHeroAttack[$LB], $iHeroWait[$LB], $iHeroAvailable) & "|" & $iHeroWait[$LB] & "|" & $iHeroAvailable, 54, "="), $COLOR_PURPLE)
 				;Setlog("BullyMode: " & $OptBullyMode & ", Bully Hero: " & BitAND($iHeroAttack[$iTHBullyAttackMode], $iHeroWait[$iTHBullyAttackMode], $iHeroAvailable) & "|" & $iHeroWait[$iTHBullyAttackMode] & "|" & $iHeroAvailable, $COLOR_PURPLE)
 			EndIf
+			If $ichkSwitchDonate = 1 Then
+				If $iPlannedRequestCCHoursEnable = 0 Then
+					$iPlannedRequestCCHoursEnable = 1
+					GUICtrlSetState($chkRequestCCHours, $GUI_CHECKED)
+					SetLog(" » Force Enable RequestCC Troops", $COLOR_ORANGE)
+				EndIf
+				RequestCC()
+				_Sleep($iDelayRunBot4)
+			EndIf
 			PrepareSearch()
 				If $OutOfGold = 1 Then Return ; Check flag for enough gold to search
 				If $Restart = True Then Return
@@ -690,10 +691,15 @@ Func AttackMain() ;Main control for attack functions
 				If $Restart = True Then Return
 			ReturnHome($TakeLootSnapShot)
 				If _Sleep($iDelayAttackMain2) Then Return
+				$iMultyFarming = 1
 			Return True
 		Else
 			Setlog("No one of search condition match:", $COLOR_BLUE)
 			Setlog("Waiting on troops, heroes and/or spells according to search settings", $COLOR_BLUE)
+			GetReadTimeHeroesAndSpell()
+			ClickP($aAway, 1, 0, "#0000") ;Click Away
+			Sleep(1500)
+			$iMultyFarming = 0
 		EndIf
 	Else
 		SetLog("Attacking Not Planned, Skipped..", $COLOR_RED)
@@ -776,19 +782,22 @@ Func _RunFunction($action)
 			_Sleep($iDelayRunBot1)
 		Case "BoostBarracks"
 			BoostBarracks()
-		Case "BoostSpellFactory"
+			BoostDarkBarracks()
+		Case "BoostSpellFactories"
 			BoostSpellFactory()
-		Case "BoostDarkSpellFactory"
+			If _Sleep($iDelayRunBot1) = False Then checkMainScreen(False)
 			BoostDarkSpellFactory()
-		Case "BoostKing"
+		Case "BoostHeroes"
 			BoostKing()
-		Case "BoostQueen"
+			If _Sleep($iDelayRunBot1) = False Then checkMainScreen(False)
 			BoostQueen()
-		Case "BoostWarden"
+			If _Sleep($iDelayRunBot1) = False Then checkMainScreen(False)
 			BoostWarden()
 		Case "RequestCC"
-			RequestCC()
-			If _Sleep($iDelayRunBot1) = False Then checkMainScreen(False)
+			If $ichkSwitchDonate = 0 Then
+				RequestCC()
+				If _Sleep($iDelayRunBot1) = False Then checkMainScreen(False)
+			EndIf
 		Case "Laboratory"
 			Laboratory()
 			If _Sleep($iDelayRunBot3) = False Then checkMainScreen(False)

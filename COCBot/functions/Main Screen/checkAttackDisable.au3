@@ -130,6 +130,10 @@ Func checkAttackDisable($iSource, $Result = "")
 	If $iModSource = $iTaBChkTime And $aShieldStatus[0] <> "guard" Then
 		Setlog("Personal Break Reset log off: " & $iValueSinglePBTimeForced & " Minutes", $COLOR_BLUE)
 		If $ichkCloseTakeBreak = 1 Then
+			If $AndroidEmbedded = True Then
+				AndroidEmbed(Not $AndroidEmbedded)
+			EndIf
+			If _Sleep(4000) Then Return
 			CloseAndroid()
 			; Pushbullet Msg/Telegram
 			_PushToPushBullet($iOrigPushBullet & " | Time To PersonalBreak - With Close Emulator - Waiting " & $iValueSinglePBTimeForced & " Minutes")

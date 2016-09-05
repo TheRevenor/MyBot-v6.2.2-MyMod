@@ -100,9 +100,6 @@
 #include "functions\Attack\Troops\SelectDropTroop.au3"
 #include "functions\Attack\Troops\SetSleep.au3"
 
-; TheRevenor
-#include "functions\BotInfo\runningBots.au3"
-
 #include "functions\CreateArmy\_TrainMoveBtn.au3"
 #include "functions\CreateArmy\BarracksStatus.au3"
 #include "functions\CreateArmy\CheckFullArmy.au3"
@@ -123,6 +120,9 @@
 #include "functions\CreateArmy\TrainClick.au3"
 #include "functions\CreateArmy\Train.au3"
 #include "functions\CreateArmy\TrainIt.au3"
+
+; New Train System
+#include "functions\CreateArmy\TrainBoosted.au3"
 
 #include "functions\Image Search\ImageSearch.au3"
 #include "functions\Image Search\checkDeadBase.au3"
@@ -278,7 +278,9 @@
 
 ; Attack files - Added by LunaEclipse
 #include "functions\Attack\attackFunctions.au3"
-#include "functions\Attack\unitInfo.au3"
+
+; SmartUpgrade - Added by Roro-Titi
+#include "functions\MOD\SmartUpgrade\AutoUpgrade.au3"
 
 ; ExtremeZap - Added by TheRevenor
 #include "functions\Mod\SmartZap\ExtremeZap.au3"
@@ -286,9 +288,6 @@
 ; SmartZap files - Added by LunaEclipse
 #include "functions\Mod\SmartZap\drillSearch.au3"
 #include "functions\Mod\SmartZap\smartZap.au3"
-
-; Android files - Added by LunaEclipse
-#include "functions\Android\modifyAndroid.au3"
 
 ; DonateStats - Added by Cutidudz
 #include "functions\Mod\DonateStats\DonateStats.au3"

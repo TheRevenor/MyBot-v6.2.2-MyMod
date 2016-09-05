@@ -41,6 +41,8 @@ Func Collect()
 	Local $Filename = ""
 	Local $CollectXY
 
+	IsWaitingForConnection()
+	
 	Local $aResult = returnMultipleMatchesOwnVillage($directory)
 	If UBound($aResult) > 1 Then
 		For $i = 1 To UBound($aResult) - 1

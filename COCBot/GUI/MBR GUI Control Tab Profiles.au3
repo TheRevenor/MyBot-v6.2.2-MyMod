@@ -12,7 +12,7 @@
 ; Link ..........: https://github.com/MyBotRun/MyBot/wiki
 ; Example .......: No
 ; ===============================================================================================================================
-
+#Cs
 Func cmbProfile()
 	saveConfig()
 
@@ -31,7 +31,7 @@ Func cmbProfile()
 
 	SetLog("Profile " & $sCurrProfile & " loaded from " & $config, $COLOR_GREEN)
 EndFunc   ;==>cmbProfile
-
+#Ce
 Func btnAddConfirm()
 	Switch @GUI_CtrlId
 		Case $btnAdd

@@ -124,9 +124,9 @@ Func getArmyCapacity($bOpenArmyWindow = False, $bCloseArmyWindow = False)
 		$fullArmy = True
 	EndIf
 
-	If ($CurCamp + 1) = $TotalCamp Then
-		$fullArmy = True
-	EndIf
+;~ 	If ($CurCamp + 1) = $TotalCamp Then    ; TOTAL CONTROL OF EACH UNIT
+;~ 		$fullArmy = True
+;~ 	EndIf
 
 	If $bCloseArmyWindow = True Then
 		ClickP($aAway, 1, 0, "#0000") ;Click Away

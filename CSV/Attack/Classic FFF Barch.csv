@@ -32,7 +32,7 @@ DROP  |E-F-G-H    |1-13       |13         |Barb       |0          |0          |0
 DROP  |A-B-C-D    |2-14       |13         |Arch       |0          |0          |0          |            |Drop Arch
 DROP  |E-F-G-H    |1-13       |13         |Arch       |0          |0          |0          |            |
 DROP  |A-B-C-D    |2-14       |18         |Barb       |0          |0          |0          |            |Drop Barb (repeat)
-DROP  |E-F-G-H    |1-13       |18       |Barb       |0          |0          |0          |            |
+DROP  |E-F-G-H    |1-13       |18         |Barb       |0          |0          |0          |            |
 DROP  |A-B-C-D    |2-14       |18         |Arch       |0          |0          |0          |            |Drop Arch (repeat)
 DROP  |E-F-G-H    |1-13       |18         |Arch       |0          |0          |0          |            |
 
@@ -42,3 +42,5 @@ DROP  |W          |1          |1          |Castle     |0          |0          |0
 DROP  |X          |1          |1          |King       |0          |0          |0          |            |Drop King
 DROP  |Y          |1          |1          |Queen      |0          |0          |0          |            |Drop Queen
 DROP  |Z          |1          |1          |Warden     |0          |0          |0          |            |Drop Warden
+
+RECALC|           |           |           |           |           |           |           |            |

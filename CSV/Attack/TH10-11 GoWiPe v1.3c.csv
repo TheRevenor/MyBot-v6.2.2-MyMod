@@ -65,3 +65,4 @@ DROP  |S          |10         |7          |Wiza       |1          |0          |5
 DROP  |I          |1          |1          |Rspell     |1          |0          |300        |           | Droping Rage Spell
 
 WAIT  |180-200    |           |           |           |           |           |           |           |
+RECALC|           |           |           |           |           |           |           |           |

@@ -39,31 +39,36 @@ Func DonateCC($Check = False)
 
 	Global $bSkipDonTroops = False, $bSkipDonSpells = False
 
-	If $bDonate = False Or $bDonationEnabled = False Then
-		;DonateStats by CDudz ==========================================================
-		If $debugSetlog = 1 Then SetLog("Current Donation=" & GuiCtrlRead($lblCurDonate) & " Donation Limit=" & GuiCtrlRead($iLimitDStats))
-		If GUICtrlRead($chkLimitDStats) = $GUI_CHECKED Then
-			$ichkLimitDStats = 1
-			If Int(GuiCtrlRead($lblCurDonate)) < Int(GuiCtrlRead($iLimitDStats)) Then
-				SetLog("Donations re-activated!", $COLOR_PURPLE)
-				$bDonationEnabled = True
-			ElseIf Int(GuiCtrlRead($lblCurDonate)) > Int(GuiCtrlRead($iLimitDStats)) Then
-				SetLog("Donation Disabled, Current Donation= " & GuiCtrlRead($lblCurDonate) & " > Donation Limit= " & GuiCtrlRead($iLimitDStats), $COLOR_ORANGE)
-				Return
-			EndIf
-		Else
-			$ichkLimitDStats = 0
-			If $debugsetlog = 1 Then Setlog("Donate Clan Castle troops skip", $COLOR_PURPLE)
-			Return ; exit func if no donate checkmarks
-		EndIf
-	ElseIf $bDonationEnabled = True And GuiCtrlRead($chkLimitDStats) = $GUI_CHECKED Then
-		If $debugSetlog = 1 Then SetLog("Current Donation=" & GuiCtrlRead($lblCurDonate) & " Donation Limit=" & GuiCtrlRead($iLimitDStats), $COLOR_PURPLE)
-		If Int(GuiCtrlRead($lblCurDonate)) > Int(GuiCtrlRead($iLimitDStats)) Then
-			$bDonationEnabled = False
-			SetLog("Donations de-activated! Donate maximum has reached!", $COLOR_PURPLE)
-			Return
-		EndIf
+	If $FirstStart = False And ($CurCamp >= ($TotalCamp * $fulltroop / 100) * .90) And $CommandStop = - 1 Then
+		If $debugsetlog = 1 Then Setlog("Total troops >90%, Skipped..", $COLOR_PURPLE)
+		Return ; skip donate if >90% full troop
 	EndIf
+	
+	If $bDonate = False Or $bDonationEnabled = False Then
+        ;DonateStats by CDudz ==========================================================
+        If $debugSetlog = 1 Then SetLog("Current Donation=" & GuiCtrlRead($lblCurDonate) & " Donation Limit=" & GuiCtrlRead($iLimitDStats))
+        If GUICtrlRead($chkLimitDStats) = $GUI_CHECKED Then
+            $ichkLimitDStats = 1
+            If Int(GuiCtrlRead($lblCurDonate)) < Int(GuiCtrlRead($iLimitDStats)) Then
+                SetLog("Donations re-activated!", $COLOR_PURPLE)
+                $bDonationEnabled = True
+            ElseIf Int(GuiCtrlRead($lblCurDonate)) > Int(GuiCtrlRead($iLimitDStats)) Then
+                SetLog("Donation Disabled, Current Donation= " & GuiCtrlRead($lblCurDonate) & " > Donation Limit= " & GuiCtrlRead($iLimitDStats), $COLOR_ORANGE)
+                Return
+            EndIf
+        Else
+            $ichkLimitDStats = 0
+            If $debugsetlog = 1 Then Setlog("Donate Clan Castle troops skip", $COLOR_PURPLE)
+            Return ; exit func if no donate checkmarks
+        EndIf
+    ElseIf $bDonationEnabled = True And GuiCtrlRead($chkLimitDStats) = $GUI_CHECKED Then
+        If $debugSetlog = 1 Then SetLog("Current Donation=" & GuiCtrlRead($lblCurDonate) & " Donation Limit=" & GuiCtrlRead($iLimitDStats), $COLOR_PURPLE)
+        If Int(GuiCtrlRead($lblCurDonate)) > Int(GuiCtrlRead($iLimitDStats)) Then
+            $bDonationEnabled = False
+            SetLog("Donations de-activated! Donate maximum has reached!", $COLOR_PURPLE)
+            Return
+        EndIf
+    EndIf
 
 	Local $hour = StringSplit(_NowTime(4), ":", $STR_NOCOUNT)
 
@@ -81,16 +86,36 @@ Func DonateCC($Check = False)
 		EndIf
 	EndIf
 
+
+	;<---- opens clan tab and verbose in log
 	ClickP($aAway, 1, 0, "#0167") ;Click Away
 	Setlog("Checking for Donate Requests in Clan Chat", $COLOR_BLUE)
 
 	ForceCaptureRegion()
 	If _CheckPixel($aChatTab, $bCapturePixel) = False Then ClickP($aOpenChat, 1, 0, "#0168") ; Clicks chat tab
 	If _Sleep($iDelayDonateCC1) Then Return
+	If _Sleep($iDelayDonateCC1) Then Return
+	If _Sleep($iDelayDonateCC1) Then Return
 
 	ClickP($aClanTab, 1, 0, "#0169") ; clicking clan tab
+	;<---- End opens clan tab and verbose in log
 
 	Local $Scroll
+	; add scroll here
+	While 1
+		ForceCaptureRegion()
+		;$Scroll = _PixelSearch(288, 640 + $bottomOffsetY, 290, 655 + $bottomOffsetY, Hex(0x588800, 6), 20)
+		$y = 90
+		$Scroll = _PixelSearch(293, 8 + $y, 295, 23 + $y, Hex(0xFFFFFF, 6), 20)
+		If IsArray($Scroll) Then
+			$bDonate = True
+			Click($Scroll[0], $Scroll[1], 1, 0, "#0172")
+			$y = 90
+			If _Sleep($iDelayDonateCC2 + 100) Then ExitLoop
+			ContinueLoop
+		EndIf
+		ExitLoop
+	WEnd
 	While $bDonate
 		checkAttackDisable($iTaBChkIdle) ; Early Take-A-Break detection
 
@@ -165,6 +190,14 @@ Func DonateCC($Check = False)
 
 			; Get remaining CC capacity of requested troops from your ClanMates
 			RemainingCCcapacity()
+			If GetCurTotalSpell() = 0 And $numBarracks = 0 And $numDarkBarracks = 0 Then
+				SetLog("Getting total Spells Available To be ready for Donation...", $COLOR_BLUE)
+				Click($aCloseChat[0], $aCloseChat[1], 1, 0, "#0173") ; required to close Chat tab
+				If _Sleep(500) Then Return
+				getArmySpellCount(True, True, True)
+				SetLog("Total DElixir Spells Available and can be donated : " & GetCurTotalDarkSpell(), $COLOR_BLUE)
+				ClickP($aOpenChat, 1, 0, "#0168") ; Open Chat Tab
+			EndIf
 
 			If $iTotalDonateCapacity <= 0 Then
 				Setlog("Clan Castle troops are full, skip troop donation...", $COLOR_ORANGE)
@@ -176,17 +209,26 @@ Func DonateCC($Check = False)
 			ElseIf $iTotalDonateSpellCapacity = -1 Then
 				; no message, this CC has no Spell capability
 				If $debugsetlog = 1 Then Setlog("This CC cannot accept spells, skip spell donation...", $COLOR_PURPLE)
+
 				$bSkipDonSpells = True
 			ElseIf GetCurTotalDarkSpell() = 0 Then
 				If $debugsetlog = 1 Then Setlog("No spells available, skip spell donation...", $COLOR_PURPLE)
+
 				$bSkipDonSpells = True
 			EndIf
 
+			If $bSkipDonTroops And $bSkipDonSpells Then
+				$bDonate = True
+				$y = $DonatePixel[1] + 50
+				ContinueLoop ; go to next button if cant read Castle Troops and Spells before the donate window opens
+			EndIf
 			; open Donate Window
 			If ($bSkipDonTroops = True And $bSkipDonSpells = True) Or DonateWindow($bOpen) = False Then
 				$bDonate = True
 				$y = $DonatePixel[1] + 50
-				ContinueLoop ; go to next button if donate window did not open
+				SetLog("Some kind of error - Exiting donate", $COLOR_RED)
+				ExitLoop ; Leave donate to prevent a bot hang condition
+
 			EndIf
 
 			If $bDonateTroop Or $bDonateSpell Then
@@ -274,14 +316,14 @@ Func DonateCC($Check = False)
 				If $debugsetlog = 1 Then Setlog("Troop/Spell All checkpoint.", $COLOR_PURPLE)
 
 				; read available donate cap again, and ByRef set the $bSkipDonTroops and $bSkipDonSpells flags
-				DonateWindowCap($bSkipDonTroops, $bSkipDonSpells)
-				If $bSkipDonTroops And $bSkipDonSpells Then
-					DonateWindow($bClose)
-					$bDonate = True
-					$y = $DonatePixel[1] + 50
-					If _Sleep($iDelayDonateCC2) Then ExitLoop
-					ContinueLoop ; go to next button if already donated max, maybe this is an impossible case..
-				EndIf
+				;				DonateWindowCap($bSkipDonTroops, $bSkipDonSpells)
+				;				If $bSkipDonTroops And $bSkipDonSpells Then
+				;					DonateWindow($bClose)
+				;					$bDonate = True
+				;					$y = $DonatePixel[1] + 50
+				;					If _Sleep($iDelayDonateCC2) Then ExitLoop
+				;					ContinueLoop ; go to next button if already donated max, maybe this is an impossible case..
+				;				EndIf
 
 				If $bDonateAllTroop And $bSkipDonTroops = False Then
 					If $debugsetlog = 1 Then Setlog("Troop All checkpoint.", $COLOR_PURPLE)
@@ -396,6 +438,7 @@ Func DonateCC($Check = False)
 			ClickP($aAway, 1, 0, "#0171")
 			If _Sleep($iDelayDonateCC2) Then ExitLoop
 		EndIf
+		;ck for more donate buttons
 		ForceCaptureRegion()
 		$DonatePixel = _MultiPixelSearch(202, $y, 224, 660 + $bottomOffsetY, 50, 1, Hex(0x98D057, 6), $aChatDonateBtnColors, 15)
 		If IsArray($DonatePixel) Then
@@ -404,15 +447,20 @@ Func DonateCC($Check = False)
 		Else
 			If $debugsetlog = 1 Then Setlog("No more Donate buttons found, closing chat ($y=" & $y & ")", $COLOR_PURPLE)
 		EndIf
+		; Scroll Down
 
 		ForceCaptureRegion()
 		;$Scroll = _PixelSearch(288, 640 + $bottomOffsetY, 290, 655 + $bottomOffsetY, Hex(0x588800, 6), 20)
-		$y = 90
-		$Scroll = _PixelSearch(293, 8 + $y, 295, 23 + $y, Hex(0xFFFFFF, 6), 20)
+		;$y = 90
+		;$Scroll = _PixelSearch(293, 8 + $y, 295, 23 + $y, Hex(0xFFFFFF, 6), 20)
+		$Scroll = _PixelSearch(293, 687 - 30, 295, 693 - 30, Hex(0xFFFFFF, 6), 20)
+
+
 		If IsArray($Scroll) Then
 			$bDonate = True
 			Click($Scroll[0], $Scroll[1], 1, 0, "#0172")
-			$y = 90
+			$y = 600
+
 			If _Sleep($iDelayDonateCC2) Then ExitLoop
 			ContinueLoop
 		EndIf
@@ -438,7 +486,7 @@ Func DonateCC($Check = False)
 			EndIf
 		EndIf
 	WEnd
-	
+
 	SetLog("-----------End Donate-----------", $COLOR_BLUE)
 	If _Sleep($iDelayDonateCC2) Then Return
 
@@ -595,8 +643,6 @@ Func DonateTroopType($Type, $Quant = 0, $Custom = False, $bDonateAll = False)
 			Local $plural = 0
 			If $Custom Then
 				If $Quant > 1 Then $plural = 1
-				;DonateStats =========================================
-				$DonatedValue = $Quant
 				If $bDonateAll Then $sTextToAll = " (to all requests)"
 				SetLog("Donating " & $Quant & " " & NameOfTroop($Type, $plural) & $sTextToAll, $COLOR_GREEN)
 				If $debugOCRdonate = 1 Then
@@ -606,13 +652,52 @@ Func DonateTroopType($Type, $Quant = 0, $Custom = False, $bDonateAll = False)
 					setlog("coordinate: " & 365 + ($Slot * 68) & "," & $DonationWindowY + 100 + $YComp, $color_red)
 					debugimagesave("LiveDonateCC-r" & $donaterow & "-c" & $donateposinrow & "-" & NameOfTroop($Type) & "_")
 				EndIf
-				If $debugOCRdonate = 0 Then Click(365 + ($Slot * 68), $DonationWindowY + 100 + $YComp, $Quant, $iDelayDonateCC3, "#0175")
+
+				If $debugOCRdonate = 0 Then
+					$icount = 0
+					For $x = 1 To $Quant
+						If _ColorCheck(_GetPixelColor(350 + ($Slot * 68), $DonationWindowY + 105 + $YComp, True), Hex(0x306ca8, 6), 20) Or _
+								_ColorCheck(_GetPixelColor(355 + ($Slot * 68), $DonationWindowY + 106 + $YComp, True), Hex(0x306ca8, 6), 20) Or _
+								_ColorCheck(_GetPixelColor(360 + ($Slot * 68), $DonationWindowY + 107 + $YComp, True), Hex(0x306ca8, 6), 20) Then ; check for 'blue'
+
+							Click(365 + ($Slot * 68), $DonationWindowY + 100 + $YComp, 1, $iDelayDonateCC3, "#0175")
+							;DonatedTroop($Type)
+							If _Sleep(1000) Then Return
+							$icount += 1
+						EndIf
+					Next
+					$Quant = $icount ; Count Troops Donated Clicks
+					;DonateStats =========================================
+					$DonatedValue = $Quant
+
+					; Adjust Values for donated troops to prevent a Double ghost donate to stats and train
+					If $Type >= $eBarb And $Type <= $eBowl Then
+						For $i = 0 To UBound($TroopName) - 1
+							If Eval("e" & $TroopName[$i]) = $Type Then
+								;Reduce iTotalDonateCapacity by troops donated
+								$iTotalDonateCapacity = $iTotalDonateCapacity - ($Quant * $TroopHeight[$i])
+								;If donated max allowed troop qty set $bSkipDonTroops = True
+								If $iDonTroopsLimit = $Quant Then
+									$bSkipDonTroops = True
+								EndIf
+							EndIf
+						Next
+						;Dark Troops
+						For $i = 0 To UBound($TroopDarkName) - 1
+							If Eval("e" & $TroopDarkName[$i]) = $Type Then
+								;Reduce iTotalDonateCapacity by troops donated
+								$iTotalDonateCapacity = $iTotalDonateCapacity - ($Quant * $TroopDarkHeight[$i])
+								;If donated max allowed troop qty set $bSkipDonTroops = True
+								If $iDonTroopsLimit = $Quant Then
+									$bSkipDonTroops = True
+								EndIf
+							EndIf
+						Next
+					EndIf
+				EndIf
+
 			Else
 				If $iDonTroopsQuantity > 1 Then $plural = 1
-				;DonateStats =========================================
-				$DonatedValue = $iDonTroopsQuantity
-				If $bDonateAll Then $sTextToAll = " (to all requests)"
-				SetLog("Donating " & $iDonTroopsQuantity & " " & NameOfTroop($Type, $plural) & $sTextToAll, $COLOR_GREEN)
 				If $debugOCRdonate = 1 Then
 					Setlog("donate", $color_RED)
 					Setlog("row: " & $donaterow, $color_RED)
@@ -620,34 +705,80 @@ Func DonateTroopType($Type, $Quant = 0, $Custom = False, $bDonateAll = False)
 					setlog("coordinate: " & 365 + ($Slot * 68) & "," & $DonationWindowY + 100 + $YComp, $color_red)
 					debugimagesave("LiveDonateCC-r" & $donaterow & "-c" & $donateposinrow & "-" & NameOfTroop($Type) & "_")
 				EndIf
-				If $debugOCRdonate = 0 Then Click(365 + ($Slot * 68), $DonationWindowY + 100 + $YComp, $iDonTroopsQuantity, $iDelayDonateCC3, "#0600")
+				If $debugOCRdonate = 0 Then
+					$icount = 0
+					For $x = 1 To $iDonTroopsQuantity
+						If _ColorCheck(_GetPixelColor(350 + ($Slot * 68), $DonationWindowY + 105 + $YComp, True), Hex(0x306ca8, 6), 20) Or _
+								_ColorCheck(_GetPixelColor(355 + ($Slot * 68), $DonationWindowY + 106 + $YComp, True), Hex(0x306ca8, 6), 20) Or _
+								_ColorCheck(_GetPixelColor(360 + ($Slot * 68), $DonationWindowY + 107 + $YComp, True), Hex(0x306ca8, 6), 20) Then ; check for 'blue'
+
+							Click(365 + ($Slot * 68), $DonationWindowY + 100 + $YComp, 1, $iDelayDonateCC3, "#0175")
+							;DonatedTroop($Type)
+							If _Sleep(1000) Then Return
+							$icount += 1
+						EndIf
+					Next
+					$iDonTroopsQuantity = $icount ; Count Troops Donated Clicks
+					;DonateStats =========================================
+					$DonatedValue = $iDonTroopsQuantity
+
+					If $bDonateAll Then $sTextToAll = " (to all requests)"
+					SetLog("Donating " & $iDonTroopsQuantity & " " & NameOfTroop($Type, $plural) & $sTextToAll, $COLOR_GREEN)
+
+					; Adjust Values for donated troops to prevent a Double ghost donate to stats and train
+					If $Type >= $eBarb And $Type <= $eBowl Then
+						For $i = 0 To UBound($TroopName) - 1
+							If Eval("e" & $TroopName[$i]) = $Type Then
+								;Reduce iTotalDonateCapacity by troops donated
+								$iTotalDonateCapacity = $iTotalDonateCapacity - ($iDonTroopsQuantity * $TroopHeight[$i])
+								;If donated max allowed troop qty set $bSkipDonTroops = True
+								If $iDonTroopsLimit = $iDonTroopsQuantity Then
+									$bSkipDonTroops = True
+								EndIf
+							EndIf
+						Next
+						;Dark Troops
+						For $i = 0 To UBound($TroopDarkName) - 1
+							If Eval("e" & $TroopDarkName[$i]) = $Type Then
+								;Reduce iTotalDonateCapacity by troops donated
+								$iTotalDonateCapacity = $iTotalDonateCapacity - ($iDonTroopsQuantity * $TroopDarkHeight[$i])
+								;If donated max allowed troop qty set $bSkipDonTroops = True
+								If $iDonTroopsLimit = $iDonTroopsQuantity Then
+									$bSkipDonTroops = True
+								EndIf
+							EndIf
+						Next
+					EndIf
+				EndIf
 			EndIf
 
 			$bDonate = True
 
 			; Assign the donated quantity troops to train : $Don $TroopName
-			If $Custom Then
-				For $i = 0 To UBound($TroopName) - 1
-					If Eval("e" & $TroopName[$i]) = $Type Then
-						Assign("Don" & $TroopName[$i], Eval("Don" & $TroopName[$i]) + $Quant)
-					EndIf
-				Next
-				For $i = 0 To UBound($TroopDarkName) - 1
-					If Eval("e" & $TroopDarkName[$i]) = $Type Then
-						Assign("Don" & $TroopDarkName[$i], Eval("Don" & $TroopDarkName[$i]) + $Quant)
-					EndIf
-				Next
-			Else
-				For $i = 0 To UBound($TroopName) - 1
-					If Eval("e" & $TroopName[$i]) = $Type Then
-						Assign("Don" & $TroopName[$i], Eval("Don" & $TroopName[$i]) + $iDonTroopsQuantity)
-					EndIf
-				Next
-				For $i = 0 To UBound($TroopDarkName) - 1
-					If Eval("e" & $TroopDarkName[$i]) = $Type Then
-						Assign("Don" & $TroopDarkName[$i], Eval("Don" & $TroopDarkName[$i]) + $iDonTroopsQuantity)
-					EndIf
-				Next
+			If $FirstStart <> True Then
+				If $Custom Then
+					For $i = 0 To UBound($TroopName) - 1
+						If Eval("e" & $TroopName[$i]) = $Type Then
+							Assign("Don" & $TroopName[$i], Eval("Don" & $TroopName[$i]) + $Quant)
+						EndIf
+					Next
+					For $i = 0 To UBound($TroopDarkName) - 1
+						If Eval("e" & $TroopDarkName[$i]) = $Type Then
+							Assign("Don" & $TroopDarkName[$i], Eval("Don" & $TroopDarkName[$i]) + $Quant)
+						EndIf
+					Next
+				Else
+					For $i = 0 To UBound($TroopName) - 1
+						If Eval("e" & $TroopName[$i]) = $Type Then
+							Assign("Don" & $TroopName[$i], Eval("Don" & $TroopName[$i]) + $iDonTroopsQuantity)
+						EndIf
+					Next
+					For $i = 0 To UBound($TroopDarkName) - 1
+						If Eval("e" & $TroopDarkName[$i]) = $Type Then
+							Assign("Don" & $TroopDarkName[$i], Eval("Don" & $TroopDarkName[$i]) + $iDonTroopsQuantity)
+						EndIf
+					Next
+				EndIf
 			EndIf
 			; End
 
@@ -657,10 +788,12 @@ Func DonateTroopType($Type, $Quant = 0, $Custom = False, $bDonateAll = False)
 			SetLog("No " & NameOfTroop($Type) & " available to donate..", $COLOR_RED)
 		EndIf
 	Else ; spells
+		SetLog("Else Spells Condition Matched", $COLOR_ORANGE)
 		If _ColorCheck(_GetPixelColor(350 + ($Slot * 68), $DonationWindowY + 105 + $YComp, True), Hex(0x6038B0, 6), 20) Or _
 				_ColorCheck(_GetPixelColor(355 + ($Slot * 68), $DonationWindowY + 106 + $YComp, True), Hex(0x6038B0, 6), 20) Or _
 				_ColorCheck(_GetPixelColor(360 + ($Slot * 68), $DonationWindowY + 107 + $YComp, True), Hex(0x6038B0, 6), 20) Then ; check for 'purple'
 			If $bDonateAll Then $sTextToAll = " (to all requests)"
+			SetLog("Else Spell Colors Conditions Matched ALSO", $COLOR_ORANGE)
 			SetLog("Donating " & $iDonSpellsQuantity & " " & NameOfTroop($Type) & $sTextToAll, $COLOR_GREEN)
 			;Setlog("click donate")
 			If $debugOCRdonate = 1 Then
@@ -670,7 +803,10 @@ Func DonateTroopType($Type, $Quant = 0, $Custom = False, $bDonateAll = False)
 				setlog("coordinate: " & 365 + ($Slot * 68) & "," & $DonationWindowY + 100 + $YComp, $color_red)
 				debugimagesave("LiveDonateCC-r" & $donaterow & "-c" & $donateposinrow & "-" & NameOfTroop($Type) & "_")
 			EndIf
-			If $debugOCRdonate = 0 Then Click(365 + ($Slot * 68), $DonationWindowY + 100 + $YComp, $iDonSpellsQuantity, $iDelayDonateCC3, "#0600")
+			If $debugOCRdonate = 0 Then
+				Click(365 + ($Slot * 68), $DonationWindowY + 100 + $YComp, $iDonSpellsQuantity, $iDelayDonateCC3, "#0600")
+				;DonatedSpell($Type)
+			EndIf
 
 			$bDonate = True
 
@@ -686,76 +822,60 @@ Func DonateTroopType($Type, $Quant = 0, $Custom = False, $bDonateAll = False)
 			SetLog("No " & NameOfTroop($Type) & " available to donate..", $COLOR_RED)
 		EndIf
 	EndIf
-	
+
 	;===================================== DonateStats =====================================;
-
-	If $bDonate And $ichkDStats = 1 And $DonatedValue <> 0 Then
-		If $iImageCompare > 90 And $ImageExist <> "" Then
-			$TroopCol = GetTroopColumn(NameOfTroop($Type, 1))
-			If $debugSetlog = 1 Then SetLog("DonateStats: Found Troop Name:" & NameOfTroop($Type, 1) & " at column: " & $TroopCol, $COLOR_PURPLE)
-
-			$iSearch = _GUICtrlListView_FindInText($lvDonatedTroops, $ImageExist)
-			If $iSearch <> -1 Then
-				If $debugSetlog = 1 Then SetLog("ImageCompare tested True, $iSearch=" & $iSearch, $COLOR_PURPLE)
-				$TroopValue = _GUICtrlListView_GetItemText($lvDonatedTroops, $iSearch, $TroopCol)
-
-				_GUICtrlListView_SetItem($lvDonatedTroops, $DonatedValue + $TroopValue, $iSearch, $TroopCol)
-				SetLog("DonateStats: updated for " & $ImageExist & " with " & $TroopValue & " " & NameOfTroop($Type, 1), $COLOR_GREEN)
-			Else
-				SetLog("DonateStats: Unable to locate " & $ImageExist & " DonateStats, update failed.", $COLOR_RED)
-			EndIf
-
-		Else
-			If FileExists($dirTemp & "DonateStats\" & $DonateFile) Then
-				SetLog("DonateStats: Updating to same clan member with: " & $DonatedValue & " " & NameOfTroop($Type, 1), $COLOR_GREEN)
-			Else
-				FileCopy($dirTemp & $DonateFile, $dirTemp & "DonateStats\", $FC_OVERWRITE + $FC_CREATEPATH)
-				SetLog("DonateStats: Adding new clan member with: " & $DonatedValue & " " & NameOfTroop($Type, 1), $COLOR_GREEN)
-
-				$Index = _GUIImageList_AddBitmap($ImageList, $dirTemp & "DonateStats\" & $DonateFile)
-
-				$iListCount = _GUIImageList_GetImageCount($ImageList)
-
-				_GUICtrlListView_AddItem($lvDonatedTroops, $DonateFile, $iListCount-1)
-				_GUICtrlListView_SetImageList($lvDonatedTroops, $ImageList, 1)
-
-			EndIf
-
-			$TroopCol = GetTroopColumn(NameOfTroop($Type, 1))
-			If $debugSetlog = 1 Then SetLog("DonateStats: Found Troop Name:" & NameOfTroop($Type, 1) & " at column: " & $TroopCol, $COLOR_PURPLE)
-
-			$iSearch = _GUICtrlListView_FindInText($lvDonatedTroops, $DonateFile)
-			If $iSearch <> -1 Then
-				_GUICtrlListView_SetItem($lvDonatedTroops, $DonatedValue, $iSearch, $TroopCol)
-				SetLog("DonateStats: updated for " & $DonateFile & " with " & $DonatedValue & " " & NameOfTroop($Type, 1), $COLOR_GREEN)
-			Else
-				SetLog("DonateStats: Unable to locate existing image in DonateStats, update failed.", $COLOR_RED)
-			EndIf
-
-		EndIf
-
-		;Set Totals
-		If $iSearch <> -1 Then
-			Local $GetLastValue = _GUICtrlListView_GetItemText($lvDonatedTroops, 0, $TroopCol)
-			_GUICtrlListView_SetItem($lvDonatedTroops, $DonatedValue + $GetLastValue, 0, $TroopCol)
-			SetLog("Totals Donation Updated: " & $DonatedValue + $GetLastValue & " Troops Or Spell", $COLOR_BLUE)
-		Else
-			SetLog("DonateStats: There were errors, donated '" & NameOfTroop($Type, 1) & "' counts/totals skipped.", $COLOR_RED)
-		EndIf
-
-		;Get Total current donations
-		Local $CurDonated = 0
-		$aResult = _GUICtrlListView_GetItemTextArray($lvDonatedTroops, 0)
-
-		For $x = 1 To $aResult[0]
-			$CurDonated += $aResult[$x]
-		Next
-		SetLog("Total Donations: " & $CurDonated)
-		GUICtrlSetData($lblCurDonate, $CurDonated)
-
-	EndIf
-	;===================================== End DonateStats =====================================;
-
+    If $bDonate And $ichkDStats = 1 And $DonatedValue <> 0 Then
+        If $iImageCompare > 90 And $ImageExist <> "" Then
+            $TroopCol = GetTroopColumn(NameOfTroop($Type, 1))
+            If $debugSetlog = 1 Then SetLog("DonateStats: Found Troop Name:" & NameOfTroop($Type, 1) & " at column: " & $TroopCol, $COLOR_PURPLE)
+            $iSearch = _GUICtrlListView_FindInText($lvDonatedTroops, $ImageExist)
+            If $iSearch <> -1 Then
+                If $debugSetlog = 1 Then SetLog("ImageCompare tested True, $iSearch=" & $iSearch, $COLOR_PURPLE)
+                $TroopValue = _GUICtrlListView_GetItemText($lvDonatedTroops, $iSearch, $TroopCol)
+                _GUICtrlListView_SetItem($lvDonatedTroops, $DonatedValue + $TroopValue, $iSearch, $TroopCol)
+                SetLog("DonateStats: updated for " & $ImageExist & " with " & $TroopValue & " " & NameOfTroop($Type, 1), $COLOR_GREEN)
+            Else
+                SetLog("DonateStats: Unable to locate " & $ImageExist & " DonateStats, update failed.", $COLOR_RED)
+            EndIf
+        Else
+            If FileExists($dirTemp & "DonateStats\" & $DonateFile) Then
+                SetLog("DonateStats: Updating to same clan member with: " & $DonatedValue & " " & NameOfTroop($Type, 1), $COLOR_GREEN)
+            Else
+                FileCopy($dirTemp & $DonateFile, $dirTemp & "DonateStats\", $FC_OVERWRITE + $FC_CREATEPATH)
+                SetLog("DonateStats: Adding new clan member with: " & $DonatedValue & " " & NameOfTroop($Type, 1), $COLOR_GREEN)
+                $Index = _GUIImageList_AddBitmap($ImageList, $dirTemp & "DonateStats\" & $DonateFile)
+                $iListCount = _GUIImageList_GetImageCount($ImageList)
+                _GUICtrlListView_AddItem($lvDonatedTroops, $DonateFile, $iListCount-1)
+                _GUICtrlListView_SetImageList($lvDonatedTroops, $ImageList, 1)
+            EndIf
+            $TroopCol = GetTroopColumn(NameOfTroop($Type, 1))
+            If $debugSetlog = 1 Then SetLog("DonateStats: Found Troop Name:" & NameOfTroop($Type, 1) & " at column: " & $TroopCol, $COLOR_PURPLE)
+            $iSearch = _GUICtrlListView_FindInText($lvDonatedTroops, $DonateFile)
+            If $iSearch <> -1 Then
+                _GUICtrlListView_SetItem($lvDonatedTroops, $DonatedValue, $iSearch, $TroopCol)
+                SetLog("DonateStats: updated for " & $DonateFile & " with " & $DonatedValue & " " & NameOfTroop($Type, 1), $COLOR_GREEN)
+            Else
+                SetLog("DonateStats: Unable to locate existing image in DonateStats, update failed.", $COLOR_RED)
+            EndIf
+        EndIf
+        ;Set Totals
+        If $iSearch <> -1 Then
+            Local $GetLastValue = _GUICtrlListView_GetItemText($lvDonatedTroops, 0, $TroopCol)
+            _GUICtrlListView_SetItem($lvDonatedTroops, $DonatedValue + $GetLastValue, 0, $TroopCol)
+            SetLog("Totals Donation Updated: " & $DonatedValue + $GetLastValue & " Troops Or Spell", $COLOR_BLUE)
+        Else
+            SetLog("DonateStats: There were errors, donated '" & NameOfTroop($Type, 1) & "' counts/totals skipped.", $COLOR_RED)
+        EndIf
+        ;Get Total current donations
+        Local $CurDonated = 0
+        $aResult = _GUICtrlListView_GetItemTextArray($lvDonatedTroops, 0)
+        For $x = 1 To $aResult[0]
+            $CurDonated += $aResult[$x]
+        Next
+        SetLog("Total Donations: " & $CurDonated)
+        GUICtrlSetData($lblCurDonate, $CurDonated)
+    EndIf
+    ;===================================== End DonateStats =====================================;
 EndFunc   ;==>DonateTroopType
 
 Func DonateWindow($Open = True)
@@ -785,56 +905,40 @@ Func DonateWindow($Open = True)
 	Local $DonatePixelCheck = _MultiPixelSearch($iLeft, $iTop, $iRight, $iBottom, 50, 1, Hex(0x98D057, 6), $aChatDonateBtnColors, 15)
 	If IsArray($DonatePixelCheck) Then
 		;===================================== DonateStats =====================================;
-		FileDelete($dirTemp & "*.bmp")
-
-		$iPosY = $DonatePixel[1] - 49
-		_CaptureRegion(31, $iPosY, 170, $iPosY + 25, True)
-
-		Local $Date = @YEAR & "-" & @MON & "-" & @MDAY
-		Local $Time = @HOUR & "." & @MIN & "." & @SEC
-
-		$DonateFile = $Date & "__" & $Time & ".bmp"
-
-		_GDIPlus_ImageSaveToFile($hBitmap, $dirTemp & $DonateFile)
-
-		If $debugSetlog = 1 Then SetLog("DonateStats: Capture clan member name to file " & $DonateFile, $COLOR_PURPLE)
-
-		_GDIPlus_BitmapDispose($hBitmap)
-		_WinAPI_DeleteObject($hBitmap)
-
-		If $ichkDStats = 1 Then
-
-			$iImageCompare = False
-			$ImageExist = ""
-			$DonatedValue = 0
-
-			$bFileList = _FileListToArrayRec($dirTemp & "DonateStats\", "*.bmp", 1, 0, 1)
-			If Not @error And IsArray($bFileList) Then
-				If $debugSetlog = 1 Then SetLog("DonateStats: ImageCompare Checkpoint.", $COLOR_PURPLE)
-
-				For $y = 1 To $bFileList[0]
-
-					$iImageCompare = CompareDBitmaps($DonateFile, $bFileList[$y])
-					If $debugSetlog = 1 Then SetLog("DonateStats: Imagecompare result: " & $iImageCompare & "% match!", $COLOR_PURPLE)
-					If $iImageCompare > 90 Then
-						$ImageExist = $bFileList[$y]
-						If $debugSetlog = 1 Then SetLog("$ImageCompare Success File " & $DonateFile & " = " & $bFileList[$y], $COLOR_GREEN)
-						ExitLoop
-					EndIf
-
-					$ImageExist = ""
-				Next
-
-			Else
-				If @error = 1 Then
-					;SetLog("Clan Castle troops are full Or No existing images to compare", $COLOR_ORANGE)
-				EndIf
-			EndIf
-
-		EndIf
-
-		;===================================== End DonateStats =====================================;
-		
+        FileDelete($dirTemp & "*.bmp")
+        $iPosY = $DonatePixel[1] - 49
+        _CaptureRegion(31, $iPosY, 170, $iPosY + 25, True)
+        Local $Date = @YEAR & "-" & @MON & "-" & @MDAY
+        Local $Time = @HOUR & "." & @MIN & "." & @SEC
+        $DonateFile = $Date & "__" & $Time & ".bmp"
+        _GDIPlus_ImageSaveToFile($hBitmap, $dirTemp & $DonateFile)
+        If $debugSetlog = 1 Then SetLog("DonateStats: Capture clan member name to file " & $DonateFile, $COLOR_PURPLE)
+        _GDIPlus_BitmapDispose($hBitmap)
+        _WinAPI_DeleteObject($hBitmap)
+        If $ichkDStats = 1 Then
+            $iImageCompare = False
+            $ImageExist = ""
+            $DonatedValue = 0
+            $bFileList = _FileListToArrayRec($dirTemp & "DonateStats\", "*.bmp", 1, 0, 1)
+            If Not @error And IsArray($bFileList) Then
+                If $debugSetlog = 1 Then SetLog("DonateStats: ImageCompare Checkpoint.", $COLOR_PURPLE)
+                For $y = 1 To $bFileList[0]
+                    $iImageCompare = CompareDBitmaps($DonateFile, $bFileList[$y])
+                    If $debugSetlog = 1 Then SetLog("DonateStats: Imagecompare result: " & $iImageCompare & "% match!", $COLOR_PURPLE)
+                    If $iImageCompare > 90 Then
+                        $ImageExist = $bFileList[$y]
+                        If $debugSetlog = 1 Then SetLog("$ImageCompare Success File " & $DonateFile & " = " & $bFileList[$y], $COLOR_GREEN)
+                        ExitLoop
+                    EndIf
+                    $ImageExist = ""
+                Next
+            Else
+                If @error = 1 Then
+                    ;SetLog("Clan Castle troops are full Or No existing images to compare", $COLOR_ORANGE)
+                EndIf
+            EndIf
+        EndIf
+        ;===================================== End DonateStats =====================================;
 		Click($DonatePixel[0] + 50, $DonatePixel[1] + 10, 1, 0, "#0174")
 	Else
 		If $debugsetlog = 1 Then SetLog("Could not find the Donate Button!", $COLOR_PURPLE)
@@ -855,7 +959,7 @@ Func DonateWindow($Open = True)
 	; Will search in $Y column = 410 for the first pure white color and determinate that position the $DonationWindowTemp
 	$DonationWindowY = 0
 
-	Local $aDonWinOffColors[2][3] = [[0xFFFFFF, 0, 2], [0xD7D5CB, 0, 209]]
+	Local $aDonWinOffColors[2][3] = [[0xFFFFFF, 0, 2], [0xc7c5bc, 0, 209]]
 	Local $aDonationWindow = _MultiPixelSearch(409, 0, 410, $DEFAULT_HEIGHT, 1, 1, Hex(0xFFFFFF, 6), $aDonWinOffColors, 10)
 
 	If IsArray($aDonationWindow) Then
@@ -913,8 +1017,14 @@ Func DonateWindowCap(ByRef $bSkipDonTroops, ByRef $bSkipDonSpells)
 		EndIf
 	EndIf
 
-	If $iDonTroopsAv = $iDonTroopsLimit Then $bSkipDonTroops = True
-	If $iDonSpellsAv = $iDonSpellsLimit Then $bSkipDonSpells = True
+	If $iDonTroopsAv = $iDonTroopsLimit Then
+		$bSkipDonTroops = True
+		SetLog("Donate Troop Limit Reached")
+	EndIf
+	If $iDonSpellsAv = $iDonSpellsLimit Then
+		$bSkipDonSpells = True
+		SetLog("Donate Spell Limit Reached")
+	EndIf
 
 	If $bSkipDonTroops = True And $bSkipDonSpells = True And $iDonTroopsAv < $iDonTroopsLimit And $iDonSpellsAv < $iDonSpellsLimit Then
 		Setlog("Donate Troops: " & $iDonTroopsAv & "/" & $iDonTroopsLimit & ", Spells: " & $iDonSpellsAv & "/" & $iDonSpellsLimit)
@@ -962,9 +1072,15 @@ Func RemainingCCcapacity()
 		If $aTempCapTroops[0] >= 2 Then
 			;  Note - stringsplit always returns an array even if no values split!
 			If $debugsetlog = 1 Then Setlog("$aTempCapTroops splitted :" & $aTempCapTroops[1] & "/" & $aTempCapTroops[2], $COLOR_PURPLE)
-			If $aTempCapTroops[2] > 0 Then
+			If $aTempCapTroops[2] >= 0 Then
 				$iDonatedTroops = $aTempCapTroops[1]
 				$iCapTroopsTotal = $aTempCapTroops[2]
+				If $iCapTroopsTotal = 0 Then
+					$iCapTroopsTotal = 30
+				EndIf
+				If $iCapTroopsTotal = 5 Then
+					$iCapTroopsTotal = 35
+				EndIf
 			EndIf
 		Else
 			Setlog("Error reading the Castle Troop Capacity...", $COLOR_RED) ; log if there is read error

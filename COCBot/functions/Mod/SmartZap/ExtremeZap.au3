@@ -21,13 +21,19 @@ Func ExtremeZap()
 	If $ichkExtLightSpell <> 1 Then Return $performedZap
 		SetLog("====== Your Activate ExtremeZap Mode ======", $COLOR_RED)
 
-	Local $aDrills
-
+	; Check match mode
+	If $ichkSmartZapDB = 1 And $iMatchMode <> $DB Then
+		SetLog("Not a dead base so lets just go home!", $COLOR_ORANGE)
+		Return $performedZap
+	EndIf
+	
 	If getDarkElixirStorageFull() Then
 		SetLog("Your Dark Elixir Storage is full, no need to zap!", $COLOR_FUCHSIA)
 		Return $performedZap
 	EndIf
 
+	Local $aDrills
+	
 	; Get Drill locations and info
 	Local $listPixelByLevel = getDrillArray()
 	Local $aDarkDrills = drillSearch($listPixelByLevel)
@@ -44,7 +50,7 @@ Func ExtremeZap()
 	Else
 		SetLog("Number of Dark Elixir Drills: " & $numDrills, $COLOR_FUCHSIA)
 	EndIf
-
+	
 	; Get the number of lightning spells
 	$numSpells = $CurLightningSpell
 	If $numSpells = 0 Then
@@ -110,13 +116,16 @@ Func ExtremeZap()
 		If $skippedZap = False Then
 			$strikeGain = $oldSearchDark - $searchDark
 			$numLSpellsUsed += 1
-		EndIf
 
-		If $aDarkDrills[0][1] <> -1 Then
-			$expectedDE = 81
-		Else
-			$expectedDE = -1
-		EndIf
+			; Get the DE Value after ExtremeZap has performed its actions.
+			$searchDark = getDarkElixir()
+			
+			; Check to make sure we actually zapped
+			If $aDarkDrills[0][1] <> -1 Then
+				$expectedDE = 81
+			Else
+				$expectedDE = -1
+			EndIf
 
 			; If change in DE is less than expected, remove the Drill from list. else, subtract change from assumed total
 			If $strikeGain < $expectedDE And $expectedDE <> -1 Then
@@ -130,10 +139,8 @@ Func ExtremeZap()
 
 			$SmartZapGain += $strikeGain
 			SetLog("DE from last zap: " & $strikeGain & ", Total DE from ExtremeZap: " & $SmartZapGain, $COLOR_FUCHSIA)
-
-			; Get the DE Value after ExtremeZap has performed its actions.
-			$searchDark = getDarkElixir()
-			
+		EndIf
+		
 		; Resort the array
 		_ArraySort($aDarkDrills, 1, 0, 0, 3)
 

@@ -82,6 +82,15 @@ Func SetComboTroopComp()
 	Local $bWasRedraw = SetRedrawBotWindow(False)
 	HideBarrackControls()
 	HideCustomControls()
+	Local $ArmyCampTemp = 0
+
+	If GUICtrlRead($chkTotalCampForced) = $GUI_CHECKED Then
+		$ArmyCampTemp = Floor(GUICtrlRead($txtTotalCampForced) * GUICtrlRead($txtFullTroop)/100)
+	Else
+		$ArmyCampTemp = Floor($TotalCamp * GUICtrlRead($txtFullTroop)/100)
+	EndIf
+
+	Local $TotalTroopsTOtrain = 0
 	Switch _GUICtrlComboBox_GetCurSel($cmbTroopComp)
 		Case 0
 			_GUI_Value_STATE("SHOW", $groupTroopsArch & "#" & $groupTroopsTot)
@@ -91,7 +100,7 @@ Func SetComboTroopComp()
 			For $i = 0 To UBound($TroopDarkName) - 1
 				GUICtrlSetData(Eval("txtNum" & $TroopDarkName[$i]), "0")
 			Next
-			GUICtrlSetData($txtNumArch, "100")
+			GUICtrlSetData($txtNumArch, $ArmyCampTemp)
 		Case 1
 			_GUI_Value_STATE("SHOW", $groupTroopsBarB & "#" & $groupTroopsTot)
 			For $i = 0 To UBound($TroopName) - 1
@@ -100,7 +109,7 @@ Func SetComboTroopComp()
 			For $i = 0 To UBound($TroopDarkName) - 1
 				GUICtrlSetData(Eval("txtNum" & $TroopDarkName[$i]), "0")
 			Next
-			GUICtrlSetData($txtNumBarb, "100")
+			GUICtrlSetData($txtNumBarb, $ArmyCampTemp)
 		Case 2
 			_GUI_Value_STATE("SHOW", $groupTroopsGobl & "#" & $groupTroopsTot)
 			For $i = 0 To UBound($TroopName) - 1
@@ -109,7 +118,7 @@ Func SetComboTroopComp()
 			For $i = 0 To UBound($TroopDarkName) - 1
 				GUICtrlSetData(Eval("txtNum" & $TroopDarkName[$i]), "0")
 			Next
-			GUICtrlSetData($txtNumGobl, "100")
+			GUICtrlSetData($txtNumGobl, $ArmyCampTemp)
 		Case 3
 			_GUI_Value_STATE("SHOW", $groupTroopsArch & "#" & $groupTroopsTot)
 			_GUI_Value_STATE("SHOW", $groupTroopsBarB & "#" & $groupTroopsTot)
@@ -119,8 +128,8 @@ Func SetComboTroopComp()
 			For $i = 0 To UBound($TroopDarkName) - 1
 				GUICtrlSetData(Eval("txtNum" & $TroopDarkName[$i]), "0")
 			Next
-			GUICtrlSetData($txtNumBarb, "50")
-			GUICtrlSetData($txtNumArch, "50")
+			GUICtrlSetData($txtNumBarb, Ceiling($ArmyCampTemp/2))
+			GUICtrlSetData($txtNumArch, Floor($ArmyCampTemp/2))
 		Case 4
 			_GUI_Value_STATE("SHOW", $groupTroopsArch & "#" & $groupTroopsTot)
 			_GUI_Value_STATE("SHOW", $groupTroopsBarB & "#" & $groupTroopsTot)
@@ -132,11 +141,16 @@ Func SetComboTroopComp()
 			For $i = 0 To UBound($TroopDarkName) - 1
 				GUICtrlSetData(Eval("txtNum" & $TroopDarkName[$i]), "0")
 			Next
-			GUICtrlSetData($txtNumBarb, "60")
-			GUICtrlSetData($txtNumArch, "30")
-			GUICtrlSetData($txtNumGobl, "10")
-			GUICtrlSetData($txtNumGiant, $GiantComp)
+			$TotalTroopsTOtrain = 0
+			GUICtrlSetData($txtNumGiant, 8)
+			$TotalTroopsTOtrain = 8 * 5
+
+			GUICtrlSetData($txtNumBarb, Ceiling((($ArmyCampTemp - $TotalTroopsTOtrain)/100)*60))
+			GUICtrlSetData($txtNumArch, Floor((($ArmyCampTemp - $TotalTroopsTOtrain)/100)*30))
+			GUICtrlSetData($txtNumGobl, Ceiling((($ArmyCampTemp - $TotalTroopsTOtrain)/100)*10))
+
 		Case 5
+			$TotalTroopsTOtrain = 0
 			_GUI_Value_STATE("SHOW", $groupTroopsArch & "#" & $groupTroopsTot)
 			_GUI_Value_STATE("SHOW", $groupTroopsBarB & "#" & $groupTroopsTot)
 			_GUI_Value_STATE("SHOW", $groupTroopsGiant)
@@ -146,9 +160,13 @@ Func SetComboTroopComp()
 			For $i = 0 To UBound($TroopDarkName) - 1
 				GUICtrlSetData(Eval("txtNum" & $TroopDarkName[$i]), "0")
 			Next
-			GUICtrlSetData($txtNumBarb, "50")
-			GUICtrlSetData($txtNumArch, "50")
-			GUICtrlSetData($txtNumGiant, $GiantComp)
+			$TotalTroopsTOtrain = 0
+			GUICtrlSetData($txtNumGiant, 12)
+			$TotalTroopsTOtrain = 12 * 5
+
+			GUICtrlSetData($txtNumBarb, Ceiling((($ArmyCampTemp - $TotalTroopsTOtrain)/100)*60))
+			GUICtrlSetData($txtNumArch, Floor((($ArmyCampTemp - $TotalTroopsTOtrain)/100)*40))
+
 		Case 6
 			_GUI_Value_STATE("SHOW", $groupTroopsArch & "#" & $groupTroopsTot)
 			_GUI_Value_STATE("SHOW", $groupTroopsBarB & "#" & $groupTroopsTot)
@@ -159,10 +177,11 @@ Func SetComboTroopComp()
 			For $i = 0 To UBound($TroopDarkName) - 1
 				GUICtrlSetData(Eval("txtNum" & $TroopDarkName[$i]), "0")
 			Next
-			GUICtrlSetData($txtNumBarb, "60")
-			GUICtrlSetData($txtNumArch, "30")
-			GUICtrlSetData($txtNumGobl, "10")
+			GUICtrlSetData($txtNumBarb, Ceiling((($ArmyCampTemp - $TotalTroopsTOtrain)/100)*60))
+			GUICtrlSetData($txtNumArch, Floor((($ArmyCampTemp - $TotalTroopsTOtrain)/100)*30))
+			GUICtrlSetData($txtNumGobl, Ceiling((($ArmyCampTemp - $TotalTroopsTOtrain)/100)*10))
 		Case 7
+			$TotalTroopsTOtrain = 0
 			_GUI_Value_STATE("SHOW", $groupTroopsArch & "#" & $groupTroopsTot)
 			_GUI_Value_STATE("SHOW", $groupTroopsBarB & "#" & $groupTroopsTot)
 			_GUI_Value_STATE("SHOW", $groupTroopsGobl & "#" & $groupTroopsTot)
@@ -174,12 +193,18 @@ Func SetComboTroopComp()
 			For $i = 0 To UBound($TroopDarkName) - 1
 				GUICtrlSetData(Eval("txtNum" & $TroopDarkName[$i]), "0")
 			Next
-			GUICtrlSetData($txtNumBarb, "60")
-			GUICtrlSetData($txtNumArch, "30")
-			GUICtrlSetData($txtNumGobl, "10")
-			GUICtrlSetData($txtNumGiant, $GiantComp)
-			GUICtrlSetData($txtNumWall, $WallComp)
-			GUICtrlSetData($txtNumWiza, $WizaComp)
+			$TotalTroopsTOtrain = 0
+
+ 			GUICtrlSetData($txtNumGiant, 8)
+ 			GUICtrlSetData($txtNumWall, 6)
+
+ 			$TotalTroopsTOtrain += 8 * 5
+ 			$TotalTroopsTOtrain += 6 * 2
+
+			GUICtrlSetData($txtNumBarb, Ceiling((($ArmyCampTemp - $TotalTroopsTOtrain)/100)*60))
+			GUICtrlSetData($txtNumArch, Floor((($ArmyCampTemp - $TotalTroopsTOtrain)/100)*30))
+			GUICtrlSetData($txtNumGobl, Ceiling((($ArmyCampTemp - $TotalTroopsTOtrain)/100)*10))
+
 		Case 8
 			;show all the barrack mode controls
 			ShowBarrackControls()
@@ -189,9 +214,7 @@ Func SetComboTroopComp()
 		Case 9
 			_GUI_Value_STATE("SHOW", $groupTroops1)
 			_GUI_Value_STATE("SHOW", $groupTroops2)
-			For $i = 0 To UBound($TroopName) - 1
-				GUICtrlSetData(Eval("txtNum" & $TroopName[$i]), Eval($TroopName[$i] & "Comp"))
-			Next
+
 	EndSwitch
 	lblTotalCount()
 	SetRedrawBotWindow($bWasRedraw)
@@ -216,14 +239,53 @@ Func ShowBarrackControls()
 EndFunc   ;==>ShowBarrackControls
 
 Func lblTotalCount()
-	GUICtrlSetData($lblTotalCount, GUICtrlRead($txtNumBarb) + GUICtrlRead($txtNumArch) + GUICtrlRead($txtNumGobl))
-	If GUICtrlRead($lblTotalCount) = "100" Then
+
+	Local $TotalTroopsTOtrain = 0
+	Local $ArmyCampTemp = 0
+
+	If GUICtrlRead($chkTotalCampForced) = $GUI_CHECKED Then
+		$ArmyCampTemp = Floor(GUICtrlRead($txtTotalCampForced) * GUICtrlRead($txtFullTroop) / 100)
+	Else
+		$ArmyCampTemp = Floor($TotalCamp * GUICtrlRead($txtFullTroop)/100)
+	EndIf
+
+	For $i = 0 To UBound($TroopName) - 1
+		If GUICtrlRead(Eval("txtNum" & $TroopName[$i])) > 0 then
+			$TotalTroopsTOtrain += GUICtrlRead(Eval("txtNum" & $TroopName[$i])) * $TroopHeight[$i]
+		EndIf
+	Next
+	For $i = 0 To UBound($TroopDarkName) - 1
+		If GUICtrlRead(Eval("txtNum" & $TroopDarkName[$i])) > 0 then
+			$TotalTroopsTOtrain += GUICtrlRead(Eval("txtNum" & $TroopDarkName[$i])) * $TroopDarkHeight[$i]
+		EndIf
+	Next
+
+	GUICtrlSetData($lblTotalCount, String($TotalTroopsTOtrain))
+
+	If GUICtrlRead($chkTotalCampForced) = $GUI_CHECKED And GUICtrlRead($lblTotalCount) = GUICtrlRead($txtTotalCampForced) Then
 		GUICtrlSetBkColor($lblTotalCount, $COLOR_MONEYGREEN)
-	ElseIf GUICtrlRead($lblTotalCount) = "0" Then
+	ElseIf GUICtrlRead($lblTotalCount) = $ArmyCampTemp Then
+		GUICtrlSetBkColor($lblTotalCount, $COLOR_MONEYGREEN)
+	ElseIf GUICtrlRead($lblTotalCount) > $ArmyCampTemp / 2 And GUICtrlRead($lblTotalCount) < $ArmyCampTemp Then
 		GUICtrlSetBkColor($lblTotalCount, $COLOR_ORANGE)
 	Else
 		GUICtrlSetBkColor($lblTotalCount, $COLOR_RED)
 	EndIf
+
+	If GUICtrlRead($chkTotalCampForced) = $GUI_CHECKED Then
+		GUICtrlSetData($caltotaltroops, (Floor((GUICtrlRead($lblTotalCount) / GUICtrlRead($txtTotalCampForced)) * 100) < 1 ? (GUICtrlRead($lblTotalCount) > 0 ? 1 : 0) : Floor((GUICtrlRead($lblTotalCount) / GUICtrlRead($txtTotalCampForced)) * 100)))
+	Else
+		GUICtrlSetData($caltotaltroops, (Floor((GUICtrlRead($lblTotalCount) / $ArmyCampTemp) * 100) < 1 ? (GUICtrlRead($lblTotalCount) > 0 ? 1 : 0) : Floor((GUICtrlRead($lblTotalCount) / $ArmyCampTemp) * 100)))
+	EndIf
+
+	If GUICtrlRead($chkTotalCampForced) = $GUI_CHECKED And GUICtrlRead($lblTotalCount) > GUICtrlRead($txtTotalCampForced) Then
+		GUICtrlSetState($lbltotalprogress, $GUI_SHOW)
+	ElseIf GUICtrlRead($lblTotalCount) > $ArmyCampTemp Then 
+		GUICtrlSetState($lbltotalprogress, $GUI_SHOW)
+	Else
+		GUICtrlSetState($lbltotalprogress, $GUI_HIDE)
+	EndIf
+
 EndFunc   ;==>lblTotalCount
 
 Func lblTotalCountSpell()

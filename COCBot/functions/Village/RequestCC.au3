@@ -118,13 +118,16 @@ Func _makerequest()
 		Click($aSendRequestCCBtn[0], $aSendRequestCCBtn[1], 1, 100, "#0256") ; click send button
 		$canRequestCC = False
 	EndIf
-
+	
 	If $ichkSwitchDonate = 1 Then
-		;exit from army overview
 		If _Sleep($iDelayRequestCC1) Then Return
 		ClickP($aAway, 2, 0, "#0335")
 		SetLog("===== Activate Switch Account For Donate =====", $COLOR_RED)
 		Sleep(1500)
 		SwitchDonate()
+		$FirstStart = True
+		Sleep(2500)
+		Train()
 	EndIf
+
 EndFunc   ;==>_makerequest

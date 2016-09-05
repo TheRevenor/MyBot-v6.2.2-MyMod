@@ -61,7 +61,8 @@ Func ReturnHome($TakeSS = 1, $GoldChangeCheck = True) ;Return main screen
 	$checkQPower = False
 	$checkWPower = False
 
-	If $iMatchMode = $TS And $icmbTroopComp <> 8 Then $FirstStart = True ;reset barracks upon return when TH sniping w/custom army
+	;If $iMatchMode = $TS And $icmbTroopComp <> 8 Then $FirstStart = True ;reset barracks upon return when TH sniping w/custom army
+	If $iTScheck = 1 and $iMatchMode = $TS And $icmbTroopComp <> 8 Then $FirstStart = True
 
 	SetLog("Returning Home", $COLOR_BLUE)
 	If $RunState = False Then Return
@@ -134,10 +135,10 @@ Func ReturnHome($TakeSS = 1, $GoldChangeCheck = True) ;Return main screen
 	;push images if requested..
 	If $GoldChangeCheck = True Then
 		PushMsgToPushBullet ("LastRaid")
-		$AttackCount +=1 ;for periodic village stats per number of attacks
+		$AttackCount += 1 ;for periodic village stats per number of attacks
 	EndIf
 	;Delete searchcount messages if necessary
-    If $SearchNotifyCount = 1 And $searchcount>=1 And isarray($SearchNotifyCountMsgIden) Then
+    If $SearchNotifyCount = 1 And $searchcount >= 1 And isarray($SearchNotifyCountMsgIden) Then
         _DeleteMessageOfPushBullet ($SearchNotifyCountMsgIden[0])
 	EndIf
 

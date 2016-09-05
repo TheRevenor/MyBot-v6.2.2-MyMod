@@ -388,7 +388,7 @@ Func ParseAttackCSV($debug = False)
 						ReleaseClicks()
 						Setlog("Calculate main side... ")
 						If StringUpper($value8) = "TOP-LEFT" Or StringUpper($value8) = "TOP-RIGHT" Or StringUpper($value8) = "BOTTOM-LEFT" Or StringUpper($value8) = "BOTTOM-RIGHT" Then
-							$MAINSIDEMAINSIDE = StringUpper($value8)
+							$MAINSIDE = StringUpper($value8)
 							Setlog("Forced side: " & StringUpper($value8))
 						Else
 							Local $heightTopLeft = 0, $heightTopRight = 0, $heightBottomLeft = 0, $heightBottomRight = 0

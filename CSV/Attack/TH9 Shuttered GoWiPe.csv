@@ -64,3 +64,4 @@ DROP  |A          |1-3        |30         |arch       |10         |0          |7
       |VECTOR_____|INDEX______|QTY_X_VECT_|TROOPNAME__|DELAY_DROP_|DELAYCHANGE|SLEEPAFTER_|___________|
 DROP  |K          |2          |1          |Hspell     |1          |0          |300        |           | Droping extra Heal Spell if train error
 WAIT  |200-400    |           |           |           |           |           |           |           |
+RECALC|           |           |           |           |           |           |           |           |

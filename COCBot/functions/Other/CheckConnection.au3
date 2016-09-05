@@ -18,7 +18,7 @@
 Func ChckInetCon()
 Local $i = 0
 If GUICtrlRead($chkConnection) = $GUI_CHECKED Then
-	$ichkConnection = 1
+	;$ichkConnection = 1
 	;MsgBox($MB_SYSTEMMODAL, "Close Emulator", "No Internet Connection Will Close Emulator", 5)
 	SetLog("Lost Internet Connection Waiting Few Sec Before Close Emulator", $COLOR_RED)
 	While $i < 5
@@ -36,14 +36,18 @@ If GUICtrlRead($chkConnection) = $GUI_CHECKED Then
 		Sleep(5000)
 	WEnd
 Else
-	$ichkConnection = 0
+	;$ichkConnection = 0
 	If $debugsetlog = 1 Then Setlog("Check Internet Connections skip", $COLOR_PURPLE)
 	Return ; exit func if no checkmarks
 EndIf
 ; If the script gets here, we missed 5 pings - take action.
 If $ping = 0 Then
-	CloseAndroid()	; Close Emulator
-If _Sleep(5000) Then Return
+	If $AndroidEmbedded = True Then
+		AndroidEmbed(Not $AndroidEmbedded)
+	EndIf
+	If _Sleep(4000) Then Return
+	CloseAndroid()	 ; Close Emulator
+	If _Sleep(4000) Then Return
 	SetLog("Waiting Internet Connection..", $COLOR_BLUE)
 	CheckConnection()
 EndIf

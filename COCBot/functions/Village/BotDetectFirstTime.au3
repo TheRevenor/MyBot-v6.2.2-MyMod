@@ -12,7 +12,7 @@
 
 Func BotDetectFirstTime()
 
-	Local $collx, $colly, $Result, $i = 0 , $t =0
+	Local $collx, $colly, $Result, $i = 0, $t = 0
 
 	If $Is_ClientSyncError = True Then Return ; if restart after OOS, and User stop/start bot, skip this.
 
@@ -67,7 +67,23 @@ Func BotDetectFirstTime()
 					$barrackPos[$x][0] = -1
 					$barrackPos[$x][1] = -1
 				Next
-				LocateBarrack2()
+				LocateBarrack()
+				SaveConfig()
+				ExitLoop
+			EndIf
+		Next
+	EndIf
+
+	If $icmbQuantBoostDarkBarracks > 0 Then
+		If _Sleep($iDelayBotDetectFirstTime3) Then Return
+		For $i = 0 To $icmbQuantBoostDarkBarracks - 1 ; verify if all barracks haves a valid position
+			If $DarkbarrackPos[$i][0] = "" Or $DarkbarrackPos[$i][0] = -1 Then ;  Boost individual barracks with "button Boost 10 gems"
+				; Setlog("loop: "& $i+1 )
+				For $x = 0 To 1
+					$DarkbarrackPos[$x][0] = -1
+					$DarkbarrackPos[$x][1] = -1
+				Next
+				LocateDarkBarrack()
 				SaveConfig()
 				ExitLoop
 			EndIf
@@ -132,46 +148,46 @@ Func BotDetectFirstTime()
 
 	;Boju Display TH Level in Stats
 
-	_GUI_Value_STATE("HIDE",$groupListTHLevels)
-		If $debugsetlog = 1 Then Setlog("Select TH Level:" & Number($iTownHallLevel), $COLOR_PURPLE)
-		Switch Number($iTownHallLevel)
-			Case 4
-				GUICtrlSetState($THLevels04,$GUI_SHOW)
-			Case 5
-				GUICtrlSetState($THLevels05,$GUI_SHOW)
-			Case 6
-				GUICtrlSetState($THLevels06,$GUI_SHOW)
-			Case 7
-				GUICtrlSetState($THLevels07,$GUI_SHOW)
-			Case 8
-				GUICtrlSetState($THLevels08,$GUI_SHOW)
-			Case 9
-				GUICtrlSetState($THLevels09,$GUI_SHOW)
-			Case 10
-				GUICtrlSetState($THLevels10,$GUI_SHOW)
-			Case 11
-				GUICtrlSetState($THLevels11,$GUI_SHOW)
-		EndSwitch
-	GUICtrlSetState(Eval("$THLevels" + Number($iTownHallLevel)),$GUI_SHOW)
+	_GUI_Value_STATE("HIDE", $groupListTHLevels)
+	If $debugSetlog = 1 Then Setlog("Select TH Level:" & Number($iTownHallLevel), $COLOR_PURPLE)
+	Switch Number($iTownHallLevel)
+		Case 4
+			GUICtrlSetState($THLevels04, $GUI_SHOW)
+		Case 5
+			GUICtrlSetState($THLevels05, $GUI_SHOW)
+		Case 6
+			GUICtrlSetState($THLevels06, $GUI_SHOW)
+		Case 7
+			GUICtrlSetState($THLevels07, $GUI_SHOW)
+		Case 8
+			GUICtrlSetState($THLevels08, $GUI_SHOW)
+		Case 9
+			GUICtrlSetState($THLevels09, $GUI_SHOW)
+		Case 10
+			GUICtrlSetState($THLevels10, $GUI_SHOW)
+		Case 11
+			GUICtrlSetState($THLevels11, $GUI_SHOW)
+	EndSwitch
+	GUICtrlSetState(Eval("$THLevels" + Number($iTownHallLevel)), $GUI_SHOW)
 	;-->Display TH Level in Stats
 
-#comments-start  removed due replacement by imgloc collect
-	If $iChkCollect = 1 And $listResourceLocation = "" Then
+	#comments-start  removed due replacement by imgloc collect
+		If $iChkCollect = 1 And $listResourceLocation = "" Then
 		If _Sleep($iDelayBotDetectFirstTime3) Then Return
 		While 1 ; Clear the collectors using old image find to reduce collector image finding errors
-			If _Sleep($iDelayBotDetectFirstTime3) Or $RunState = False Then ExitLoop
-			_CaptureRegion()
-			If _ImageSearch(@ScriptDir & "\images\collect.png", 1, $collx, $colly, 20) Then
-				If isInsideDiamondXY($collx, $colly) Then
-					If IsMainPage() Then Click($collx, $colly, 1, 0, "#0330") ;Click collector
-					If _Sleep($iDelayBotDetectFirstTime3) Then Return
-				EndIf
-				ClickP($aAway, 1, 0, "#0329") ;Click Away
-			Else
-				ExitLoop
-			EndIf
-			If $i >= 20 Then ExitLoop
-			$i += 1
+		If _Sleep($iDelayBotDetectFirstTime3) Or $RunState = False Then ExitLoop
+		_CaptureRegion()
+		If _ImageSearch(@ScriptDir & "\images\collect.png", 1, $collx, $colly, 20) Then
+		If isInsideDiamondXY($collx, $colly) Then
+		If IsMainPage() Then Click($collx, $colly, 1, 0, "#0330") ;Click collector
+		If _Sleep($iDelayBotDetectFirstTime3) Then Return
+		EndIf
+		ClickP($aAway, 1, 0, "#0329") ;Click Away
+		Else
+		ExitLoop
+		EndIf
+		If $i >= 20 Then ExitLoop
+		$i += 1
 		WEnd
 		SetLog("Verifying your Mines/Collectors/Drills ...wait ...")
 
@@ -180,48 +196,48 @@ Func BotDetectFirstTime()
 		$t =0
 		$PixelMineHere = GetLocationMine()
 		For $i = 0 To UBound($PixelMineHere) - 1
-			If isInsideDiamond($PixelMineHere[$i]) Then
-				$pixel = $PixelMineHere[$i]
-				$listResourceLocation = $listResourceLocation & $pixel[0] & ";" & $pixel[1] & "|"
-				If $debugSetlog = 1 Then SetLog("- Gold Mine " & $i + 1 & ": (" & $pixel[0] & "," & $pixel[1] & ")", $COLOR_PURPLE)
-				$t +=1
-			EndIf
+		If isInsideDiamond($PixelMineHere[$i]) Then
+		$pixel = $PixelMineHere[$i]
+		$listResourceLocation = $listResourceLocation & $pixel[0] & ";" & $pixel[1] & "|"
+		If $debugSetlog = 1 Then SetLog("- Gold Mine " & $i + 1 & ": (" & $pixel[0] & "," & $pixel[1] & ")", $COLOR_PURPLE)
+		$t +=1
+		EndIf
 		Next
 		If $t > 0 Then
-			SetLog("Total No. of Gold Mines: " & $t)
+		SetLog("Total No. of Gold Mines: " & $t)
 		EndIf
 
 		$t =0
 		If _Sleep($iDelayBotDetectFirstTime1) Then Return
 		$PixelElixirHere = GetLocationElixir()
 		For $i = 0 To UBound($PixelElixirHere) - 1
-			If isInsideDiamond($PixelElixirHere[$i]) Then
-				$pixel = $PixelElixirHere[$i]
-				$listResourceLocation = $listResourceLocation & $pixel[0] & ";" & $pixel[1] & "|"
-				If $debugSetlog = 1 Then SetLog("- Elixir Collector " & $i + 1 & ": (" & $pixel[0] & "," & $pixel[1] & ")", $COLOR_PURPLE)
-				$t +=1
-			EndIf
+		If isInsideDiamond($PixelElixirHere[$i]) Then
+		$pixel = $PixelElixirHere[$i]
+		$listResourceLocation = $listResourceLocation & $pixel[0] & ";" & $pixel[1] & "|"
+		If $debugSetlog = 1 Then SetLog("- Elixir Collector " & $i + 1 & ": (" & $pixel[0] & "," & $pixel[1] & ")", $COLOR_PURPLE)
+		$t +=1
+		EndIf
 		Next
 		If $t > 0 Then
-			SetLog("Total No. of Elixir Collectors: " & $t)
+		SetLog("Total No. of Elixir Collectors: " & $t)
 		EndIf
 
 		$t =0
 		If _Sleep($iDelayBotDetectFirstTime1) Then Return
 		$PixelDarkElixirHere = GetLocationDarkElixir()
 		For $i = 0 To UBound($PixelDarkElixirHere) - 1
-			If isInsideDiamond($PixelDarkElixirHere[$i]) Then
-				$pixel = $PixelDarkElixirHere[$i]
-				$listResourceLocation = $listResourceLocation & $pixel[0] & ";" & $pixel[1] & "|"
-				If $debugSetlog = 1 Then SetLog("- Dark Ellxir Drill " & $i + 1 & ": (" & $pixel[0] & "," & $pixel[1] & ")", $COLOR_PURPLE)
-				$t +=1
-			EndIf
+		If isInsideDiamond($PixelDarkElixirHere[$i]) Then
+		$pixel = $PixelDarkElixirHere[$i]
+		$listResourceLocation = $listResourceLocation & $pixel[0] & ";" & $pixel[1] & "|"
+		If $debugSetlog = 1 Then SetLog("- Dark Ellxir Drill " & $i + 1 & ": (" & $pixel[0] & "," & $pixel[1] & ")", $COLOR_PURPLE)
+		$t +=1
+		EndIf
 		Next
 		If $t > 0 Then
-			SetLog("Total No. of Dark Elixir Drills: " & $t)
+		SetLog("Total No. of Dark Elixir Drills: " & $t)
 		EndIf
 		$t =0
-	EndIf
-#comments-end
+		EndIf
+	#comments-end
 
 EndFunc   ;==>BotDetectFirstTime

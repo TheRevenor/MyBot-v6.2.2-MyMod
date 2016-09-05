@@ -20,12 +20,19 @@ Func GetResources($bLog = True, $pMatchMode = -1) ;Reads resources
 	$searchTrophy = ""
 	Local $iResult = 0
 	Local $i = 0
+	Local $iWaitClouds
+	
+	If ( $iTrophyCurrent > 4200 ) Then
+	  $iWaitClouds = 1080 ; Titan Leagle and over
+	Else
+	  $iWaitClouds = 720
+	Endif
 
 	ForceCaptureRegion() ; ensure screenshots are not cached
 	While _CheckPixel($aNoCloudsAttack, $bCapturePixel) = False ; wait for clouds to be gone
 		If _Sleep($iDelayGetResources1) Then Return
 		$i += 1
-		If $i >= 720 Or isProblemAffect(True) Then ; Wait 3 min then restart bot and CoC
+		If $i >= $iWaitClouds Or isProblemAffect(True) Then ; Wait then restart bot and CoC [720 = 3min] [1080 = 0:04:30]
 			$Is_ClientSyncError = True
 			checkMainScreen()
 			If $Restart Then
@@ -92,18 +99,18 @@ Func GetResources($bLog = True, $pMatchMode = -1) ;Reads resources
 	$SearchCount += 1 ; Counter for number of searches
 	
 	;pushbullet searchcount notification every xxx searches so you know bot is still running
-    If $searchcount > 0 AND $SearchNotifyCount = 1 AND mod($searchcount,$SearchNotifyCountTXT) = 0 Then
+    If $searchcount > 0 AND $SearchNotifyCount = 1 AND mod($searchcount, $SearchNotifyCountTXT) = 0 Then
         PushMsgToPushBullet ("CurrentSearchCount")
-    ElseIF $searchcount = 1 AND $SearchNotifyCount = 1 Then
+    ElseIf $searchcount = 1 AND $SearchNotifyCount = 1 Then
         PushMsgToPushBullet ("CurrentSearchCount")
     EndIf
 
 	;send village stats every xxx attacks
-	If $Villagestatincrement = 1 AND mod($Attackcount,$VillageStatIncrementTXT) = 0 AND $AttackCount <>0 Then
+	If $Villagestatincrement = 1 AND mod($Attackcount, $VillageStatIncrementTXT) = 0 AND $AttackCount <> 0 Then
 		PushMsgToPushBullet ("AttackCountStats")
 		$attackcount = 0
 	EndIf
-	If $PersonalBreakNotified = True THEN $PersonalBreakNotified = False
+	If $PersonalBreakNotified = True Then $PersonalBreakNotified = False
 
 	ResumeAndroid()
 

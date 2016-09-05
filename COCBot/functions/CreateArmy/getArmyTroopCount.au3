@@ -45,6 +45,8 @@ Func getArmyTroopCount($bOpenArmyWindow = False, $bCloseArmyWindow = False, $tes
 	Local $TroopTypeT = ""
 	ReDim $TroopSpellStats[0][2]
 
+	checkAttackDisable($iTaBChkIdle)
+	
 	_CaptureRegion2(120, 165 + $midOffsetY, 740, 220 + $midOffsetY)
 	If $debugSetlog = 1 Then SetLog("$hHBitmap2 made", $COLOR_PURPLE)
 	If _Sleep($iDelaycheckArmyCamp5) Then Return
@@ -236,16 +238,18 @@ Func getArmyTroopCount($bOpenArmyWindow = False, $bCloseArmyWindow = False, $tes
 					EndIf
 
 				EndIf
-				If $TroopQ <> 0 Then 
-					SetLog(" - No. of " & NameOfTroop($Troops[0]) & ": " & $TroopQ)
-					_ArrayAdd($TroopSpellStats, $TroopName & "|" & $TroopQ)
+				Local $Plural = 0
+				If $TroopQ > 1 Then $Plural = 1
+				If $TroopQ <> 0 Then
+					SetLog(" - No. of " & NameOfTroop($Troops[0], $Plural) & ": " & $TroopQ)
+					_ArrayAdd($TroopSpellStats, NameOfTroop($Troops[0], $Plural) & "|" & $TroopQ)
 				EndIf
 			EndIf
 		Next
 
 	EndIf
 
-	If Not $fullArmy And $FirstStart Then
+	If Not $fullArmy And ( $FirstStart Or $iMatchMode = $TS ) and $icmbTroopComp <> 8 Then
 		$ArmyComp = $CurCamp
 	EndIf
 

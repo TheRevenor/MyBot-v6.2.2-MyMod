@@ -44,7 +44,7 @@ Global $aMainTabItems[7] = [$tabMain, $tabGeneral, $tabVillage, $tabAttack, $tab
 
 Global $aTabControlsVillage[6] = [$hGUI_VILLAGE_TAB, $hGUI_VILLAGE_TAB_ITEM1, $hGUI_VILLAGE_TAB_ITEM2, $hGUI_VILLAGE_TAB_ITEM3, $hGUI_VILLAGE_TAB_ITEM4, $hGUI_VILLAGE_TAB_ITEM5]
 Global $aTabControlsDonate[4] = [$hGUI_DONATE_TAB, $hGUI_DONATE_TAB_ITEM1, $hGUI_DONATE_TAB_ITEM2, $hGUI_DONATE_TAB_ITEM3]
-Global $aTabControlsUpgrade[5] = [$hGUI_UPGRADE_TAB, $hGUI_UPGRADE_TAB_ITEM1, $hGUI_UPGRADE_TAB_ITEM2, $hGUI_UPGRADE_TAB_ITEM3, $hGUI_UPGRADE_TAB_ITEM4]
+Global $aTabControlsUpgrade[6] = [$hGUI_UPGRADE_TAB, $hGUI_UPGRADE_TAB_ITEM1, $hGUI_UPGRADE_TAB_ITEM2, $hGUI_UPGRADE_TAB_ITEM3, $hGUI_UPGRADE_TAB_ITEM4, $hGUI_UPGRADE_TAB_ITEM5]
 Global $aTabControlsNotify[3] = [$hGUI_NOTIFY_TAB, $hGUI_NOTIFY_TAB_ITEM1, $hGUI_NOTIFY_TAB_ITEM2]
 
 Global $aTabControlsAttack[4] = [$hGUI_ATTACK_TAB, $hGUI_ATTACK_TAB_ITEM1, $hGUI_ATTACK_TAB_ITEM2, $hGUI_ATTACK_TAB_ITEM3]
@@ -504,6 +504,7 @@ Func BotClose($SaveConfig = Default, $bExit = True)
    If $SaveConfig = Default Then $SaveConfig = $iBotLaunchTime > 0
    ResumeAndroid()
    SetLog("Closing " & $sBotTitle & " ...")
+   DeletePicturesHostFolder()
    AndroidEmbed(False) ; detach Android Window
    AndroidShieldDestroy() ; destroy Shield Hooks
    If $RunState = True Then AndroidBotStopEvent() ; signal android that bot is now stoppting
@@ -1235,7 +1236,7 @@ Func Bind_ImageList($nCtrl)
 	Switch $nCtrl
 		Case $tabMain
 			; the icons for main tab
-			Local $aIconIndex[6] = [$eIcnHourGlass, $eIcnTH11, $eIcnCamp, $eIcnGUI, $eIcnDevo, $eIcnInfo]
+			Local $aIconIndex[6] = [$eIcnHourGlass, $eIcnTH11, $eIcnCamp, $eIcnGUI, $eIcnModTheRevenor, $eIcnInfo]
 
 		Case $hGUI_VILLAGE_TAB
 			; the icons for village tab
@@ -1251,7 +1252,7 @@ Func Bind_ImageList($nCtrl)
 
 		Case $hGUI_UPGRADE_TAB
 			; the icons for upgrade tab
-			Local $aIconIndex[4] = [$eIcnLaboratory, $eIcnKingAbility, $eIcnMortar, $eIcnWall]
+			Local $aIconIndex[5] = [$eIcnLaboratory, $eIcnKingAbility, $eIcnMortar, $eIcnWall, $eIcnUpgrade]
 
 		Case $hGUI_NOTIFY_TAB
 			; the icons for NOTIFY tab

@@ -135,7 +135,7 @@ $y += 20
 		$chkSearchNotifyCount = GUICtrlCreateCheckbox("Searchcount.  Increment:", $x + 10, $y, -1, -1)
 		_GUICtrlSetTip(-1, "Searchcount Notification every ____ searches.  If getting pushbullet errors or acting funny, increase increment.  ")
 		GUICtrlSetState(-1, $GUI_DISABLE)
-		$txtSearchNotifyCount = GUICtrlCreateInput("25", $x + 150, $y + 2, 25, 18, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
+		$txtSearchNotifyCount = GUICtrlCreateInput("25", $x + 150, $y + 2, 30, 18, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
 		$txtTip = "Searchcount Notification every ____ searches."
 		_GUICtrlSetTip(-1, $txtTip)
 		GUICtrlSetLimit(-1, 3)
@@ -162,6 +162,7 @@ $hGUI_NOTIFY_TAB_ITEM2 = GUICtrlCreateTabItem(GetTranslated(600, 19, "Instructio
 			$x -= 10
 			$lblPBdesc = GUICtrlCreateLabel(GetTranslated(620, 1, "BOT") & " " & GetTranslated(620, 14,"HELP") & GetTranslated(620,2, " - send this help message") & @CRLF & _
 				GetTranslated(620, 1, -1) & " " & GetTranslated(620, 15,"DELETE") & GetTranslated(620, 3, " - delete all your previous messages") & @CRLF & _
+				GetTranslated(620, 1, -1) & " START - start the bot named" & @CRLF & _
 				GetTranslated(620, 1, -1) & " <" & GetTranslated(619, 16, -1) & "> " & GetTranslated(620, 16,"RESTART") & GetTranslated(620, 4, " - restart the bot named <Village Name> and Android Emulator") & @CRLF & _
 				GetTranslated(620, 1, -1) & " <" & GetTranslated(619, 16, -1) & "> " & GetTranslated(620, 17,"STOP") & GetTranslated(620, 5, " - stop the bot named <Village Name>") & @CRLF & _
 				GetTranslated(620, 1, -1) & " <" & GetTranslated(619, 16, -1) & "> " & GetTranslated(620, 18,"PAUSE") & GetTranslated(620, 6, " - pause the bot named <Village Name>") & @CRLF & _

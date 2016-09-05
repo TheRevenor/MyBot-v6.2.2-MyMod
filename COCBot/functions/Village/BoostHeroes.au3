@@ -41,6 +41,7 @@ Func BoostKing()
 						SetLog("Not enough gems", $COLOR_RED)
 					Else
 						$icmbBoostBarbarianKing -= 1
+						GUICtrlSetData($cmbBoostBarbarianKing, $icmbBoostBarbarianKing)
 						SetLog('Boost completed. Remaining :' & $icmbBoostBarbarianKing, $COLOR_GREEN)
 					EndIf
 				Else
@@ -84,6 +85,7 @@ Func BoostQueen()
 						SetLog("Not enough gems", $COLOR_RED)
 					Else
 						$icmbBoostArcherQueen -= 1
+						GUICtrlSetData($cmbBoostArcherQueen, $icmbBoostArcherQueen)
 						SetLog('Boost completed. Remaining :' & $icmbBoostArcherQueen, $COLOR_GREEN)
 					EndIf
 				Else
@@ -126,6 +128,7 @@ Func BoostWarden()
 						SetLog("Not enough gems", $COLOR_RED)
 					Else
 						$cmbBoostWarden -= 1
+						GUICtrlSetData($cmbBoostWarden, $icmbBoostWarden )
 						SetLog('Boost completed. Remaining :' & $icmbBoostWarden, $COLOR_GREEN)
 					EndIf
 				Else

@@ -44,11 +44,13 @@ DROP  |B-D        |1-14       |14         |barb       |30         |30-70      |1
 DROP  |F-H        |3-16       |14         |arch       |30         |30-70      |0          |            | UP SIDES ARCHS PART 1
 DROP  |B-D        |1-14       |14         |arch       |30         |30-70      |500        |            | UP SIDES ARCHS PART 2
 
-      |VECTOR_____|INDEX______|QTY_X_VECT_|TROOPNAME__|DELAY_DROP_|DELAYCHANGE|SLEEPAFTER_|____________|SEQUENCE 3 LAUNCH BARBS THEN ARCH IF REMAINING
-DROP  |E-G        |3-16       |14         |barb       |30         |30-70      |0          |            | DONW SIDES BARBS PART 1
-DROP  |A-C        |1-14       |14         |arch       |30         |30-70      |0          |            | DOWN SIDES ARCHS PART 2
-
-      |VECTOR_____|INDEX______|QTY_X_VECT_|TROOPNAME__|DELAY_DROP_|DELAYCHANGE|SLEEPAFTER_|____________|SEQUENCE 5 DROP HEROES AND CC 
+      |VECTOR_____|INDEX______|QTY_X_VECT_|TROOPNAME__|DELAY_DROP_|DELAYCHANGE|SLEEPAFTER_|____________|SEQUENCE 3 DROP HEROES AND CC 
 DROP  |R          |3          |1          |castle     |500        |30-70      |500        |            |LAUNCE CASTLE
 DROP  |Q          |3          |1          |king       |500        |30-70      |500        |            |LAUNCE KING
 DROP  |R          |3          |1          |queen      |0          |30-70      |800        |            |LAUNCE QUEEN
+
+      |VECTOR_____|INDEX______|QTY_X_VECT_|TROOPNAME__|DELAY_DROP_|DELAYCHANGE|SLEEPAFTER_|____________|SEQUENCE 4 LAUNCH BARBS THEN ARCH IF REMAINING
+DROP  |E-G        |3-16       |10         |barb       |30         |30-70      |0          |            | DONW SIDES BARBS PART 1
+DROP  |A-C        |1-14       |10         |arch       |30         |30-70      |0          |            | DOWN SIDES ARCHS PART 2
+
+

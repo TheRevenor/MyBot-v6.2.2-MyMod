@@ -96,7 +96,7 @@ If $AndroidAdbScreencap = True Then chkBackground() ; update background mode GUI
 $pic2arrow = GUICtrlCreatePic(@ScriptDir & "\Images\2arrow1.jpg", $x + 190, $y + 1, 60, 60)
 ;	GUICtrlSetOnEvent(-1, "arrows")
 
-$lblVersion = GUICtrlCreateLabel($sBotVersion, 205, $y + 60, 60, 17, $SS_CENTER)
+$lblVersion = GUICtrlCreateLabel($sBotVersion, 205, $y + 75, 60, 17, $SS_CENTER)
 	GUICtrlSetColor(-1, $COLOR_MEDGRAY)
 
 $arrowleft = GUICtrlCreatePic(@ScriptDir & "\Images\triangle_left.bmp", $x + 247, $y + 30, 8, 14)

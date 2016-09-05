@@ -193,11 +193,4 @@ $chkCloseTakeBreak = GUICtrlCreateCheckbox("Close Emulator When TakeBreak", $x-5
 	_GUICtrlSetTip(-1, $txtTip)
 	GUICtrlSetOnEvent(-1, "chkClosePBEmu")
 	GUICtrlSetState(-1, $GUI_DISABLE)
-$y +=21
-$chkTotalCampForced = GUICtrlCreateCheckbox(GetTranslated(636,46, "Force Total Army Camp")&":", $x-5, $y-5, -1, -1)
-	GUICtrlSetOnEvent(-1, "chkTotalCampForced")
-	_GUICtrlSetTip(-1, GetTranslated(636,47, "If not detected set army camp values (instead ask)"))
-$txtTotalCampForced = GUICtrlCreateInput("200", $x + 130, $y - 5, 30, 16, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
-	GUICtrlSetLimit(-1, 3)
-	GUICtrlSetState(-1, $GUI_DISABLE)
 GUICtrlCreateGroup("", -99, -99, 1, 1)

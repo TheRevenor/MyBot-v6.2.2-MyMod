@@ -15,6 +15,7 @@
 ; ===============================================================================================================================
 Func PrepareSearch() ;Click attack button and find match button, will break shield
 
+	IsWaitingForConnection()
 	SetLog("Going to Attack...", $COLOR_BLUE)
 
 	ChkAttackCSVConfig()

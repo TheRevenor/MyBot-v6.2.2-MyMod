@@ -319,4 +319,74 @@ Global $lblWallCost, $cmbWalls, $UseGold, $UseElixir, $UseElixirGold, $txtWallMi
 	GUICtrlCreateGroup("", -99, -99, 1, 1)
 GUICtrlCreateTabItem("")
 
+$hGUI_UPGRADE_TAB_ITEM5 = GUICtrlCreateTabItem("SmartUpgrade")
+
+Local $x = 25, $y = 45
+
+$SmartUpgrade = GUICtrlCreateGroup("SmartUpgrade", $x - 20, $y - 20, 430, 600)
+
+$chkSmartUpgrade = GUICtrlCreateCheckbox("Enable SmartUpgrade", $x, $y, -1, -1)
+	$txtTip = GetTranslated(614,3, "Check box to enable automatically starting Upgrades from builders menu")
+	_GUICtrlSetTip(-1, $txtTip)
+	GUICtrlSetOnEvent(-1, "chkSmartUpgrade")
+
+$IgnoreUpgrades = GUICtrlCreateGroup("Upgrades to ignore", $x - 15, $y + 30, 420, 155)
+
+Local $x = 15, $y = 45
+
+	$iconIgnoreTH = GUICtrlCreateIcon($pIconLib, $eIcnTH11, $x + 5, $y + 50, 40, 40)
+	$chkIgnoreTH = GUICtrlCreateCheckbox("", $x + 20, $y + 90, 17, 17)
+	GUICtrlSetOnEvent(-1, "chkIgnoreTH")
+
+	$iconIgnoreKing = GUICtrlCreateIcon($pIconLib, $eIcnKing, $x + 95, $y + 50, 40, 40)
+	$chkIgnoreKing = GUICtrlCreateCheckbox("", $x + 110, $y + 90, 17, 17)
+	GUICtrlSetOnEvent(-1, "chkIgnoreKing")
+
+	$iconIgnoreQueen = GUICtrlCreateIcon($pIconLib, $eIcnQueen, $x + 140, $y + 50, 40, 40)
+	$chkIgnoreQueen = GUICtrlCreateCheckbox("", $x + 155, $y + 90, 17, 17)
+	GUICtrlSetOnEvent(-1, "chkIgnoreQueen")
+
+	$iconIgnoreWarden = GUICtrlCreateIcon($pIconLib, $eIcnWarden, $x + 185, $y + 50, 40, 40)
+	$chkIgnoreWarden = GUICtrlCreateCheckbox("", $x + 200, $y + 90, 17, 17)
+	GUICtrlSetOnEvent(-1, "chkIgnoreWarden")
+
+	$iconIgnoreCC = GUICtrlCreateIcon($pIconLib, $eIcnCC, $x + 275, $y + 50, 40, 40)
+	$chkIgnoreCC = GUICtrlCreateCheckbox("", $x + 290, $y + 90, 17, 17)
+	GUICtrlSetOnEvent(-1, "chkIgnoreCC")
+
+	$iconIgnoreLab = GUICtrlCreateIcon($pIconLib, $eIcnLaboratory, $x + 365, $y + 50, 40, 40)
+	$chkIgnoreLab = GUICtrlCreateCheckbox("", $x + 380, $y + 90, 17, 17)
+	GUICtrlSetOnEvent(-1, "chkIgnoreLab")
+
+	$iconIgnoreBarrack = GUICtrlCreateIcon($pIconLib, $eIcnBarrack, $x + 5, $y + 120, 40, 40)
+	$chkIgnoreBarrack = GUICtrlCreateCheckbox("", $x + 20, $y + 160, 17, 17)
+	GUICtrlSetOnEvent(-1, "chkIgnoreBarrack")
+
+	$iconIgnoreDBarrack = GUICtrlCreateIcon($pIconLib, $eIcnDarkBarrack, $x + 50, $y + 120, 40, 40)
+	$chkIgnoreDBarrack = GUICtrlCreateCheckbox("", $x + 65, $y + 160, 17, 17)
+	GUICtrlSetOnEvent(-1, "chkIgnoreDBarrack")
+
+	$iconIgnoreFactory = GUICtrlCreateIcon($pIconLib, $eIcnSpellFactory, $x + 140, $y + 120, 40, 40)
+	$chkIgnoreFactory = GUICtrlCreateCheckbox("", $x + 155, $y + 160, 17, 17)
+	GUICtrlSetOnEvent(-1, "chkIgnoreFactory")
+
+	$iconIgnoreDFactory = GUICtrlCreateIcon($pIconLib, $eIcnDarkSpellFactory, $x + 185, $y + 120, 40, 40)
+	$chkIgnoreDFactory = GUICtrlCreateCheckbox("", $x + 200, $y + 160, 17, 17)
+	GUICtrlSetOnEvent(-1, "chkIgnoreDFactory")
+
+	$iconIgnoreGColl = GUICtrlCreateIcon($pIconLib, $eIcnMine, $x + 275, $y + 120, 40, 40)
+	$chkIgnoreGColl = GUICtrlCreateCheckbox("", $x + 290, $y + 160, 17, 17)
+	GUICtrlSetOnEvent(-1, "chkIgnoreGColl")
+
+	$iconIgnoreEColl = GUICtrlCreateIcon($pIconLib, $eIcnCollector, $x + 320, $y + 120, 40, 40)
+	$chkIgnoreEColl = GUICtrlCreateCheckbox("", $x + 335, $y + 160, 17, 17)
+	GUICtrlSetOnEvent(-1, "chkIgnoreEColl")
+
+	$iconIgnoreDColl = GUICtrlCreateIcon($pIconLib, $eIcnDrill, $x + 365, $y + 120, 40, 40)
+	$chkIgnoreDColl = GUICtrlCreateCheckbox("", $x + 380, $y + 160, 17, 17)
+	GUICtrlSetOnEvent(-1, "chkIgnoreDColl")
+
+	GUICtrlCreateGroup("", -99, -99, 1, 1)
+GUICtrlCreateTabItem("")
+
 ;GUISetState()

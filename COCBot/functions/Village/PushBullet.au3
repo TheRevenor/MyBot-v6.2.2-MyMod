@@ -71,6 +71,7 @@ Func _RemoteControlPushBullet()
 							Local $txtHelp = GetTranslated(620, 13, "You can remotely control your bot sending commands following this syntax:")
 							$txtHelp &= '\n' & GetTranslated(620, 1, -1) & " " & GetTranslated(620, 14, -1) & GetTranslated(620, 2, " - send this help message")
 							$txtHelp &= '\n' & GetTranslated(620, 1, -1) & " " & GetTranslated(620, 15, "DELETE") & GetTranslated(620, 3, " - delete all your previous PushBullet messages")
+							$txtHelp &= '\n' & GetTranslated(620, 1, -1) & " START - start the bot named"
 							$txtHelp &= '\n' & GetTranslated(620, 1, -1) & " <" & $iOrigPushBullet & "> " & GetTranslated(620, 16, "RESTART") & GetTranslated(620, 4, " - restart the bot named <Village Name> and Android Emulator")
 							$txtHelp &= '\n' & GetTranslated(620, 1, -1) & " <" & $iOrigPushBullet & "> " & GetTranslated(620, 17, "STOP") & GetTranslated(620, 5, " - stop the bot named <Village Name>")
 							$txtHelp &= '\n' & GetTranslated(620, 1, -1) & " <" & $iOrigPushBullet & "> " & GetTranslated(620, 18, "PAUSE") & GetTranslated(620, 6, " - pause the bot named <Village Name>")
@@ -80,6 +81,11 @@ Func _RemoteControlPushBullet()
 							$txtHelp &= '\n' & GetTranslated(620, 1, -1) & " <" & $iOrigPushBullet & "> " & GetTranslated(620, 22, "LASTRAID") & GetTranslated(620, 10, " - send the last raid loot screenshot of <Village Name>")
 							$txtHelp &= '\n' & GetTranslated(620, 1, -1) & " <" & $iOrigPushBullet & "> " & GetTranslated(620, 23, "LASTRAIDTXT") & GetTranslated(620, 11, " - send the last raid loot values of <Village Name>")
 							$txtHelp &= '\n' & GetTranslated(620, 1, -1) & " <" & $iOrigPushBullet & "> " & GetTranslated(620, 24, "SCREENSHOT") & GetTranslated(620, 12, " - send a screenshot of <Village Name>")
+							$txtHelp &= '\n' & GetTranslated(620, 1, -1) & " <" & $iOrigPushBullet & "> SCREENSHOTHD - send a screenshot in high resolution of <Village Name>"
+							$txtHelp &= '\n' & GetTranslated(620, 1, -1) & " <" & $iOrigPushBullet & "> BUILDER - send a screenshot of builder status of <Village Name>"
+							$txtHelp &= '\n' & GetTranslated(620, 1, -1) & " <" & $iOrigPushBullet & "> SHIELD - send a screenshot of shield status of <Village Name>"
+							$txtHelp &= '\n' & GetTranslated(620, 1, -1) & " <" & $iOrigPushBullet & "> TOP - send a top gain & zap statistics of <Village Name>"
+							$txtHelp &= '\n' & GetTranslated(620, 1, -1) & " <" & $iOrigPushBullet & "> SWITCHPROFILE <PROFILENAME> - Swap Profile Village and restart bot"
 							$txtHelp &= '\n' & GetTranslated(620, 1, -1) & " <" & $iOrigPushBullet & "> SENDCHAT <TEXT> - send TEXT in clan chat of <Village Name>"
 							$txtHelp &= '\n' & GetTranslated(620, 1, -1) & " <" & $iOrigPushBullet & "> GETCHATS <STOP|NOW|INTERVAL> - select any of this three option to do"
 							$txtHelp &= '\n'
@@ -87,7 +93,8 @@ Func _RemoteControlPushBullet()
 							$txtHelp &= '\n' & GetTranslated(620, 1, -1) & " " & $iOrigPushBullet & " " & GetTranslated(620, 18, "PAUSE")
 							$txtHelp &= '\n' & GetTranslated(620, 1, -1) & " " & GetTranslated(620, 15, "DELETE")
 							$txtHelp &= '\n' & GetTranslated(620, 1, -1) & " " & $iOrigPushBullet & " " & GetTranslated(620, 24, "SCREENSHOT")
-							;_PushToPushBullet($iOrigPushBullet & " | " & GetTranslated(620,26, "Request for Help") & "\n" & $txtHelp)
+							$txtHelp &= '\n' & "Etc"
+							_PushToPushBullet($iOrigPushBullet & " | " & GetTranslated(620,26, "Request for Help") & "\n" & $txtHelp)
 							;_PushToPushBullet($iOrigPushBullet & " | " & GetTranslated(620,26, "Request for Help") & "\n")
 							SetLog("Pushbullet: Your request has been received from ' " & $iOrigPushBullet & ". Help has been sent", $COLOR_GREEN)
 							_DeleteMessageOfPushBullet($iden[$x])
@@ -163,6 +170,14 @@ Func _RemoteControlPushBullet()
 								_PushToPushBullet($iOrigPushBullet & " | " & GetTranslated(620, 48, "Request to Stop") & "..." & "\n" & GetTranslated(620, 50, "Your bot is currently stopped, no action was taken"))
 							EndIf
 									;=================================== "TheRevenor Notify" ===================================
+						Case GetTranslated(620, 1, -1) & " " & StringUpper($iOrigPushBullet) & " HALTATTACKON"
+							GUICtrlSetState($chkBotStop, $GUI_CHECKED)
+							btnStop()
+							btnStart()
+						Case GetTranslated(620, 1, -1) & " " & StringUpper($iOrigPushBullet) & " HALTATTACKOFF"
+							GUICtrlSetState($chkBotStop, $GUI_UNCHECKED)
+							btnStop()
+							btnStart()
 						Case GetTranslated(620, 1, -1) & " " & StringUpper($iOrigPushBullet) & " SCREENSHOTHD"
 							SetLog("Pushbullet: ScreenShot HD request received", $COLOR_GREEN)
 							$RequestScreenshot = 1
@@ -176,11 +191,11 @@ Func _RemoteControlPushBullet()
 							SetLog("Pushbullet: Shield Status request received", $COLOR_GREEN)
 							$RequestShieldInfo = 1
 							_DeleteMessageOfPushBullet($iden[$x])
-						Case GetTranslated(620, 1, -1) & " " & StringUpper($iOrigPushBullet) & " TOP"									
+						Case GetTranslated(620, 1, -1) & " " & StringUpper($iOrigPushBullet) & " TOP"
 							SetLog("Pushbullet: Your request has been received. Top Gain & Zap Statistics sent", $COLOR_GREEN)
-							Local $txtStats = " | Top Gain & Zap Stats Village Report" & "\n" & "\n[G]: " & _NumberFormat($topgoldloot) & "\n[E]: "
-							  $txtStats & = _NumberFormat($topelixirloot) & "\n[D]: " & _NumberFormat($topdarkloot) & "\n[T]: " & $toptrophyloot
-							  $txtStats & = "\n[Z]: " & _NumberFormat($smartZapGain) & "\n[S]: " & _NumberFormat($numLSpellsUsed)
+							Local $txtStats = " | Top Gain & Zap Stats Village Report" & "\n" & "\n[Gold]: " & _NumberFormat($topgoldloot)
+							$txtStats &= "\n[Elixir]: " & _NumberFormat($topelixirloot) & "\n[Dark]: " & _NumberFormat($topdarkloot) & "\n[Trophy]: " & _NumberFormat($toptrophyloot)
+							$txtStats &= "\n[Zap]: " & _NumberFormat($smartZapGain) & "\n[Spells]: " & _NumberFormat($numLSpellsUsed)
 							_PushToPushBullet($iOrigPushBullet & $txtStats)
 							_DeleteMessageOfPushBullet($iden[$x])
 									;=================================== "Chat Bot" ===================================
@@ -215,6 +230,22 @@ Func _RemoteControlPushBullet()
 								btnStart()
 								SetLog("Pushbullet: Your request has been received. Bot is now Started", $COLOR_BLUE)
 								_PushToPushBullet("Request to Start..." & "\n" & "Your bot is now Starting.")
+								_DeleteMessageOfPushBullet($iden[$x])
+							ElseIf StringInStr($body[$x], StringUpper($iOrigPushBullet) & " SWITCHPROFILE") Then
+								$VillageSelect = StringRight($body[$x], StringLen($body[$x]) - StringLen("BOT " & StringUpper($iOrigPushBullet) & " SWITCHPROFILE "))
+								Local $iIndex = _GUICtrlComboBox_FindString($cmbProfile, $VillageSelect)
+								If $iIndex = -1 Then
+								SetLog("PushBullet: Profile Switch failed", $COLOR_RED)
+								$profileString = StringReplace(_GUICtrlComboBox_GetList($cmbProfile), "|", "\n")
+								_PushToPushBullet($iOrigPushBullet & " | " & GetTranslated(18, 128, "Error Switch Profile") & ":\n" & GetTranslated(18, 129, "Available Profiles") & ":\n" & $profileString)
+							Else
+								btnStop()
+								_GUICtrlComboBox_SetCurSel($cmbProfile, $iIndex)
+								cmbProfile()
+								SetLog("PushBullet: Profile Switch success!", $COLOR_GREEN)
+								_PushToPushBullet($iOrigPushBullet & " | " & GetTranslated(18, 130, "Switched to Profile") & ": " & $VillageSelect & GetTranslated(18, 131, " Success!"))
+								btnStart()
+							EndIf
 								_DeleteMessageOfPushBullet($iden[$x])
 							Else
 								Local $lenstr = StringLen(GetTranslated(620, 1, -1) & " " & StringUpper($iOrigPushBullet) & " " & "")
@@ -383,10 +414,13 @@ Func _RemoteControlPushBullet()
 						Local $txtTroopStats = " | " & GetTranslated(18, 114, "Troops/Spells set to Train") & ":\n" & "Barbs:" & $BarbComp & " Arch:" & $ArchComp & " Gobl:" & $GoblComp
 						$txtTroopStats &= "\n" & "Giant:" & $GiantComp & " WallB:" & $WallComp & " Wiza:" & $WizaComp
 						$txtTroopStats &= "\n" & "Balloon:" & $BallComp & " Heal:" & $HealComp & " Dragon:" & $DragComp & " Pekka:" & $PekkComp
+						$txtTroopStats &= "\n" & "BabyD:" & $BabyDComp & " Miner:" & $MineComp
 						$txtTroopStats &= "\n" & "Mini:" & $MiniComp & " Hogs:" & $HogsComp & " Valks:" & $ValkComp
 						$txtTroopStats &= "\n" & "Golem:" & $GoleComp & " Witch:" & $WitcComp & " Lava:" & $LavaComp
+						$txtTroopStats &= "\n" & "Bowler:" & $BowlComp
 						$txtTroopStats &= "\n" & "LSpell:" & $iLightningSpellComp & " HeSpell:" & $iHealSpellComp & " RSpell:" & $iRageSpellComp & " JSpell:" & $iJumpSpellComp
-						$txtTroopStats &= "\n" & "FSpell:" & $iFreezeSpellComp & " PSpell:" & $iPoisonSpellComp & " ESpell:" & $iEarthSpellComp & " HaSpell:" & $iHasteSpellComp & "\n"
+						$txtTroopStats &= "\n" & "FSpell:" & $iFreezeSpellComp & " PSpell:" & $iPoisonSpellComp & " ESpell:" & $iEarthSpellComp & " HaSpell:" & $iHasteSpellComp
+						$txtTroopStats &= "\n" & "CSpell:" & $iCloneSpellComp & " SSpell:" & $iSkeletonSpellComp & "\n"
 						$txtTroopStats &= "\n" & GetTranslated(18, 115, "Current Trained Troops & Spells") & ":"
 						For $i = 0 To UBound($TroopSpellStats) - 1
 							If $TroopSpellStats[$i][0] <> "" Then

@@ -116,8 +116,8 @@ Func chkPBenabled2()
 		GUICtrlSetState($btnDeletePBmessages, $GUI_DISABLE)
 		GUICtrlSetState($chkSearchNotifyCount, $GUI_ENABLE)
 		GUICtrlSetState($txtSearchNotifyCount, $GUI_ENABLE)
-		GUICtrlSetState($chkVillageStatIncrement, $GUI_DISABLE)
-		GUICtrlSetState($txtVillageStatIncrement, $GUI_DISABLE)
+		GUICtrlSetState($chkVillageStatIncrement, $GUI_ENABLE)
+		GUICtrlSetState($txtVillageStatIncrement, $GUI_ENABLE)
 		GUICtrlSetState($chkAlertTopGain, $GUI_ENABLE)
 
 	Else

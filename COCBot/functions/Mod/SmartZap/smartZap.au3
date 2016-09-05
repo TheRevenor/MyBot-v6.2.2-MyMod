@@ -92,6 +92,7 @@ Func smartZap($minDE = -1)
 
 	; If smartZap is not checked, exit.
 	If $ichkSmartZap <> 1 Then Return $performedZap
+	SetLog("====== Your Activate SmartZap Mode ======", $COLOR_FUCHSIA)
 
 	; Use UI Setting if no Min DE is specified
 	If $minDE = -1 Then $minDE = Number($itxtMinDE)
@@ -295,23 +296,6 @@ Func zapDrill($THSpell, $x, $y)
 
 	Local $Spell = -1
 	Local $name = ""
-	;If ($THSpell = $eHSpell And $ichkUseHSpellsTH = 1) Or ($THSpell = $eLSpell And $ichkUseLSpellsTH = 1) Or ($THSpell = $eRSpell And $ichkUseRSpellsTH = 1) Then
-;		If _Sleep(10) Then Return
-;		If $Restart = True Then Return
-;		If CheckOneStar(0, False, True) Then Return
-;		For $i = 0 To UBound($atkTroops) - 1
-;			If $atkTroops[$i][0] = $THSpell Then
-;				$Spell = $i
-;				$name = NameOfTroop($THSpell, 0)
-;			EndIf
-;		Next
-;		If $Spell > -1 Then
-;			SetLog("Dropping " & $name)
-;			SelectDropTroop($Spell)
-;			If _Sleep($iDelayCastSpell1) Then Return
-;			If IsAttackPage() Then Click($x, $y, 1, 0, "#0029")
-;		Else
-;			If $debugSetLog = 1 Then SetLog("No " & $name & " Found")
 	For $i = 0 To UBound($atkTroops) - 1
 		If $atkTroops[$i][0] = $THSpell Then
 			$Spell = $i

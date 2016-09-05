@@ -12,7 +12,7 @@
 ; Link ..........: https://github.com/MyBotRun/MyBot/wiki
 ; Example .......: No
 ; ===============================================================================================================================
-#Cs
+
 Func cmbProfile()
 	saveConfig()
 
@@ -26,9 +26,12 @@ Func cmbProfile()
 	applyConfig()
 	saveConfig()
 
+	;DonateStats ============================
+	InitDonateStats()
+
 	SetLog("Profile " & $sCurrProfile & " loaded from " & $config, $COLOR_GREEN)
 EndFunc   ;==>cmbProfile
-
+#Cs
 Func btnAddConfirm()
 	Switch @GUI_CtrlId
 		Case $btnAdd
@@ -172,6 +175,17 @@ Func btnLocateBarracks()
 	$RunState = $wasRunState
 	AndroidShield("btnLocateBarracks") ; Update shield status due to manual $RunState
 EndFunc   ;==>btnLocateBarracks
+
+
+Func btnLocateDarkBarracks()
+	Local $wasRunState = $RunState
+	$RunState = True
+	ZoomOut()
+	LocateDarkBarrack()
+	$RunState = $wasRunState
+	AndroidShield("btnLocateBarracks") ; Update shield status due to manual $RunState
+EndFunc   ;==>btnLocateDarkBarracks
+
 
 Func btnLocateArmyCamp()
 	Local $wasRunState = $RunState

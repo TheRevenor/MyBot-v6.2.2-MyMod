@@ -133,7 +133,10 @@ Func checkObstacles() ;Checks if something is in the way for mainscreen
 	If _CheckPixel($aIsMainGrayed, $bNoCapturePixel) Then
 		PureClickP($aAway, 1, 0, "#0133") ;Click away If things are open
 		If _Sleep(1000) Then Return
-		PureClick(354, 435, 1, 0, "Click Cancel") ;Click Cancel Button
+		If _ColorCheck(_GetPixelColor(383, 405), Hex(0xF0BE70, 6), 20) Then
+			SetLog("Found Window Load Click Cancel", $COLOR_RED)
+			PureClick(354, 435, 1, 0, "Click Cancel") ;Click Cancel Button
+		EndIf
 		$MinorObstacle = True
 		If _Sleep($iDelaycheckObstacles1) Then Return
 		Return False
