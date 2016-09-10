@@ -1,21 +1,22 @@
-#cs ----------------------------------------------------------------------------
-
-	AutoIt Version: 3.3.14.2
-	Author:         RoroTiti - Updated 10/08/2016
-
-	Script Function:
-	This file contains functions associated to SmartUpgrade.
-
-#ce ----------------------------------------------------------------------------
-
-; Script Start - Add your code below here
-
-Global $sBldgLevel, $aString
-Global $upgradeName[3] = ["", "", ""]
+; #FUNCTION# ====================================================================================================================
+; Name ..........: SmartUpgrade (v2)
+; Description ...: This file contains all functions of SmartUpgrade feature
+; Syntax ........: ---
+; Parameters ....: ---
+; Return values .: ---
+; Author ........: RoroTiti
+; Modified ......: 03/09/2016
+; Remarks .......: This file is part of MyBotRun. Copyright 2016
+;                  MyBotRun is distributed under the terms of the GNU GPL
+;				   Because this file is a part of an open-sourced project, I allow all MODders and DEVelopers to use these functions.
+; Related .......: ---
+; Link ..........: https://www.mybot.run
+; Example .......:  =====================================================================================================================
 
 Func SmartUpgrade()
 
 	If $ichkSmartUpgrade = 1 Then ; check if SmartUpgrade is enabled
+		getBuilderCount()
 		If $iFreeBuilderCount <> 0 Then ; check free builders
 			If ($iSaveWallBldr = 1 And $iFreeBuilderCount > 1) Or $iSaveWallBldr = 0 Then ; check if Save builder for walls is active
 				SetLog("Starting SmartUpgrade...", $COLOR_BLUE)
@@ -34,7 +35,7 @@ Func SmartUpgrade()
 				SetLog("Only 1 builder available and he works on walls... Good Luck haha !!!", $COLOR_DEEPPINK)
 			EndIf
 		Else
-			SetLog("No builder available, skipping SmartUpgrade", $COLOR_ORANGE)
+			SetLog("No builder available, skipping SmartUpgrade...", $COLOR_ORANGE)
 		EndIf
 	Else
 		Return
@@ -57,115 +58,214 @@ Func clickUpgrade()
 
 	;;;;				Check the first slot				;;;
 
-	openUpgradeTab()
-	searchZeros(0, 76, 860, 106)
-	If $zerosHere = 1 Then
-		If ($iSaveWallBldr = 1 And $iFreeBuilderCount > 1) Or $iSaveWallBldr = 0 Then
-			$zerosHere = 0
-			Click(435, 94)
-			Sleep(1500)
-			locateUpgrade()
-			checkIgnoreUpgrade()
+	VillageReport()
+	$TypeFound = 0
+	If $iTotalBuilderCount >= 1 Then
+		getBuilderCount()
+		If $iFreeBuilderCount <> 0 Then ; check free builders
+			If ($iSaveWallBldr = 1 And $iFreeBuilderCount > 1) Or $iSaveWallBldr = 0 Then
+				openUpgradeTab()
+				searchZeros(0, 76, 860, 106)
+				If $zerosHere = 1 Then
+					$zerosHere = 0
+					Click(435, 94)
+					Sleep(1500)
+					locateUpgrade()
+					launchUpgrade()
+				Else
+					SetLog("No upgrade available on the First slot, checking the Second...", $COLOR_ORANGE)
+				EndIf
+			Else
+				SetLog("Only 1 builder available and he works on walls... Good Luck haha !!!", $COLOR_DEEPPINK)
+				Return
+			EndIf
 		Else
-			SetLog("Only 1 builder available and he works on walls... Good Luck haha !!!", $COLOR_DEEPPINK)
-			Sleep(1500)
+			SetLog("No builder available, skipping SmartUpgrade...", $COLOR_ORANGE)
+			Return
 		EndIf
-	Else
-		SetLog("No upgrade available on the First slot, checking the Second...", $COLOR_ORANGE)
+		PureClickP($aAway, 1, 0, "#0133") ;Click away
+		Sleep(1500)
 	EndIf
-
-	PureClickP($aAway, 1, 0, "#0133") ;Click away
-	Sleep(1500)
 
 	;;;;				Check the second slot				;;;
 
-	openUpgradeTab()
-	searchZeros(0, 106, 860, 136)
-	If $zerosHere = 1 Then
-		If ($iSaveWallBldr = 1 And $iFreeBuilderCount > 1) Or $iSaveWallBldr = 0 Then
-			$zerosHere = 0
-			Click(435, 123)
-			Sleep(1500)
-			locateUpgrade()
-			checkIgnoreUpgrade()
+	VillageReport()
+	$TypeFound = 0
+	If $iTotalBuilderCount >= 2 Then
+		getBuilderCount()
+		If $iFreeBuilderCount <> 0 Then ; check free builders
+			If ($iSaveWallBldr = 1 And $iFreeBuilderCount > 1) Or $iSaveWallBldr = 0 Then
+				openUpgradeTab()
+				searchZeros(0, 106, 860, 136)
+				If $zerosHere = 1 Then
+					$zerosHere = 0
+					Click(435, 123)
+					Sleep(1500)
+					locateUpgrade()
+					launchUpgrade()
+				Else
+					SetLog("No upgrade available on the Second slot, checking the Third...", $COLOR_ORANGE)
+				EndIf
+			Else
+				SetLog("Only 1 builder available and he works on walls... Good Luck haha !!!", $COLOR_DEEPPINK)
+				Return
+			EndIf
 		Else
-			SetLog("Only 1 builder available and he works on walls... Good Luck haha !!!", $COLOR_DEEPPINK)
-			Sleep(1500)
+			SetLog("No builder available, skipping SmartUpgrade...", $COLOR_ORANGE)
+			Return
 		EndIf
-	Else
-		SetLog("No upgrade available on the Second slot, checking the Third...", $COLOR_ORANGE)
+		PureClickP($aAway, 1, 0, "#0133") ;Click away
+		Sleep(1500)
 	EndIf
-
-	PureClickP($aAway, 1, 0, "#0133") ;Click away
-	Sleep(1500)
 
 	;;;;				Check the third slot				;;;
 
-	openUpgradeTab()
-	searchZeros(0, 136, 860, 166)
-	If $zerosHere = 1 Then
-		If ($iSaveWallBldr = 1 And $iFreeBuilderCount > 1) Or $iSaveWallBldr = 0 Then
-			$zerosHere = 0
-			Click(435, 151)
-			Sleep(1500)
-			locateUpgrade()
-			checkIgnoreUpgrade()
+	VillageReport()
+	$TypeFound = 0
+	If $iTotalBuilderCount >= 3 Then
+		getBuilderCount()
+		If $iFreeBuilderCount <> 0 Then ; check free builders
+			If ($iSaveWallBldr = 1 And $iFreeBuilderCount > 1) Or $iSaveWallBldr = 0 Then
+				openUpgradeTab()
+				searchZeros(0, 136, 860, 166)
+				If $zerosHere = 1 Then
+					$zerosHere = 0
+					Click(435, 151)
+					Sleep(1500)
+					locateUpgrade()
+					launchUpgrade()
+				Else
+					SetLog("No upgrade available on the Third slot, checking the Fourth...", $COLOR_ORANGE)
+				EndIf
+			Else
+				SetLog("Only 1 builder available and he works on walls... Good Luck haha !!!", $COLOR_DEEPPINK)
+				Sleep(1500)
+			EndIf
 		Else
-			SetLog("Only 1 builder available and he works on walls... Good Luck haha !!!", $COLOR_DEEPPINK)
-			Sleep(1500)
+			SetLog("No builder available, skipping SmartUpgrade...", $COLOR_ORANGE)
+			Return
 		EndIf
-	Else
-		SetLog("No upgrade available on the Third slot, checking the Fourth...", $COLOR_ORANGE)
+		PureClickP($aAway, 1, 0, "#0133") ;Click away
+		Sleep(1500)
 	EndIf
-
-	PureClickP($aAway, 1, 0, "#0133") ;Click away
-	Sleep(1500)
 
 	;;;;				Check the fourth slot				;;;
 
-	openUpgradeTab()
-	searchZeros(0, 166, 860, 196)
-	If $zerosHere = 1 Then
-		If ($iSaveWallBldr = 1 And $iFreeBuilderCount > 1) Or $iSaveWallBldr = 0 Then
-			$zerosHere = 0
-			Click(435, 180)
-			Sleep(1500)
-			locateUpgrade()
-			checkIgnoreUpgrade()
+	VillageReport()
+	$TypeFound = 0
+	If $iTotalBuilderCount >= 4 Then
+		getBuilderCount()
+		If $iFreeBuilderCount <> 0 Then ; check free builders
+			If ($iSaveWallBldr = 1 And $iFreeBuilderCount > 1) Or $iSaveWallBldr = 0 Then
+				openUpgradeTab()
+				searchZeros(0, 166, 860, 196)
+				If $zerosHere = 1 Then
+					$zerosHere = 0
+					Click(435, 180)
+					Sleep(1500)
+					locateUpgrade()
+					launchUpgrade()
+				Else
+					SetLog("No upgrade available on the Fourth slot, checking the Fifth...", $COLOR_ORANGE)
+				EndIf
+			Else
+				SetLog("Only 1 builder available and he works on walls... Good Luck haha !!!", $COLOR_DEEPPINK)
+				Return
+			EndIf
 		Else
-			SetLog("Only 1 builder available and he works on walls... Good Luck haha !!!", $COLOR_DEEPPINK)
-			Sleep(1500)
+			SetLog("No builder available, skipping SmartUpgrade...", $COLOR_ORANGE)
+			Return
 		EndIf
-	Else
-		SetLog("No upgrade available on the Fourth slot, checking the Fifth...", $COLOR_ORANGE)
+		PureClickP($aAway, 1, 0, "#0133") ;Click away
+		Sleep(1500)
 	EndIf
-
-	PureClickP($aAway, 1, 0, "#0133") ;Click away
-	Sleep(1500)
 
 	;;;;				Check the fifth slot				;;;
 
-	openUpgradeTab()
-	searchZeros(0, 196, 860, 226)
-	If $zerosHere = 1 Then
-		If ($iSaveWallBldr = 1 And $iFreeBuilderCount > 1) Or $iSaveWallBldr = 0 Then
-			$zerosHere = 0
-			Click(435, 208)
-			Sleep(1500)
-			locateUpgrade()
-			checkIgnoreUpgrade()
+	VillageReport()
+	$TypeFound = 0
+	If $iTotalBuilderCount >= 5 Then
+		getBuilderCount()
+		If $iFreeBuilderCount <> 0 Then ; check free builders
+			If ($iSaveWallBldr = 1 And $iFreeBuilderCount > 1) Or $iSaveWallBldr = 0 Then
+				openUpgradeTab()
+				searchZeros(0, 196, 860, 226)
+				If $zerosHere = 1 Then
+					$zerosHere = 0
+					Click(435, 208)
+					Sleep(1500)
+					locateUpgrade()
+					launchUpgrade()
+				Else
+					SetLog("No upgrade available on the Fifth slot, no more upgrade available !", $COLOR_ORANGE)
+				EndIf
+			Else
+				SetLog("Only 1 builder available and he works on walls... Good Luck haha !!!", $COLOR_DEEPPINK)
+				Return
+			EndIf
 		Else
-			SetLog("Only 1 builder available and he works on walls... Good Luck haha !!!", $COLOR_DEEPPINK)
-			Sleep(1500)
+			SetLog("No builder available, skipping SmartUpgrade...", $COLOR_ORANGE)
+			Return
 		EndIf
-	Else
-		SetLog("No upgrade available on the Fifth slot, no more upgrade available !", $COLOR_ORANGE)
+		PureClickP($aAway, 1, 0, "#0133") ;Click away
+		Sleep(1500)
 	EndIf
 
-	PureClickP($aAway, 1, 0, "#0133") ;Click away
-	Sleep(1500)
-
 EndFunc   ;==>clickUpgrade
+
+Func launchUpgrade()
+
+	If $upgradeAvailable = 1 Then
+		$upgradeAvailable = 0
+		Sleep(1500)
+		Click($upgradeX, $upgradeY)
+		$upgradeX = 0
+		$upgradeY = 0
+		Sleep(1500)
+		checkMinRessources()
+		If $SufficentRessources = 0 Then
+			SetLog("Insufficent ressources to launch upgrade, skipping...", $COLOR_RED)
+			PureClickP($aAway, 1, 0, "#0133") ;Click away
+			Sleep(1500)
+		Else
+			updateSmartUpgradeLog()
+			If StringInStr($sBldgText, "Barbar") Or StringInStr($sBldgText, "Queen") Or StringInStr($sBldgText, "Warden") Then ; search for heros, which have a different place for upgrade button
+				Click(710, 560)
+			Else
+				Click(480, 520)
+			EndIf
+		EndIf
+		Sleep(1500)
+	EndIf
+
+EndFunc   ;==>launchUpgrade
+
+; ================================================== LOCATE PART ================================================== ;
+
+Func searchZeros($xdebut, $ydebut, $xlargeur, $yhauteur) ; check for zeros on the builers menu - translate upgrade available
+
+	Local $ImagesToUse2 = @ScriptDir & "\images\Button\Price.png"
+	Local $ToleranceImgLoc = 0.90
+
+	Sleep(1500)
+	_CaptureRegion2($xdebut, $ydebut, $xlargeur, $yhauteur)
+	$res = DllCall($hImgLib, "str", "SearchTile", "handle", $hHBitmap2, "str", $ImagesToUse2, "float", $ToleranceImgLoc, "str", "FV", "int", 1)
+	If IsArray($res) Then
+		If $DebugSetlog = 1 Then SetLog("DLL Call succeeded " & $res[0], $COLOR_PURPLE)
+		If $res[0] = "0" Or $res[0] = "" Then
+			If $DebugSetlog Then SetLog("No Button found")
+			SetLog("No zeros here !", $COLOR_RED)
+			$zerosHere = 0
+		ElseIf $res[0] = "-1" Then
+			SetLog("DLL Error", $COLOR_RED)
+		ElseIf $res[0] = "-2" Then
+			SetLog("Invalid Resolution", $COLOR_RED)
+		Else
+			$zerosHere = 1
+		EndIf
+	EndIf
+
+EndFunc   ;==>searchZeros
 
 Func locateUpgrade() ; search for the upgrade builing button
 
@@ -196,80 +296,68 @@ Func locateUpgrade() ; search for the upgrade builing button
 
 EndFunc   ;==>locateUpgrade
 
-Func searchZeros($xdebut, $ydebut, $xlargeur, $yhauteur) ; check for zeros on the builers menu - translate upgrade available
+; ================================================== INFOS PART ================================================== ;
 
-	Local $ImagesToUse2 = @ScriptDir & "\images\Button\Price.png"
-	Local $ToleranceImgLoc = 0.90
+Func checkUpgradeType() ; search for the upgrade builing button
 
-	Sleep(1500)
-	_CaptureRegion2($xdebut, $ydebut, $xlargeur, $yhauteur)
-	$res = DllCall($hImgLib, "str", "SearchTile", "handle", $hHBitmap2, "str", $ImagesToUse2, "float", $ToleranceImgLoc, "str", "FV", "int", 1)
-	If IsArray($res) Then
-		If $DebugSetlog = 1 Then SetLog("DLL Call succeeded " & $res[0], $COLOR_PURPLE)
-		If $res[0] = "0" Or $res[0] = "" Then
-			If $DebugSetlog Then SetLog("No Button found")
-			SetLog("No zeros here !", $COLOR_RED)
-			$zerosHere = 0
-		ElseIf $res[0] = "-1" Then
-			SetLog("DLL Error", $COLOR_RED)
-		ElseIf $res[0] = "-2" Then
-			SetLog("Invalid Resolution", $COLOR_RED)
-		Else
-			$zerosHere = 1
-		EndIf
-	EndIf
+	Local $ImagesToUse1 = @ScriptDir & "\images\Button\Gold.png"
+	Local $ImagesToUse2 = @ScriptDir & "\images\Button\Elixir.png"
+	Local $ImagesToUse3 = @ScriptDir & "\images\Button\Dark.png"
 
-EndFunc   ;==>searchZeros
-
-Func checkCost() ; search for the upgrade builing button
-
-	Local $ImagesToUse = @ScriptDir & "\images\Button\Red_Price.png"
 	Local $ToleranceImgLoc = 0.90
 
 	_CaptureRegion2()
-	$res = DllCall($hImgLib, "str", "SearchTile", "handle", $hHBitmap2, "str", $ImagesToUse, "float", $ToleranceImgLoc, "str", "FV", "int", 1)
+
+	$res = DllCall($hImgLib, "str", "SearchTile", "handle", $hHBitmap2, "str", $ImagesToUse1, "float", $ToleranceImgLoc, "str", "FV", "int", 1)
 	If IsArray($res) Then
 		If $DebugSetlog = 1 Then SetLog("DLL Call succeeded " & $res[0], $COLOR_RED)
 		If $res[0] = "0" Or $res[0] = "" Then
 			If $DebugSetlog Then SetLog("No Button found")
-			SetLog("No Red Cost, sufficent ressources to launch upgrade !", $COLOR_GREEN)
-			$SufficentRessources = 1
+			$TypeFound = 0
 		ElseIf $res[0] = "-1" Then
 			SetLog("DLL Error", $COLOR_RED)
 		ElseIf $res[0] = "-2" Then
 			SetLog("Invalid Resolution", $COLOR_RED)
 		Else
-			SetLog("Insufficent ressources to launch upgrade...", $COLOR_RED)
-			$SufficentRessources = 0
+			$TypeFound = 1
 		EndIf
 	EndIf
 
-EndFunc   ;==>checkCost
-
-Func launchUpgrade()
-
-	If $upgradeAvailable = 1 Then
-		$upgradeAvailable = 0
-		Sleep(1500)
-		Click($upgradeX, $upgradeY)
-		$upgradeX = 0
-		$upgradeY = 0
-		Sleep(1500)
-		checkCost()
-		If $SufficentRessources = 0 Then
-			PureClickP($aAway, 1, 0, "#0133") ;Click away
-			Sleep(1500)
-		Else
-			If StringInStr($sBldgText, "Barbar") Or StringInStr($sBldgText, "Queen") Or StringInStr($sBldgText, "Warden") Then ; search for heros, which have a different place for upgrade button
-				Click(710, 560)
+	If $TypeFound = 0 Then
+		$res = DllCall($hImgLib, "str", "SearchTile", "handle", $hHBitmap2, "str", $ImagesToUse2, "float", $ToleranceImgLoc, "str", "FV", "int", 1)
+		If IsArray($res) Then
+			If $DebugSetlog = 1 Then SetLog("DLL Call succeeded " & $res[0], $COLOR_RED)
+			If $res[0] = "0" Or $res[0] = "" Then
+				If $DebugSetlog Then SetLog("No Button found")
+				$TypeFound = 0
+			ElseIf $res[0] = "-1" Then
+				SetLog("DLL Error", $COLOR_RED)
+			ElseIf $res[0] = "-2" Then
+				SetLog("Invalid Resolution", $COLOR_RED)
 			Else
-				Click(480, 520)
+				$TypeFound = 2
 			EndIf
 		EndIf
-		Sleep(1500)
 	EndIf
 
-EndFunc   ;==>launchUpgrade
+	If $TypeFound = 0 Then
+		$res = DllCall($hImgLib, "str", "SearchTile", "handle", $hHBitmap2, "str", $ImagesToUse3, "float", $ToleranceImgLoc, "str", "FV", "int", 1)
+		If IsArray($res) Then
+			If $DebugSetlog = 1 Then SetLog("DLL Call succeeded " & $res[0], $COLOR_RED)
+			If $res[0] = "0" Or $res[0] = "" Then
+				If $DebugSetlog Then SetLog("No Button found")
+				$TypeFound = 0
+			ElseIf $res[0] = "-1" Then
+				SetLog("DLL Error", $COLOR_RED)
+			ElseIf $res[0] = "-2" Then
+				SetLog("Invalid Resolution", $COLOR_RED)
+			Else
+				$TypeFound = 3
+			EndIf
+		EndIf
+	EndIf
+
+EndFunc   ;==>checkUpgradeType
 
 Func upgradeInfo($iXstart, $iYstart) ; note the upgrade name and level into the log
 
@@ -301,6 +389,42 @@ Func upgradeInfo($iXstart, $iYstart) ; note the upgrade name and level into the 
 	If $upgradeName[2] <> "" Then $upgradeName[0] += 1
 
 EndFunc   ;==>upgradeInfo
+
+; ================================================== VERIFS PART ================================================== ;
+
+Func checkMinRessources()
+
+	checkUpgradeType()
+
+	If StringInStr($sBldgText, "Barbar") Or StringInStr($sBldgText, "Queen") Or StringInStr($sBldgText, "Warden") Then ; search for heros, which have a different place for upgrade button
+		$UpgradeCost = Number(getResourcesBonus(598, 519 + $midOffsetY)) ; Try to read white text.
+		If $UpgradeCost = "" Then $UpgradeCost = Number(getUpgradeResource(598, 519 + $midOffsetY)) ;read RED upgrade text
+	Else
+		$UpgradeCost = Number(getResourcesBonus(366, 487 + $midOffsetY)) ; Try to read white text.
+		If $UpgradeCost = "" Then $UpgradeCost = Number(getUpgradeResource(366, 487 + $midOffsetY)) ;read RED upgrade text
+	EndIf
+
+	If $TypeFound = 1 Then
+		If $iGoldCurrent - $UpgradeCost >= GUICtrlRead($SmartMinGold) Then
+			$SufficentRessources = 1
+		Else
+			$SufficentRessources = 0
+		EndIf
+	ElseIf $TypeFound = 2 Then
+		If $iElixirCurrent - $UpgradeCost >= GUICtrlRead($SmartMinElixir) Then
+			$SufficentRessources = 1
+		Else
+			$SufficentRessources = 0
+		EndIf
+	ElseIf $TypeFound = 3 Then
+		If $iDarkCurrent - $UpgradeCost >= GUICtrlRead($SmartMinDark) Then
+			$SufficentRessources = 1
+		Else
+			$SufficentRessources = 0
+		EndIf
+	EndIf
+
+EndFunc   ;==>checkMinRessources
 
 Func checkIgnoreUpgrade()
 
@@ -356,22 +480,58 @@ Func checkIgnoreUpgrade()
 		SetLog("Grand Warden upgrade selected, skipping upgrade...")
 		Return
 	Else
-		SetLog("We will upgrade " & $upgradeName[1] & "to level " & $upgradeName[2] + 1, $COLOR_GREEN)
 		Sleep(1500)
 		launchUpgrade()
 	EndIf
 
 EndFunc   ;==>checkIgnoreUpgrade
 
+; ================================================== LOG PART ================================================== ;
+
+Func updateSmartUpgradeLog()
+
+	SetLog("Sufficent ressources to launch upgrade !", $COLOR_GREEN)
+	SetLog("We will upgrade " & $upgradeName[1] & "to level " & $upgradeName[2] + 1, $COLOR_GREEN)
+	If $TypeFound = 1 Then
+		SetLog("Upgrade cost : " & _NumberFormat($UpgradeCost) & " Gold", $COLOR_GREEN)
+		_GUICtrlEdit_AppendText($SmartUpgradeLog, @CRLF & _NowTime(4) & " - " & "Upgrading " & $upgradeName[1] & "from level " & $upgradeName[2] & " to level " & $upgradeName[2] + 1 & " for " & _NumberFormat($UpgradeCost) & " Gold")
+		_FileWriteLog($dirLogs & "\SmartUpgradeHistory.log", "Upgrading " & $upgradeName[1] & "from level " & $upgradeName[2] & " to level " & $upgradeName[2] + 1 & " for " & _NumberFormat($UpgradeCost) & " Gold")
+		If $ichkAlertSmartUpgrade = 1 Then _PushToPushBullet("SmartUpgrade : Upgrading " & $upgradeName[1] & "from level " & $upgradeName[2] & " to level " & $upgradeName[2] + 1 & " for " & _NumberFormat($UpgradeCost) & " Gold")
+	ElseIf $TypeFound = 2 Then
+		SetLog("Upgrade cost : " & _NumberFormat($UpgradeCost) & " Elixir", $COLOR_GREEN)
+		_GUICtrlEdit_AppendText($SmartUpgradeLog, @CRLF & _NowTime(4) & " - " & "Upgrading " & $upgradeName[1] & "from level " & $upgradeName[2] & " to level " & $upgradeName[2] + 1 & " for " & _NumberFormat($UpgradeCost) & " Elixir")
+		_FileWriteLog($dirLogs & "\SmartUpgradeHistory.log", "Upgrading " & $upgradeName[1] & "from level " & $upgradeName[2] & " to level " & $upgradeName[2] + 1 & " for " & _NumberFormat($UpgradeCost) & " Elixir")
+		If $ichkAlertSmartUpgrade = 1 Then _PushToPushBullet("SmartUpgrade : Upgrading " & $upgradeName[1] & "from level " & $upgradeName[2] & " to level " & $upgradeName[2] + 1 & " for " & _NumberFormat($UpgradeCost) & " Elixir")
+	ElseIf $TypeFound = 3 Then
+		SetLog("Upgrade cost : " & _NumberFormat($UpgradeCost) & " Dark Elixir", $COLOR_GREEN)
+		_GUICtrlEdit_AppendText($SmartUpgradeLog, @CRLF & _NowTime(4) & " - " & "Upgrading " & $upgradeName[1] & "from level " & $upgradeName[2] & " to level " & $upgradeName[2] + 1 & " for " & _NumberFormat($UpgradeCost) & " Dark Elixir")
+		_FileWriteLog($dirLogs & "\SmartUpgradeHistory.log", "Upgrading " & $upgradeName[1] & "from level " & $upgradeName[2] & " to level " & $upgradeName[2] + 1 & " for " & _NumberFormat($UpgradeCost) & " Dark Elixir")
+		If $ichkAlertSmartUpgrade = 1 Then _PushToPushBullet("SmartUpgrade : Upgrading " & $upgradeName[1] & "from level " & $upgradeName[2] & " to level " & $upgradeName[2] + 1 & " for " & _NumberFormat($UpgradeCost) & " Dark Elixir")
+	EndIf
+
+EndFunc   ;==>updateSmartUpgradeLog
+
+Func chkAlertSmartUpgrade()
+
+	If GUICtrlRead($chkAlertSmartUpgrade) = $GUI_CHECKED Then
+		$ichkAlertSmartUpgrade = 1
+	Else
+		$ichkAlertSmartUpgrade = 0
+	EndIf
+
+EndFunc   ;==>chkAlertSmartUpgrade
+
+; ================================================== CONFIG PART ================================================== ;
+
 Func chkSmartUpgrade()
 	If GUICtrlRead($chkSmartUpgrade) = $GUI_CHECKED Then
 		$ichkSmartUpgrade = 1
-		For $i = $iconIgnoreTH To $chkIgnoreDColl
+		For $i = $iconIgnoreTH To $SmartUpgradeLog
 			GUICtrlSetState($i, $GUI_ENABLE)
 		Next
 	Else
 		$ichkSmartUpgrade = 0
-		For $i = $iconIgnoreTH To $chkIgnoreDColl
+		For $i = $iconIgnoreTH To $SmartUpgradeLog
 			GUICtrlSetState($i, $GUI_DISABLE)
 		Next
 	EndIf

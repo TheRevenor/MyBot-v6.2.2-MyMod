@@ -567,7 +567,7 @@ Func saveConfig() ;Saves the controls settings to the config
 	$icmbBotCond = _GUICtrlComboBox_GetCurSel($cmbBotCond)
 	$icmbHoursStop = _GUICtrlComboBox_GetCurSel($cmbHoursStop)
 
-	$sTimeWakeUp = GUICtrlRead($txtTimeWakeUp)
+	$sTimeWakeUp = Int(GUICtrlRead($txtTimeWakeUp)) * 60 ; Minutes are entered
 
 	$itxtRestartGold = GUICtrlRead($txtRestartGold)
 	$itxtRestartElixir = GUICtrlRead($txtRestartElixir)
@@ -2476,6 +2476,10 @@ Func saveConfig() ;Saves the controls settings to the config
 	IniWriteS($config, "attack", "CSVSpeedDB", $isldSelectedCSVSpeed[$DB])
 	IniWriteS($config, "attack", "CSVSpeedAB", $isldSelectedCSVSpeed[$LB])
 	
+	; Android Settings - Added by LunaEclipse
+	IniWrite($config, "Android", "Emulator", GUICtrlRead($cmbAndroid))
+	IniWrite($config, "Android", "Instance", GUICtrlRead($txtAndroidInstance))
+	
 	; SmartZap Settings - Added by LunaEclipse
 	If GUICtrlRead($chkSmartLightSpell) = $GUI_CHECKED Then
 		IniWrite($config, "SmartZap", "UseSmartZap", 1)
@@ -2607,6 +2611,9 @@ Func saveConfig() ;Saves the controls settings to the config
 		IniWrite($config, "pushbullet", "AlertTopGain", 0)
 	EndIf
 	
+	; Notify SmartUpgrade - Added by Roro-Titi
+	IniWrite($config, "pushbullet", "chkAlertSmartUpgrade", $ichkAlertSmartUpgrade)
+	
 	; SmartUpgrade - Added by Roro-Titi
 	IniWrite($config, "upgrade", "chkSmartUpgrade", $ichkSmartUpgrade)
 	IniWrite($config, "upgrade", "chkIgnoreTH", $ichkIgnoreTH)
@@ -2622,6 +2629,9 @@ Func saveConfig() ;Saves the controls settings to the config
 	IniWrite($config, "upgrade", "chkIgnoreGColl", $ichkIgnoreGColl)
 	IniWrite($config, "upgrade", "chkIgnoreEColl", $ichkIgnoreEColl)
 	IniWrite($config, "upgrade", "chkIgnoreDColl", $ichkIgnoreDColl)
+	IniWrite($config, "upgrade", "SmartMinGold", GUICtrlRead($SmartMinGold))
+	IniWrite($config, "upgrade", "SmartMinElixir", GUICtrlRead($SmartMinElixir))
+	IniWrite($config, "upgrade", "SmartMinDark", GUICtrlRead($SmartMinDark))
 	
 	; Profile Switch Settings
 	If GUICtrlRead($chkGoldSwitchMax) = $GUI_CHECKED Then

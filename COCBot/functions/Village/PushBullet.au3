@@ -882,7 +882,7 @@ Func PushMsgToPushBullet($Message, $Source = "")
 				SetLog("Pushbullet/Telegram: Last Raid Text has been sent!", $COLOR_GREEN)
 			EndIf
 			If ($PushBulletEnabled = 1 Or $TelegramEnabled = 1) And $pLastRaidImg = 1 Then
-				_CaptureRegion(0, 0, $DEFAULT_WIDTH, $DEFAULT_HEIGHT - 45)
+				_CaptureRegion()
 				;create a temporary file to send with pushbullet...
 				Local $Date = @YEAR & "-" & @MON & "-" & @MDAY
 				Local $Time = @HOUR & "." & @MIN & "." & @SEC
@@ -938,10 +938,10 @@ Func PushMsgToPushBullet($Message, $Source = "")
 		Case "RequestScreenshot"
 			Local $Date = @YEAR & "-" & @MON & "-" & @MDAY
 			Local $Time = @HOUR & "." & @MIN & "." & @SEC
-			_CaptureRegion(0, 0, $DEFAULT_WIDTH, $DEFAULT_HEIGHT - 45)
 			If $RequestScreenshotHD = 1 Then
 				$hBitmap_Scaled = $hBitmap
 			Else
+			_CaptureRegion()
 			$hBitmap_Scaled = _GDIPlus_ImageResize($hBitmap, _GDIPlus_ImageGetWidth($hBitmap) / 2, _GDIPlus_ImageGetHeight($hBitmap) / 2) ;resize image
 			EndIf
 			Local $Screnshotfilename = "Screenshot_" & $Date & "_" & $Time & ".jpg"

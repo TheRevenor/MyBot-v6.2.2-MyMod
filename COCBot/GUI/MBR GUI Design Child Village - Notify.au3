@@ -87,7 +87,7 @@ $hGUI_NOTIFY_TAB_ITEM1 = GUICtrlCreateTabItem(GetTranslated(600,18,"PushBullet/T
 		;$y += 25
 		$y += 45
 		;$lblNotifyPBWhen = GUICtrlCreateLabel(GetTranslated(619, 18, "Send a PushBullet message for these options") & ":", $x, $y, -1, -1, $SS_RIGHT)
-		$lblNotifyPBWhen = GUICtrlCreateGroup(GetTranslated(619, 18, "Send a PushBullet message for these options") & ":", $x, $y, 410, 105, $SS_RIGHT)
+		$lblNotifyPBWhen = GUICtrlCreateGroup(GetTranslated(619, 18, "Send a PushBullet message for these options") & ":", $x, $y, 410, 125, $SS_RIGHT)
 		$y += 15
 		$chkAlertPBVMFound = GUICtrlCreateCheckbox(GetTranslated(619, 19, "Match Found"), $x + 10, $y)
 			_GUICtrlSetTip(-1, GetTranslated(619, 20, "Send the amount of available loot when bot finds a village to attack."))
@@ -139,7 +139,6 @@ $y += 20
 		$txtTip = "Searchcount Notification every ____ searches."
 		_GUICtrlSetTip(-1, $txtTip)
 		GUICtrlSetLimit(-1, 3)
-		GUICtrlSetOnEvent(-1, "txtSearchNotifyCount")
 		GUICtrlSetState(-1, $GUI_DISABLE)
 		$chkVillageStatIncrement = GUICtrlCreateCheckbox("Stats.  Increment:", $x + 210, $y, -1, -1)
 		_GUICtrlSetTip(-1, "Send Village Stats every ____ attacks.")
@@ -148,8 +147,12 @@ $y += 20
 		$txtTip = "No. of attacks between stat updates."
 		_GUICtrlSetTip(-1, $txtTip)
 		GUICtrlSetLimit(-1, 3)
-		GUICtrlSetOnEvent(-1, "txtVillageStatIncrement")
 		GUICtrlSetState(-1, $GUI_DISABLE)
+$y += 20
+		$chkAlertSmartUpgrade = GUICtrlCreateCheckbox("SmartUpgrade", $x + 10, $y, -1, -1)
+		_GUICtrlSetTip(-1, "Send a notification after each upgrade done with SmartUpgrade")
+		GUICtrlSetState(-1, $GUI_DISABLE)
+		GUICtrlSetOnEvent(-1, "chkAlertSmartUpgrade")
 ;$y += 20
 	;$chkAlertTopGain = GUICtrlCreateCheckbox("Top Gain", $x + 10, $y, -1, -1)
 		;_GUICtrlSetTip(-1, "Send an Alert when a Top Gain is achived.") 

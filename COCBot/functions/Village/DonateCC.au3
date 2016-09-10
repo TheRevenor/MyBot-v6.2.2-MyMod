@@ -698,6 +698,8 @@ Func DonateTroopType($Type, $Quant = 0, $Custom = False, $bDonateAll = False)
 
 			Else
 				If $iDonTroopsQuantity > 1 Then $plural = 1
+				If $bDonateAll Then $sTextToAll = " (to all requests)"
+				SetLog("Donating " & $iDonTroopsQuantity & " " & NameOfTroop($Type, $plural) & $sTextToAll, $COLOR_GREEN)
 				If $debugOCRdonate = 1 Then
 					Setlog("donate", $color_RED)
 					Setlog("row: " & $donaterow, $color_RED)

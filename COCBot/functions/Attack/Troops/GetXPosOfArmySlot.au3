@@ -6,13 +6,14 @@
 ;                  $xOffsetFor11Slot    - an unknown value.
 ; Return values .: None
 ; Author ........:
-; Modified ......: ProMac (08-2016)
+; Modified ......: Promac 08-2016
 ; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2016
 ;                  MyBot is distributed under the terms of the GNU GPL
 ; Related .......:
 ; Link ..........: https://github.com/MyBotRun/MyBot/wiki
 ; Example .......: No
 ; ===============================================================================================================================
+
 Func GetXPosOfArmySlot($slotNumber, $xOffsetFor11Slot)
 
 	Local $SlotPixelColor, $SlotPixelColorTemp, $SlotPixelColor1

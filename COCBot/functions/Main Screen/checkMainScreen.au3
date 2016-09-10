@@ -1,8 +1,7 @@
-
 ; #FUNCTION# ====================================================================================================================
 ; Name ..........: checkMainScreen
 ; Description ...: Checks whether the pixel, located in the eyes of the builder in mainscreen, is available
-;						If it is not available, it calls checkObstacles and also waitMainScreen.
+;				   If it is not available, it calls checkObstacles and also waitMainScreen.
 ; Syntax ........: checkMainScreen([$Check = True]), IsWaitingForConnection()
 ; Parameters ....: $Check               - [optional] an unknown value. Default is True.
 ; Return values .: None
@@ -19,32 +18,39 @@ Func checkMainScreen($Check = True) ;Checks if in main screen
 	Local $iCount, $Result
 	If $Check = True Then
 		SetLog("Trying to locate Main Screen")
-		_WinAPI_EmptyWorkingSet(GetAndroidPid()) ; Reduce Android Memory Usage
 	Else
 		;If $debugsetlog = 1 Then SetLog("checkMainScreen start quiet mode", $COLOR_PURPLE)
     EndIf
 	If CheckAndroidRunning(False) = False Then Return
 	getBSPos() ; Update $HWnd and Android Window Positions
+	#cs
 	If $ichkBackground = 0 And $NoFocusTampering = False And $AndroidEmbedded = False Then
 	    Local $hTimer = TimerInit(), $hWndActive = -1
 		Local $activeHWnD = WinGetHandle("")
 		While TimerDiff($hTimer) < 1000 And $hWndActive <> $HWnD And Not _Sleep(100)
-		    getBSPos() ; update $HWnD
-		    $hWndActive = WinActivate($HWnD) ; ensure bot has window focus
+		   getBSPos() ; update $HWnD
+		   $hWndActive = WinActivate($HWnD) ; ensure bot has window focus
 		WEnd
 		If $hWndActive <> $HWnD Then
 		   ; something wrong with window, restart Android
-		    RebootAndroid()
-			Return
+		   RebootAndroid()
+		   Return
 	    EndIf
 		WinActivate($activeHWnD) ; restore current active window
     EndIf
+	#ce
+	WinGetAndroidHandle()
+	If $ichkBackground = 0 And $HWnD <> 0 Then
+		; ensure android is top
+		BotToFront()
+	EndIf
+	If $AndroidAdbScreencap = False And _WinAPI_IsIconic($HWnD) Then WinSetState($HWnD, "", @SW_RESTORE)
 	$iCount = 0
 	While _CheckPixel($aIsMain, $bCapturePixel) = False
 		WinGetAndroidHandle()
 		If _Sleep($iDelaycheckMainScreen1) Then Return
 		$Result = checkObstacles()
-		If $debugsetlog = 1 Then Setlog("CheckObstacles Result = " & $Result, $COLOR_PURPLE)
+		If $debugsetlog = 1 Then Setlog("CheckObstacles Result = "&$Result, $COLOR_PURPLE)
 
 		If ($Result = False And $MinorObstacle = True) Then
 			$MinorObstacle = False
@@ -96,3 +102,4 @@ Func IsWaitingForConnection()
 	EndIf
 	Return False
 EndFunc   ;==>IsWaitingForConnection
+

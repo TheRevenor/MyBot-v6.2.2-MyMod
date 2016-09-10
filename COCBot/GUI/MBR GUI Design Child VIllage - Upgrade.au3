@@ -323,9 +323,9 @@ $hGUI_UPGRADE_TAB_ITEM5 = GUICtrlCreateTabItem("SmartUpgrade")
 
 Local $x = 25, $y = 45
 
-$SmartUpgrade = GUICtrlCreateGroup("SmartUpgrade", $x - 20, $y - 20, 430, 600)
+$SmartUpgrade = GUICtrlCreateGroup("SmartUpgrade", $x - 20, $y - 20, 430, 335)
 
-$chkSmartUpgrade = GUICtrlCreateCheckbox("Enable SmartUpgrade", $x, $y, -1, -1)
+$chkSmartUpgrade = GUICtrlCreateCheckbox("Enable SmartUpgrade", $x - 5, $y, -1, -1)
 	$txtTip = GetTranslated(614,3, "Check box to enable automatically starting Upgrades from builders menu")
 	_GUICtrlSetTip(-1, $txtTip)
 	GUICtrlSetOnEvent(-1, "chkSmartUpgrade")
@@ -387,6 +387,18 @@ Local $x = 15, $y = 45
 	GUICtrlSetOnEvent(-1, "chkIgnoreDColl")
 
 	GUICtrlCreateGroup("", -99, -99, 1, 1)
+
+	$SmartMinGold = GUICtrlCreateInput("200000", 162, 37, 57, 17, BitOR($GUI_SS_DEFAULT_INPUT,$ES_CENTER,$ES_NUMBER))
+	GUICtrlCreateLabel("Gold to save", 224, 40, 64, 17)
+	$SmartMinElixir = GUICtrlCreateInput("200000", 162, 57, 57, 17, BitOR($GUI_SS_DEFAULT_INPUT,$ES_CENTER,$ES_NUMBER))
+	GUICtrlCreateLabel("Elixir to save", 224, 60, 63, 17)
+	$SmartMinDark = GUICtrlCreateInput("1500", 290, 37, 65, 17, BitOR($GUI_SS_DEFAULT_INPUT,$ES_CENTER,$ES_NUMBER))
+	GUICtrlCreateLabel("Dark to save", 360, 40, 65, 17)
+	GUICtrlCreateLabel("... after launching upgrade", 296, 60, 128, 17)
+	$SmartUpgradeLog = GUICtrlCreateEdit("", 10, 232, 420, 124, BitOR($GUI_SS_DEFAULT_EDIT,$ES_READONLY))
+	GUICtrlSetData(-1, "                                        ----- SMART UPGRADE LOG -----")
+
+GUICtrlCreateGroup("", -99, -99, 1, 1)
 GUICtrlCreateTabItem("")
 
 ;GUISetState()

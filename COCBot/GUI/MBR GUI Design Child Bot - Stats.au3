@@ -20,7 +20,6 @@ Global $LastControlToHide = GUICtrlCreateDummy()
 Global $iPrevState[$LastControlToHide + 1]
 ;~ -------------------------------------------------------------
 
-$hGUI_STATS = GUICreate("", $_GUI_MAIN_WIDTH - 28, $_GUI_MAIN_HEIGHT - 255 - 28, 5, 25, BitOR($WS_CHILD, $WS_TABSTOP), -1, $hGUI_BOT)
 ;GUISetBkColor($COLOR_WHITE, $hGUI_STATS)
 
 GUISwitch($hGUI_STATS)

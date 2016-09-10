@@ -50,6 +50,7 @@ Func chkPBenabled()
 		GUICtrlSetState($chkVillageStatIncrement, $GUI_ENABLE)
 		GUICtrlSetState($txtVillageStatIncrement, $GUI_ENABLE)
 		GUICtrlSetState($chkAlertTopGain, $GUI_ENABLE)
+		GUICtrlSetState($chkAlertSmartUpgrade, $GUI_ENABLE)
 
 		If $ichkDeleteOldPBPushes = 1 Then
 			GUICtrlSetState($cmbHoursPushBullet, $GUI_ENABLE)
@@ -85,6 +86,7 @@ Func chkPBenabled()
 			GUICtrlSetState($chkVillageStatIncrement, $GUI_DISABLE)
 			GUICtrlSetState($txtVillageStatIncrement, $GUI_DISABLE)
 			GUICtrlSetState($chkAlertTopGain, $GUI_DISABLE)
+			GUICtrlSetState($chkAlertSmartUpgrade, $GUI_DISABLE)
 
 			GUICtrlSetState($cmbHoursPushBullet, $GUI_DISABLE)
 		EndIf
@@ -119,6 +121,7 @@ Func chkPBenabled2()
 		GUICtrlSetState($chkVillageStatIncrement, $GUI_ENABLE)
 		GUICtrlSetState($txtVillageStatIncrement, $GUI_ENABLE)
 		GUICtrlSetState($chkAlertTopGain, $GUI_ENABLE)
+		GUICtrlSetState($chkAlertSmartUpgrade, $GUI_ENABLE)
 
 	Else
 		If GUICtrlRead($chkPBenabled) = $GUI_CHECKED Then
@@ -149,6 +152,7 @@ Func chkPBenabled2()
 			GUICtrlSetState($txtSearchNotifyCount, $GUI_DISABLE)
 			GUICtrlSetState($chkVillageStatIncrement, $GUI_DISABLE)
 			GUICtrlSetState($txtVillageStatIncrement, $GUI_DISABLE)
+			GUICtrlSetState($chkAlertSmartUpgrade, $GUI_DISABLE)
 			
 			GUICtrlSetState($cmbHoursPushBullet, $GUI_DISABLE)
 			GUICtrlSetState($chkAlertTopGain, $GUI_DISABLE)
@@ -174,6 +178,7 @@ Func chkPBenabled2()
 			GUICtrlSetState($txtSearchNotifyCount, $GUI_DISABLE)
 			GUICtrlSetState($chkVillageStatIncrement, $GUI_DISABLE)
 			GUICtrlSetState($txtVillageStatIncrement, $GUI_DISABLE)
+			GUICtrlSetState($chkAlertSmartUpgrade, $GUI_DISABLE)
 
 			GUICtrlSetState($cmbHoursPushBullet, $GUI_DISABLE)
 			GUICtrlSetState($chkAlertBuilderIdle, $GUI_DISABLE)

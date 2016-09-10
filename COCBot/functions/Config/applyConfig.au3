@@ -730,9 +730,11 @@ Func applyConfig($bRedrawAtExit = True) ;Applies the data from config to the con
 
 	If $ibtnCloseWaitExact = 1 Then
 		GUICtrlSetState($btnCloseWaitExact, $GUI_CHECKED)
+		GUICtrlSetState($btnCloseWaitRandom, $GUI_UNCHECKED)
 	EndIf
 	If $ibtnCloseWaitRandom = 1 Then
 		GUICtrlSetState($btnCloseWaitRandom, $GUI_CHECKED)
+		GUICtrlSetState($btnCloseWaitExact, $GUI_UNCHECKED)
 	EndIf
 
 	_GUICtrlComboBox_SetCurSel($cmbCloseWaitRdmPercent, $icmbCloseWaitRdmPercent)
@@ -1914,7 +1916,7 @@ Func applyConfig($bRedrawAtExit = True) ;Applies the data from config to the con
 	_GUICtrlComboBox_SetCurSel($cmbHoursStop, $icmbHoursStop)
 	cmbBotCond()
 
-	GUICtrlSetData($txtTimeWakeUp, $sTimeWakeUp)
+	GUICtrlSetData($txtTimeWakeUp, Int(Int($sTimeWakeUp) / 60))
 
 	GUICtrlSetData($txtRestartGold, $itxtRestartGold)
 	GUICtrlSetData($txtRestartElixir, $itxtRestartElixir)
@@ -2576,6 +2578,15 @@ Func applyConfig($bRedrawAtExit = True) ;Applies the data from config to the con
 	LoadABSnipeAttacks() ; recreate combo box values
 	_GUICtrlComboBox_SetCurSel($cmbTHSnipeBeforeLBScript, _GUICtrlComboBox_FindStringExact($cmbTHSnipeBeforeLBScript, $THSnipeBeforeLBScript))
 	
+	; Android Settings - Added by LunaEclipse
+	If _GUICtrlComboBox_FindStringExact($cmbAndroid, String($sAndroid)) <> -1 Then
+		_GUICtrlComboBox_SelectString($cmbAndroid, String($sAndroid))
+	Else
+		_GUICtrlComboBox_SetCurSel($cmbAndroid, 0)
+	EndIf
+	GUICtrlSetData($txtAndroidInstance, $sAndroidInstance)
+	modifyAndroid()
+	
 	; SmartZap Settings - Added by LunaEclipse
 	If $ichkSmartZap = 1 Then
 		GUICtrlSetState($chkExtLightSpell, $GUI_DISABLE)
@@ -2719,6 +2730,13 @@ Func applyConfig($bRedrawAtExit = True) ;Applies the data from config to the con
 	ElseIf $pAlertTopGain = 0 Then
 		GUICtrlSetState($chkAlertTopGain, $GUI_UNCHECKED)
 	EndIf
+
+	; Notify SmartUpgrade - Added by Roro-Titi
+	If $ichkAlertSmartUpgrade = 1 Then
+		GUICtrlSetState($chkAlertSmartUpgrade, $GUI_CHECKED)
+	Else
+		GUICtrlSetState($chkAlertSmartUpgrade, $GUI_UNCHECKED)
+	EndIf
 	
 	; Profile Switch
 	If $ichkGoldSwitchMax = 1 Then
@@ -2787,6 +2805,11 @@ Func applyConfig($bRedrawAtExit = True) ;Applies the data from config to the con
 	Else
 		GUICtrlSetState($chkSmartUpgrade, $GUI_UNCHECKED)
 	EndIf
+	chkSmartUpgrade()
+
+	GUICtrlSetData($SmartMinGold, $iSmartMinGold)
+	GUICtrlSetData($SmartMinElixir, $iSmartMinElixir)
+	GUICtrlSetData($SmartMinDark, $iSmartMinDark)
 
 	If $ichkIgnoreTH = 1 Then
 		GUICtrlSetState($chkIgnoreTH, $GUI_CHECKED)

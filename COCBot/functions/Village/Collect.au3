@@ -42,7 +42,7 @@ Func Collect()
 	Local $CollectXY
 
 	IsWaitingForConnection()
-	
+
 	Local $aResult = returnMultipleMatchesOwnVillage($directory)
 	If UBound($aResult) > 1 Then
 		For $i = 1 To UBound($aResult) - 1
@@ -56,7 +56,7 @@ Func Collect()
 							Click($CollectXY[$t][0], $CollectXY[$t][1], 1, 0, "#0430")
 							If _Sleep($iDelayCollect2) Then Return
 						Else
-							ClickZone($CollectXY[$t][0], $CollectXY[$t][1], 20, "#0430")
+							ClickZone($CollectXY[$t][0], $CollectXY[$t][1], 5, "#0430")
 							_Sleep(Random($iDelayCollect2, $iDelayCollect2 * 4, 1))
 						EndIF
 					Next
@@ -79,7 +79,6 @@ Func Collect()
 		Local $MaxReturnPoints = 1
 
 		_CaptureRegion2()
-		;Local $res = DllCall($pImgLib, "str", "SearchTile", "handle", $hHBitmap2, "str", $LootCart, "float", $ToleranceImgLoc, "str", $fullCocAreas, "Int", $MaxReturnPoints)
 		Local $res = DllCall($hImgLib, "str", "SearchTile", "handle", $hHBitmap2, "str", $LootCart, "float", $ToleranceImgLoc, "str", $fullCocAreas, "Int", $MaxReturnPoints)
 		If @error Then _logErrorDLLCall($pImgLib, @error)
 		If IsArray($res) Then

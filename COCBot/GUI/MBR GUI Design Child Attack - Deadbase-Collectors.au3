@@ -166,10 +166,10 @@ Local $txtFull = GetTranslated(626,30, "Full")
 			GUICtrlSetData(-1, 50)
 			GUICtrlCreateLabel("%", $x + 176, $y + 4, -1, -1)
 			GUICtrlSetTip(-1, $txtTip)
-#cs
+
+	$y += 25
 		$lblCollectorWarning = GUICtrlCreateLabel("Warning: no collecters are selected. The bot will never find a dead base.", $x, $y, 255, 30)
 			GUICtrlSetFont(-1, 10, $FW_BOLD)
 			GUICtrlSetColor(-1, $COLOR_RED)
 			GUICtrlSetState(-1, $GUI_HIDE)
-#ce
 	GUICtrlCreateGroup("", -99, -99, 1, 1)

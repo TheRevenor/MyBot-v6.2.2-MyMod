@@ -9,7 +9,7 @@
 
 Func setupProfileComboBox()
 	; Array to store Profile names to add to ComboBox
-	$profileString = ""
+	Global $profileString
 	Local $aProfiles = _FileListToArray($sProfilePath, "*", $FLTA_FOLDERS)
 	If @error Then
 		; No folders for profiles so lets set the combo box to a generic entry
