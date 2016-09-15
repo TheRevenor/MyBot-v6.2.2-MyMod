@@ -127,7 +127,7 @@ Func TrainNormalTroops()
 
 	; Check What barrack|dark barrack was boosted with ColorCheck on ArmyOverView Window
 
-	Redim $CheckIfWasBoostedOnBarrack[$numBarracksAvailable]
+	ReDim $CheckIfWasBoostedOnBarrack[$numBarracksAvailable]
 	$CheckIfWasBoostedOnBarrack = CheckBarrackBoost(True, False, True, False)
 
 	For $i = 0 To UBound($CheckIfWasBoostedOnBarrack) - 1
@@ -260,19 +260,19 @@ Func TrainNormalTroops()
 	; [2] is the housing space
 	; [3] is the quantity to make - > this will be filled with $CurTroop[$i]
 
-	Local $TroopsToMake[12][4] = [ _
-			["Pekk", 900, 25, 0], _
-			["Drag", 900, 20, 0], _
-			["BabyD", 600, 10, 0], _
-			["Heal", 600, 14, 0], _
-			["Mine", 300, 5, 0], _
-			["Ball", 300, 5, 0], _
-			["Wiza", 300, 4, 0], _
-			["Giant", 120, 5, 0], _
-			["Wall", 60, 2, 0], _
-			["Gobl", 30, 1, 0], _
-			["Arch", 25, 1, 0], _
-			["Barb", 20, 1, 0]]
+	Local $TroopsToMake[12][5] = [ _
+			["Pekk", 900, 25, 0, 75], _
+			["Drag", 900, 20, 0, 60], _
+			["BabyD", 600, 10, 0, 80], _
+			["Heal", 600, 14, 0, 45], _
+			["Mine", 300, 5, 0, 85], _
+			["Ball", 300, 5, 0, 45], _
+			["Wiza", 300, 4, 0, 50], _
+			["Giant", 120, 5, 0, 30], _
+			["Wall", 60, 2, 0, 40], _
+			["Gobl", 30, 1, 0, 35], _
+			["Arch", 25, 1, 0, 25], _
+			["Barb", 20, 1, 0, 20]]
 
 
 	; Fill the $TroopsToMake[$x][3] with the quantity to make with the existent $Cur[troopName] Global variable
@@ -309,6 +309,13 @@ Func TrainNormalTroops()
 		If $BarrackCapacity[$i] = 0 Then $BarrackTotalStatus[$i][4] = 75 ; In case of any error Reading The Unit Queue Length
 	Next
 
+	; Lets verify what Barracks are Boosted and use it first! adding a small time to the no Boosted Barrack
+	For $i = 0 To ($numBarracksAvailable - 1)
+		If $BarrackTotalStatus[$i][3] = 0 Then
+			$BarrackTotalStatus[$i][0] = 20
+		EndIf
+	Next
+
 	; Variable to assign each troop quantity on each barrack | max Barracks available
 	; Local $PekkEBarrack0 , $PekkEBarrack1 , $PekkEBarrack2 , $PekkEBarrack3
 	; Making a loop to assign the 0 and forcing the variable declaration on local scope
@@ -324,24 +331,99 @@ Func TrainNormalTroops()
 		Next
 	Next
 
+	Local $BarrackNotAvailableForTheTroop[$numBarracksAvailable]
+
+	For $x = 0 To ($numBarracksAvailable - 1)
+		$BarrackNotAvailableForTheTroop[$x] = 0
+	Next
+
+	; If is necessary make a troop but is not available in all barracks will proceed with a sort on the $TroopsToMake
+	; In descending order Value ($TroopsToMake[$i][4])
+
+	For $i = 0 To 11
+		For $x = 0 To ($numBarracksAvailable - 1)
+			If $TroopsToMake[$i][3] > 0 And $TroopsToMake[$i][4] > $BarrackCapacity[$x] Then
+				Setlog(" » " & NameOfTroop(Eval("e" & $TroopsToMake[$i][0]), $plural) & " are not available on Barrack nº " & $x + 1, $COLOR_RED)
+				$LetsSortNB = True
+			EndIf
+		Next
+		If $LetsSortNB = True Then
+			_ArraySort($TroopsToMake, 1, 0, 0, 4)
+			If @error Then _logErrorDateDiff(@error)
+			ExitLoop
+		EndIf
+	Next
+
 	; ###################################################################################################################################################
 	; ############################################################ Barracks Troops distribution #########################################################
 	; ################################################################ Main Core - balanced #############################################################
 	; ###################################################################################################################################################
 
-	For $i = 0 To UBound($TroopsToMake) - 1 ; From pekka to barbarians
+	Local $TimeStored[$numBarracksAvailable] ; This will store the correct time on boosted Barrcaks after filled
+	For $i = 0 To ($numBarracksAvailable - 1)
+		$TimeStored[$i] = 0
+	Next
+
+	Local $z = 0, $AreAllFull = 0
+
+	For $i = 0 To UBound($TroopsToMake) - 1 ; From pekka to barbarians | OR  Miner to Barbarian if was Sorted before
+
 		If $TroopsToMake[$i][3] > 0 Then ; if is necessary to train
+
+			$plural = 0
+			If $TroopsToMake[$i][3] > 0 Then $plural = 1
+
+			Local $m = 0
+			Local $TotalCapacityOfBarracks = 0
+
+			; This will disable the Barracks without this Troop
+			For $x = 0 To ($numBarracksAvailable - 1)
+
+				;	Reset the variables from the previous Troop , remember the loop is from Pekka to Barbarians
+				; 	$BarrackTotalStatus[$x][1]
+				If $BarrackNotAvailableForTheTroop[$x] = 1 And ($BarrackTotalStatus[$x][1] < $BarrackTotalStatus[$x][4]) Then
+					If $debugsetlogTrain = 1 Then Setlog(" » | $BarrackNotAvailableForTheTroop[" & $x & "] = 0")
+					$BarrackNotAvailableForTheTroop[$x] = 0
+					$BarrackTotalStatus[$x][0] -= 10000
+					If $debugsetlogTrain = 1 Then Setlog(" » | $BarrackTotalStatus[" & $x & "] was = " & $BarrackTotalStatus[$x][0] + 10000 & " Now = " & $BarrackTotalStatus[$x][0])
+				EndIf
+
+				; $TroopsToMake[$i][4]  is the Barrack capacity , represents the Level.
+				If $TroopsToMake[$i][4] > $BarrackCapacity[$x] Then
+					$BarrackTotalStatus[$x][0] += 10000
+					$BarrackNotAvailableForTheTroop[$x] = 1
+					If $debugsetlogTrain = 1 Then Setlog(" »»» $BarrackNotAvailableForTheTroop[" & $x & "] = 1")
+				Else
+					$TotalCapacityOfBarracks += $BarrackCapacity[$x]
+					$m += 1
+				EndIf
+			Next
+
+			; Just a Log remember the user of the quantities do not fit on the barracks
+			If $TroopsToMake[$i][3] * $TroopsToMake[$i][2] > $TotalCapacityOfBarracks Then
+				Setlog(" » Total of " & $TroopsToMake[$i][3] & " " & NameOfTroop(Eval("e" & $TroopsToMake[$i][0]), $plural) & " don't fit in " & $m & " [NB] in one loop", $COLOR_BLUE)
+			EndIf
+
+
+			; Distribution logically of each troop for each Barrack available and shorter time
 			Local $QuantityToMake = $TroopsToMake[$i][3]
-			If $debugsetlogTrain = 1 Then Setlog(" » " & NameOfTroop(Eval("e" & $TroopsToMake[$i][0])) & " Quantity: " & $QuantityToMake)
+			If $debugsetlogTrain = 1 Then Setlog(" » " & NameOfTroop(Eval("e" & $TroopsToMake[$i][0]), $plural) & " Quantity: " & $QuantityToMake)
 			Local $BarrackToTrain = 0
 			Local $AssignedQuantity = 0
 
 			Do
+				$z += 1
 				$BarrackToTrain = _ArrayMinIndex($BarrackTotalStatus, 0, -1, -1, 0) ; if all barracks are equal then will return lower index
 				If $BarrackTotalStatus[$BarrackToTrain][1] >= $BarrackTotalStatus[$BarrackToTrain][4] Then ; Current Unit Queue and the Max Barrack Unit Queue
 					SetLog("Queue Spacing is Full!! on Barrack nº :" & $BarrackToTrain + 1, $COLOR_RED) ; ** flag for boosted barrack !!
-					Setlog("Please don't use 'Close While Train' with a boosted Barrack(s)", $COLOR_RED)
-					$BarrackTotalStatus[$BarrackToTrain][0] += 2500
+					$TimeStored[$BarrackToTrain] = $BarrackTotalStatus[$BarrackToTrain][0]
+					$BarrackTotalStatus[$BarrackToTrain][0] += 8000
+					; Lets check If all Barrcaks ARE FULL and exit
+					$AreAllFull = 0
+					For $t = 0 To $numBarracksAvailable - 1
+						If $BarrackTotalStatus[$t][1] >= $BarrackTotalStatus[$t][4] Then $AreAllFull += 1
+					Next
+					If $AreAllFull = $numBarracksAvailable Then ExitLoop (2)
 				Else
 					Assign($TroopsToMake[$i][0] & "EBarrack" & $BarrackToTrain, Eval($TroopsToMake[$i][0] & "EBarrack" & $BarrackToTrain) + 1) ; assing 1 troop each loop verifying the Barrack time
 					$BarrackTotalStatus[$BarrackToTrain][1] += $TroopsToMake[$i][2]
@@ -353,8 +435,12 @@ Func TrainNormalTroops()
 						$BarrackTotalStatus[$BarrackToTrain][0] += $TroopsToMake[$i][1]
 					EndIf
 				EndIf
+
 				If $RunState = False Then Return
+				If _Sleep(30) Then Return
+
 				If $AssignedQuantity > $QuantityToMake Then ExitLoop
+				If $z = 240 Then ExitLoop (2)
 			Until $AssignedQuantity = $QuantityToMake
 
 			For $x = 0 To UBound($BarrackTotalStatus) - 1
@@ -368,6 +454,7 @@ Func TrainNormalTroops()
 	; Lets store the last Remain Train Time in a Global Variable to use if is necessary to make Donated Troops
 
 	For $i = 0 To ($numBarracksAvailable - 1)
+		If $TimeStored[$i] > 0 Then $BarrackTotalStatus[$i][0] = $TimeStored[$i]
 		$BarrackTimeRemain[$i] = $BarrackTotalStatus[$i][0]
 	Next
 
@@ -551,7 +638,7 @@ Func TrainNormalTroops()
 
 	checkAttackDisable($iTaBChkIdle) ; Check for Take-A-Break after opening train page
 
-EndFunc   ;==>TrainNormalTroopsBoosted
+EndFunc   ;==>TrainNormalTroops
 
 Func getArmyNormalTroopCount()
 
@@ -657,7 +744,7 @@ Func getArmyNormalTroopCount()
 
 EndFunc   ;==>getArmyNormalTroopCount
 
-Func TrainDarkTroopsBoosted()
+Func TrainDarkTroops()
 
 	SetLog("Func TrainDarkTroopsBoosted ", $COLOR_PURPLE) ; If $debugsetlogTrain = 1 Then
 
@@ -769,14 +856,14 @@ Func TrainDarkTroopsBoosted()
 
 	If IsTrainPage() Then GoesToFirstDarkBarrack()
 
-	Local $DtroopsToMake[7][4] = [ _
-			["Lava", 900, 30, 0], _
-			["Gole", 900, 30, 0], _
-			["Witc", 600, 12, 0], _
-			["Bowl", 300, 6, 0], _
-			["Valk", 300, 8, 0], _
-			["Hogs", 120, 5, 0], _
-			["Mini", 45, 2, 0]]
+	Local $DtroopsToMake[7][5] = [ _
+			["Lava", 900, 30, 0, 90], _
+			["Gole", 900, 30, 0, 70], _
+			["Witc", 600, 12, 0, 80], _
+			["Bowl", 300, 6, 0, 100], _
+			["Valk", 300, 8, 0, 60], _
+			["Hogs", 120, 5, 0, 50], _
+			["Mini", 45, 2, 0, 40]]
 
 	For $i = 0 To UBound($TroopDarkName) - 1 ; Dark troops
 		If Eval("Cur" & $TroopDarkName[$i]) > 0 Then
@@ -813,6 +900,13 @@ Func TrainDarkTroopsBoosted()
 		$DarkBarrackTimeRemain[$i] = 0
 	Next
 
+	; Lets verify what Barracks are Boosted and use it first! adding a small time to the no Boosted Barrack
+	For $i = 0 To ($numDarkBarracksAvailable - 1)
+		If $BarrackDarkTotalStatus[$i][3] = 0 then
+			$BarrackDarkTotalStatus[$i][0] = 20
+		EndIf
+	Next
+
 	For $i = 0 To UBound($DtroopsToMake) - 1
 		For $x = 0 To ($numDarkBarracksAvailable - 1)
 			Assign($DtroopsToMake[$i][0] & "EBarrack" & $x, 0, $ASSIGN_FORCELOCAL)
@@ -824,16 +918,72 @@ Func TrainDarkTroopsBoosted()
 		Next
 	Next
 
+	Local $BarrackNotAvailableForTheDarkTroop[$numDarkBarracksAvailable]
+
+	For $x = 0 To ($numDarkBarracksAvailable - 1)
+		$BarrackNotAvailableForTheDarkTroop[$x] = 0
+	Next
+
+	; If is necessary make a troop but is not available in all barracks will proceed with a sort on the $DtroopsToMake
+	; In descending order Value ($DtroopsToMake[$i][4])
+
+	For $i = 0 To UBound($DtroopsToMake) - 1
+		For $x = 0 To ($numDarkBarracksAvailable - 1)
+			If $DtroopsToMake[$i][3] > 0 And $DtroopsToMake[$i][4] > $DarkBarrackCapacity[$x] Then
+				Setlog(" » " & NameOfTroop(Eval("e" & $DtroopsToMake[$i][0]), $plural) & " are not available on Dark Barrack nº " & $x + 1, $COLOR_RED)
+				$LetsSortNB = True
+			EndIf
+		Next
+		If $LetsSortNB = True Then
+			_ArraySort($DtroopsToMake, 1, 0, 0, 4)
+			If @error Then _logErrorDateDiff(@error)
+			ExitLoop
+		EndIf
+	Next
+
 	Local $TimeStored[$numDarkBarracksAvailable] ; This will store the correct time on boosted Barrcaks after filled
 	For $i = 0 To ($numDarkBarracksAvailable - 1)
 		$TimeStored[$i] = 0
 	Next
 
-	$z = 0
+	Local $z = 0, $AreAllFull = 0
 
 	For $i = 0 To UBound($DtroopsToMake) - 1 ; From Lava Hound to Minion
 
 		If $DtroopsToMake[$i][3] > 0 Then ; if is necessary to train
+
+			$plural = 0
+			If $DtroopsToMake[$i][3] > 1 Then $plural = 1
+
+			Local $m = 0
+			Local $TotalCapacityOfBarracks = 0
+
+			; This will disable the Barracks without this Troop
+			For $x = 0 To ($numDarkBarracksAvailable - 1)
+				;	Reset the variables from the previous Troop , remember the loop is from Pekka to Barbarians
+				; 	$BarrackTotalStatus[$x][1]
+				If $BarrackNotAvailableForTheDarkTroop[$x] = 1 And ($BarrackDarkTotalStatus[$x][1] < $BarrackDarkTotalStatus[$x][4]) Then
+					If $debugsetlogTrain = 1 Then Setlog(" » | $BarrackNotAvailableForTheDarkTroop[" & $x & "] = 0")
+					$BarrackNotAvailableForTheDarkTroop[$x] = 0
+					$BarrackDarkTotalStatus[$x][0] -= 10000
+					If $debugsetlogTrain = 1 Then Setlog(" » | $BarrackTotalStatus[" & $x & "] was = " & $BarrackDarkTotalStatus[$x][0] + 10000 & " Now = " & $BarrackDarkTotalStatus[$x][0])
+				EndIf
+				; $TroopsToMake[$i][4]  is the Barrack capacity , represents the Level.
+				If $DtroopsToMake[$i][4] > $DarkBarrackCapacity[$x] Then
+					$BarrackDarkTotalStatus[$x][0] += 10000
+					$BarrackNotAvailableForTheDarkTroop[$x] = 1
+					If $debugsetlogTrain = 1 Then Setlog(" »»» $BarrackNotAvailableForTheDarkTroop[" & $x & "] = 1")
+				Else
+					$TotalCapacityOfBarracks += $DarkBarrackCapacity[$x]
+					$m += 1
+				EndIf
+			Next
+
+			; Just a Log remember the user of the quantities do not fit on the barracks
+			If $DtroopsToMake[$i][3] * $DtroopsToMake[$i][2] > $TotalCapacityOfBarracks Then
+				Setlog(" » Total of " & $DtroopsToMake[$i][3] & " " & NameOfTroop(Eval("e" & $DtroopsToMake[$i][0]), $plural) & " don't fit in " & $m & " [DB] in one loop", $COLOR_BLUE)
+			EndIf
+
 			Local $QuantityToMake = $DtroopsToMake[$i][3]
 			If $debugsetlogTrain = 1 Then Setlog(" » " & NameOfTroop(Eval("e" & $DtroopsToMake[$i][0])) & " Quantity: " & $QuantityToMake)
 			Local $BarrackToTrain = 0
@@ -847,7 +997,7 @@ Func TrainDarkTroopsBoosted()
 					$TimeStored[$BarrackToTrain] = $BarrackDarkTotalStatus[$BarrackToTrain][0]
 					$BarrackDarkTotalStatus[$BarrackToTrain][0] += 2500
 					; Lets check If all Barrcaks ARE FULL and exit
-					Local $AreAllFull = 0
+					$AreAllFull = 0
 					For $t = 0 To $numDarkBarracksAvailable - 1
 						If $BarrackDarkTotalStatus[$t][1] >= $BarrackDarkTotalStatus[$t][4] Then $AreAllFull += 1
 					Next
@@ -863,6 +1013,7 @@ Func TrainDarkTroopsBoosted()
 						$BarrackDarkTotalStatus[$BarrackToTrain][0] += $DtroopsToMake[$i][1]
 					EndIf
 				EndIf
+
 				If $RunState = False Then Return
 				If $AssignedQuantity > $QuantityToMake Then ExitLoop
 				If $z = 200 Then ExitLoop (2)
@@ -1037,7 +1188,7 @@ Func TrainDarkTroopsBoosted()
 	If $debugsetlogTrain = 1 Then SetLog("---============== END TRAIN =============---", $COLOR_PURPLE)
 
 	checkAttackDisable($iTaBChkIdle) ; Check for Take-A-Break after opening train page
-	$Fullarmy = False
+	$fullarmy = False
 
 EndFunc   ;==>TrainDarkTroopsBoosted
 
@@ -1288,6 +1439,3 @@ Func GoesToFirstDarkBarrack()
 
 EndFunc   ;==>GoesToFirstDarkBarrack
 
-Func DeleteQueueTroopsOnBoostedBarracks()
-
-EndFunc

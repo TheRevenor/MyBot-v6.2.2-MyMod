@@ -5,7 +5,7 @@
 ; Parameters ....: None
 ; Return values .: None
 ; Author ........: Cosote (2015-12)
-; Modified ......: MR.ViPER (2016 - SecureME)
+; Modified ......:
 ; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2016
 ;                  MyBot is distributed under the terms of the GNU GPL
 ; Related .......:
@@ -554,7 +554,6 @@ Func InitAndroid($bCheckOnly = False)
 		; add $AndroidPicturesHostFolder to $AndroidPicturesHostPath
 		If FileExists($AndroidPicturesHostPath) Then
 			DirCreate($AndroidPicturesHostPath & $AndroidPicturesHostFolder)
-			AddFolderToInUseList()
 		ElseIf $AndroidPicturesHostPath <> "" Then
 			SetLog("Shared Folder doesn't exist, please fix:", $COLOR_RED)
 			SetLog($AndroidPicturesHostPath, $COLOR_RED)
@@ -1235,9 +1234,11 @@ Func AndroidAdbSendShellCommandScript($scriptFile, $variablesArray = Default, $c
 	;If $HwND <> WinGetHandle($HwND) Then Return SetError(2, 0) ; Window gone
 	AndroidAdbLaunchShellInstance()
 	If @error <> 0 Then Return SetError(3, 0)
+
 	Local $hTimer = TimerInit()
 	Local $hFileOpen = FileOpen($AdbScriptsDir & "\" & $scriptFile)
 	If $hFileOpen = -1 Then
+		SetLog("ADB script file not found: " & $scriptFile, $COLOR_RED)
 		Return SetError(5, 0)
 	EndIf
 
@@ -1267,7 +1268,7 @@ Func AndroidAdbSendShellCommandScript($scriptFile, $variablesArray = Default, $c
 	EndIf
 	$scriptFileSh = StringRegExpReplace($scriptFileSh, '[/\:*?"<>|]', '.')
 
-	$scriptFileSh &= $shExt
+	$scriptFileSh &= ".sh"
 	$script = StringReplace($script, @CRLF, @LF)
 
 	Local $aCmds = StringSplit($script, @LF)
@@ -1306,15 +1307,13 @@ Func AndroidAdbSendShellCommandScript($scriptFile, $variablesArray = Default, $c
 	$i = 1
 	While FileExists($AdbScriptsDir & "\" & $scriptFile & "." & $i) = 1
 		Local $srcFile = $AdbScriptsDir & "\" & $scriptFile & "." & $i
-		$tmpscriptFile = FilterFile($scriptFile)
-		Local $dstFile = $hostPath & $tmpscriptFile & "." & $i
+		Local $dstFile = $hostPath & $scriptFile & "." & $i
 		If FileGetTime($srcFile, $FT_MODIFIED, $FT_STRING) <> FileGetTime($dstFile, $FT_MODIFIED, $FT_STRING) Then
-			;_Crypt_EncryptFile($srcFile, $dstFile, $pwToDecrypt, $CALG_AES_256)
 			FileCopy($srcFile, $dstFile, $FC_OVERWRITE)
 		EndIf
 		$i += 1
 	WEnd
-	$scriptFileSh = FilterFile($scriptFile)
+
 	Local $loopCount = 0
 	If $combine = True And StringLen($cmds) <= 1024 Then
 		; invoke commands now
@@ -1339,8 +1338,7 @@ Func AndroidAdbSendShellCommandScript($scriptFile, $variablesArray = Default, $c
 				$script &= $aCmds[$i]
 			Next
 			; create sh file
-			$script = FilterFile($script)
-			If FileWrite($hostPath & $scriptFileSh, _Crypt_EncryptData($script, $pwToDecrypt, $CALG_AES_256)) = 1 Then
+			If FileWrite($hostPath & $scriptFileSh, $script) = 1 Then
 				If $debugSetlog = 1 Then SetLog("ADB script file created: " & $hostPath & $scriptFileSh)
 			Else
 				SetLog("ADB cannot create script file: " & $hostPath & $scriptFileSh, $COLOR_RED)
@@ -1348,12 +1346,9 @@ Func AndroidAdbSendShellCommandScript($scriptFile, $variablesArray = Default, $c
 			EndIf
 			FileSetTime($hostPath & $scriptFileSh, $scriptModifiedTime, $FT_MODIFIED) ; set modification date of source
 		EndIf
-		DecFile($hostPath & $scriptFileSh)
 		$s = AndroidAdbSendShellCommand("sh """ & $androidPath & $scriptFileSh & """", $timeout, $wasRunState, $EnsureShellInstance)
-		EncFile($hostPath & $scriptFileSh)
 		If @error <> 0 Then
 			SetDebugLog("Error executing " & $scriptFileSh & ": " & $s)
-			SetLog("Error executing " & $scriptFileSh & ": " & $s)
 			Return SetError(1, 0, $s)
 		EndIf
 		Local $a = StringSplit(@extended, "#")
@@ -1425,8 +1420,8 @@ Func _AndroidScreencap($iLeft, $iTop, $iWidth, $iHeight, $iRetryCount = 0)
 	If @error <> 0 Then Return SetError(2, 0)
 
 	Local $sBotTitleEx = StringRegExpReplace($sBotTitle, '[/:*?"<>|]', '_')
-	Local $filename = $replaceOfBotTitle & $rgbaExt
-	If $AndroidAdbScreencapPngEnabled = True Then $filename = $replaceOfBotTitle & ".png"
+	Local $filename = $sBotTitleEx & ".rgba"
+	If $AndroidAdbScreencapPngEnabled = True Then $filename = $sBotTitleEx & ".png"
 	Local $s
 
 	; Create 32 bits-per-pixel device-independent bitmap (DIB)

@@ -39,11 +39,15 @@ Func DonateCC($Check = False)
 
 	Global $bSkipDonTroops = False, $bSkipDonSpells = False
 
-	If $FirstStart = False And ($CurCamp >= ($TotalCamp * $fulltroop / 100) * .90) And $CommandStop = - 1 Then
-		If $debugsetlog = 1 Then Setlog("Total troops >90%, Skipped..", $COLOR_PURPLE)
-		Return ; skip donate if >90% full troop
+	; Global $aTimeTrain[0] = Remain Troops train time , minutes
+	; Global $aTimeTrain[1] = Spells remain time , minutes
+	; Global $aTimeTrain[2] = Remain time to Heroes recover , minutes
+	If (($aTimeTrain[0] < 5) Or (IsWaitforSpellsActive() And $aTimeTrain[1] < 5) Or (IsWaitforHeroesActive() and $aTimeTrain[2] < 5)) And _
+	    ($CurCamp >= ($TotalCamp * $fulltroop / 100) * .80) And $CommandStop = -1 Then
+		If $debugsetlog = 1 Then Setlog("Total troops >80%, Skipped..", $COLOR_PURPLE)
+		Return ; skip donate if >80% full troop AND Spells OR Heroes are almost Made/Recovered
 	EndIf
-	
+
 	If $bDonate = False Or $bDonationEnabled = False Then
         ;DonateStats by CDudz ==========================================================
         If $debugSetlog = 1 Then SetLog("Current Donation=" & GuiCtrlRead($lblCurDonate) & " Donation Limit=" & GuiCtrlRead($iLimitDStats))
@@ -90,16 +94,35 @@ Func DonateCC($Check = False)
 	;<---- opens clan tab and verbose in log
 	ClickP($aAway, 1, 0, "#0167") ;Click Away
 	Setlog("Checking for Donate Requests in Clan Chat", $COLOR_BLUE)
+	
+    ForceCaptureRegion()
+    If _CheckPixel($aChatTab, $bCapturePixel) = False Then ClickP($aOpenChat, 1, 0, "#0168") ; Clicks chat tab
+	If _Sleep($iDelayDonateCC4) Then Return
 
-	ForceCaptureRegion()
-	If _CheckPixel($aChatTab, $bCapturePixel) = False Then ClickP($aOpenChat, 1, 0, "#0168") ; Clicks chat tab
-	If _Sleep($iDelayDonateCC1) Then Return
-	If _Sleep($iDelayDonateCC1) Then Return
-	If _Sleep($iDelayDonateCC1) Then Return
-
-	ClickP($aClanTab, 1, 0, "#0169") ; clicking clan tab
-	;<---- End opens clan tab and verbose in log
-
+    Local $icount = 0
+    While 1
+        ;If Clan tab is selected.
+        If _ColorCheck(_GetPixelColor(189, 24, True), Hex(0x706C50, 6), 20) = True Then ; color med gray
+            ;If _Sleep(200) Then Return ;small delay to allow tab to completely open
+            ;Clan tab already Selected no click needed
+            ;ClickP($aClanTab, 1, 0, "#0169") ; clicking clan tab
+            ExitLoop
+        EndIf
+        ;If Global tab is selected.
+        If _ColorCheck(_GetPixelColor(189, 24, True), Hex(0x383828, 6), 20) = True Then ; Darker gray
+			If _Sleep($iDelayDonateCC1) Then Return ;small delay to allow tab to completely open
+            ClickP($aClanTab, 1, 0, "#0169") ; clicking clan tab
+            ExitLoop
+        EndIf
+        ;counter for time approx 3 sec max allowed for tab to open
+		$icount += 1
+		If $icount >= 15 Then ; allows for up to a sleep of 3000
+            SetLog("Clan Chat Did Not Open - Abandon Donate")
+            Return
+        EndIf
+		If _Sleep($iDelayDonateCC1) Then Return ; delay Allow 15x
+    WEnd
+	
 	Local $Scroll
 	; add scroll here
 	While 1
@@ -698,8 +721,6 @@ Func DonateTroopType($Type, $Quant = 0, $Custom = False, $bDonateAll = False)
 
 			Else
 				If $iDonTroopsQuantity > 1 Then $plural = 1
-				If $bDonateAll Then $sTextToAll = " (to all requests)"
-				SetLog("Donating " & $iDonTroopsQuantity & " " & NameOfTroop($Type, $plural) & $sTextToAll, $COLOR_GREEN)
 				If $debugOCRdonate = 1 Then
 					Setlog("donate", $color_RED)
 					Setlog("row: " & $donaterow, $color_RED)

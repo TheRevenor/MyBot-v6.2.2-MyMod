@@ -1029,10 +1029,6 @@ Func readConfig($inputfile = $config, $partial = False) ;Reads config and sets i
 		IniReadS($iEnableSpellsWait[$DB], $config, "search", "ChkDBSpellsWait", "0")
 		IniReadS($iEnableSpellsWait[$LB], $config, "search", "ChkABSpellsWait", "0")
 		IniReadS($iTotalTrainSpaceSpell, $config, "search", "TotalTrainSpaceSpell", "0")
-
-		; Android Settings - Added by LunaEclipse
-		$sAndroid = IniRead($config, "Android", "Emulator", "<No Emulators>")
-		$sAndroidInstance = IniRead($config, "Android", "Instance", "")
 		
 		; SmartZap Settings - Added by LunaEclipse
 		$ichkSmartZap = IniRead($config, "SmartZap", "UseSmartZap", "1")
@@ -1088,6 +1084,13 @@ Func readConfig($inputfile = $config, $partial = False) ;Reads config and sets i
 		$iSmartMinGold = IniRead($config, "upgrade", "SmartMinGold", "0")
 		$iSmartMinElixir = IniRead($config, "upgrade", "SmartMinElixir", "0")
 		$iSmartMinDark = IniRead($config, "upgrade", "SmartMinDark", "0")
+		
+		; Upgrade Management - Added by MMHK
+		If IniRead($config, "upgrade", "UpdateNewUpgradesOnly", "0") = 1 Then
+			$bUpdateNewUpgradesOnly = True
+		Else
+			$bUpdateNewUpgradesOnly = False
+		EndIf
 		
 	Else
 		Return False

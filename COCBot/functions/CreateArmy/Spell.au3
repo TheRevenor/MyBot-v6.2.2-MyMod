@@ -19,11 +19,9 @@ Func BrewSpells()
 
 	If $iTotalCountSpell = 0 Then Return
 
-	Local $IsFullArmywithHeroesAndSpells = BitAND($fullarmy, BitOR(IsSearchModeActive($DB), IsSearchModeActive($TS), IsSearchModeActive($LB)))
-
 	If $numFactorySpellAvaiables = 1 And ($iLightningSpellComp > 0 Or $iRageSpellComp > 0 Or $iHealSpellComp > 0 Or $iJumpSpellComp > 0 Or $iFreezeSpellComp > 0 Or $iCloneSpellComp > 0) Then
 		
-		$iBarrHere = 0
+		Local $iBarrHere = 0
 		While Not (isSpellFactory())
 			If Not (IsTrainPage()) Then Return
 			_TrainMoveBtn(+1) ;click Next button

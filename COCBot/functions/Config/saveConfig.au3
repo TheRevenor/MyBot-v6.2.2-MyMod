@@ -2476,10 +2476,6 @@ Func saveConfig() ;Saves the controls settings to the config
 	IniWriteS($config, "attack", "CSVSpeedDB", $isldSelectedCSVSpeed[$DB])
 	IniWriteS($config, "attack", "CSVSpeedAB", $isldSelectedCSVSpeed[$LB])
 	
-	; Android Settings - Added by LunaEclipse
-	IniWrite($config, "Android", "Emulator", GUICtrlRead($cmbAndroid))
-	IniWrite($config, "Android", "Instance", GUICtrlRead($txtAndroidInstance))
-	
 	; SmartZap Settings - Added by LunaEclipse
 	If GUICtrlRead($chkSmartLightSpell) = $GUI_CHECKED Then
 		IniWrite($config, "SmartZap", "UseSmartZap", 1)
@@ -2633,6 +2629,13 @@ Func saveConfig() ;Saves the controls settings to the config
 	IniWrite($config, "upgrade", "SmartMinElixir", GUICtrlRead($SmartMinElixir))
 	IniWrite($config, "upgrade", "SmartMinDark", GUICtrlRead($SmartMinDark))
 	
+	; Upgrade Management - Added by MMHK
+	If GUICtrlRead($chkUpdateNewUpgradesOnly) = $GUI_CHECKED Then
+		IniWriteS($config, "upgrade", "UpdateNewUpgradesOnly", 1)
+	Else
+		IniWriteS($config, "upgrade", "UpdateNewUpgradesOnly", 0)
+	EndIf
+
 	; Profile Switch Settings
 	If GUICtrlRead($chkGoldSwitchMax) = $GUI_CHECKED Then
 		IniWrite($config, "profiles", "chkGoldSwitchMax", 1)

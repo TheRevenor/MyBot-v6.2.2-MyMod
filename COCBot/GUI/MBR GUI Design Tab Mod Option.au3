@@ -149,34 +149,3 @@ Local $x = 20, $y = 177 ;150
 			GUICtrlSetOnEvent(-1, "btnmultyDetectAcc")
 			GUICtrlSetState(-1, $GUI_ENABLE)				
 		GUICtrlCreateGroup("", -99, -99, 1, 1)
-		
-; #FUNCTION# ====================================================================================================================
-; Name ..........: Android Settings
-; Description ...: This file Includes GUI Design
-; Syntax ........:
-; Parameters ....: None
-; Return values .: None
-; Author ........: LunaEclipse(February, 2016)
-; Modified ......: TheRevenor (Jul, 2016)
-; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015
-;                  MyBot is distributed under the terms of the GNU GPL
-; Related .......:
-; Link ..........: https://github.com/MyBotRun/MyBot/wiki
-; Example .......: No
-; ===============================================================================================================================
-
-	Local $x = 20, $y = 247
-	$grpHideAndroid = GUICtrlCreateGroup("Android Options", $x - 20, $y - 20, 438, 43)
-		$cmbAndroid = GUICtrlCreateCombo("", $x - 10, $y - 5, 130, 18, BitOR($CBS_DROPDOWNLIST, $CBS_AUTOHSCROLL))
-			$txtTip = "Use this to select the Android Emulator to use with this profile."
-			_GUICtrlSetTip(-1, $txtTip)
-			setupAndroidComboBox()
-			GUICtrlSetState(-1, $GUI_SHOW)
-			GUICtrlSetOnEvent(-1, "cmbAndroid")
-		$lblAndroidInstance = GUICtrlCreateLabel("Instance:", $x + 130, $y - 2 , 60, 21, $SS_RIGHT)
-		$txtAndroidInstance = GUICtrlCreateInput("", $x + 200, $y - 5, 210, 20, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER))
-			$txtTip = "Enter the Instance to use with this profile."
-			_GUICtrlSetTip(-1, $txtTip)
-			GUICtrlSetOnEvent(-1, "txtAndroidInstance")
-			GUICtrlSetState(-1, $GUI_DISABLE)
-	GUICtrlCreateGroup("", -99, -99, 1, 1)

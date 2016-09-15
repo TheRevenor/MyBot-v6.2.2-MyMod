@@ -74,16 +74,6 @@ $chkUseResponses = GUICtrlCreateCheckbox("Use custom responses", $x - 9, $y)
 _GUICtrlSetTip($chkUseResponses, "Use the keywords and responses defined below")
 GUICtrlSetState($chkUseResponses, $ChatbotClanUseResponses)
 GUICtrlSetOnEvent(-1, "ChatGuiCheckboxUpdate")
-#Cs $y += 25
-$chkUseCleverbot = GUICtrlCreateCheckbox("Use cleverbot responses", $x - 9, $y)
-GUICtrlSetTip($chkUseCleverbot, "Get responses from cleverbot.com")
-GUICtrlSetState($chkUseCleverbot, $ChatbotClanUseCleverbot)
-GUICtrlSetOnEvent(-1, "ChatGuiCheckboxUpdate")
-$y += 25
-$chkUseSimsimi = GUICtrlCreateCheckbox("Use simsimi responses", $x - 9, $y)
-GUICtrlSetTip($chkUseSimsimi, "Get responses from simsimi.com")
-GUICtrlSetState($chkUseSimsimi, $ChatbotClanUseSimsimi)
-#Ce GUICtrlSetOnEvent(-1, "ChatGuiCheckboxUpdate")
 $y += 25
 $chkUseGeneric = GUICtrlCreateCheckbox("Use generic chats", $x - 9, $y)
 _GUICtrlSetTip($chkUseGeneric, "Use generic chats if reading the latest chat failed or there are no new chats")

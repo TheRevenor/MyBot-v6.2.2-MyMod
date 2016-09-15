@@ -277,9 +277,6 @@
 ; Attack files - Added by LunaEclipse
 #include "functions\Attack\attackFunctions.au3"
 
-; Android Settings - Added by LunaEclipse
-#include "functions\Android\modifyAndroid.au3"
-
 ; SmartUpgrade - Added by Roro-Titi
 #include "functions\MOD\SmartUpgrade\AutoUpgrade.au3"
 
@@ -298,3 +295,6 @@
 
 ; Multy Farming - Added by TheRevenor
 #include "functions\Mod\Multy\MultyFarmingRevenor.au3"
+
+; Upgrade Management - Added by MMHK
+#include "functions\Mod\UpgradeManagement\UpgradesMgmt.au3"

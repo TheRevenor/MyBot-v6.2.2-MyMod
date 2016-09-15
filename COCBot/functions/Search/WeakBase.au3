@@ -21,29 +21,29 @@ Global $weakDefenseNames[6] = ["None", "Eagle Artillery", "Inferno Tower", "XBow
 Global $weakDefenseMaxLevels[6] = [0, 2, 4, 4, 9, 9]
 
 Func createWeakBaseStats()
-    ; Get the directory file contents as keys for the stats file
+	; Get the directory file contents as keys for the stats file
 	Local $aKeys = _FileListToArrayRec(@ScriptDir & "\images\WeakBase", "*.png", $FLTAR_FILES, $FLTAR_RECUR, $FLTAR_SORT, $FLTAR_NOPATH)
 	; Create our return array
 	Local $return[UBound($aKeys) - 1][2]
 
 	; If the stats file doesn't exist, create it
-    If Not FileExists($statChkWeakBase) Then _FileCreate($statChkWeakBase)
+	If Not FileExists($statChkWeakBase) Then _FileCreate($statChkWeakBase)
 
 	; Loop through the keys
-    For $i = 1 To UBound($aKeys) - 1
+	For $i = 1 To UBound($aKeys) - 1
 		; Set the return array values
 		$return[$i - 1][0] = $aKeys[$i] ; Filename
 		$return[$i - 1][1] = 0 ; Number
 
 		; Write the entry to the stats file
-        IniWrite($statChkWeakBase, "WeakBase", $aKeys[$i], "0")
-    Next
+		IniWrite($statChkWeakBase, "WeakBase", $aKeys[$i], "0")
+	Next
 
 	Return $return
 EndFunc   ;==>createWeakBaseStats
 
 Func readWeakBaseStats()
-    ; Get the directory file contents as keys for the stats file
+	; Get the directory file contents as keys for the stats file
 	Local $aKeys = _FileListToArrayRec(@ScriptDir & "\images\WeakBase", "*.png", $FLTAR_FILES, $FLTAR_RECUR, $FLTAR_SORT, $FLTAR_NOPATH)
 	; Create our return array
 	Local $return[UBound($aKeys) - 1][2]
@@ -74,7 +74,7 @@ Func saveWeakBaseStats()
 		IniWrite($statChkWeakBase, "WeakBase", $aWeakBaseStats[$j][0], $aWeakBaseStats[$j][1])
 	Next
 
-    ; Don't forget to close the file handle now that we are finished with it
+	; Don't forget to close the file handle now that we are finished with it
 	FileClose($hFile)
 EndFunc   ;==>saveWeakBaseStats
 
@@ -85,7 +85,7 @@ Func updateWeakBaseStats($aResult)
 			; Loop through the current stats
 			For $j = 0 To UBound($aWeakBaseStats) - 1
 				; Check to see if the current stat is for the found tile
-				If $aWeakBaseStats[$j][0] = $aResult[$i][0] then
+				If $aWeakBaseStats[$j][0] = $aResult[$i][0] Then
 					; Update the counter
 					$aWeakBaseStats[$j][1] = Number($aWeakBaseStats[$j][1]) + 1
 				EndIf

@@ -5,7 +5,7 @@
 ; Parameters ....:
 ; Return values .: None
 ; Author ........: MR.ViPER
-; Modified ......:
+; Modified ......: MR.ViPER (9-9-2016)
 ; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2016
 ;                  MyBot is distributed under the terms of the GNU GPL
 ; Related .......:
@@ -27,22 +27,17 @@ Func BoostBarracks()
 	EndIf
 
 	If $numBarracksAvaiables = 0 Then
-		If $DebugBarrackBoost = 1 Then
-			openArmyOverview()
-			BarracksStatus()
-		EndIf
+		openArmyOverview()
+		BarracksStatus()
 	EndIf
 
-	if $numBarracksAvaiables = 0 then return
+	If $numBarracksAvaiables = 0 Then Return
+	If isEnoughBarracksesAlreadyBoosted() = True Then Return ; Exit function if Number of already boosted barracks is equal to Number of barrackses to boost
 
-	If $icmbQuantBoostBarracks > $numBarracksAvaiables Then
-		SetLog("Hey Chief! I can not Boost more than: " & $numBarracksAvaiables & " Barracks .... ")
-		Return
-	EndIf
-
-	SetLog("Boost Barracks started, checking available Barracks...", $COLOR_BLUE)
+	SetLog("Boost Barracks started...", $COLOR_BLUE)
 	If _Sleep($iDelaycheckArmyCamp1) Then Return
 
+	If $totalPossibleBoostTimes = 0 Then $totalPossibleBoostTimes = (Number($icmbBoostBarracks) * Number($icmbQuantBoostBarracks))
 	;######################## CHECK If Number Of Barrackses To Boost Is Number Of Total Barrackses In Village, If True Then Use Boost All Button #####################
 
 	If $icmbQuantBoostBarracks = $numBarracks Then
@@ -62,14 +57,26 @@ Func BoostBarracks()
 		EndIf ; EndIf For @error or $btnStatus = False
 
 		If $btnStatus = True Then
-			If IsGemWindowOpen("icmbBoostBarracks", "icmbBoostBarracks", True) = True Then ;If Gem Window Was Open, Then Click On GREEN Button And Boost ALL Barrackses
+			If IsGemWindowOpen("", "", True) = True Then ;If Gem Window Was Open, Then Click On GREEN Button And Boost ALL Barrackses
 				For $i = 0 To $numBarracks - 1
-					$InitBoostTime[$i][0] = 1
-					$InitBoostTime[$i][1] = TimerInit()
+					If IsBoostedSuccessfully($i + 1) = True Then
+						$InitBoostTime[$i][0] = 1
+						$InitBoostTime[$i][1] = TimerInit()
+						$totalPossibleBoostTimes -= 1
+						$totalPossibleBoostBarrackses -= $totalPossibleBoostBarrackses
+						WorksWithBoostedBarrackses()
+						If IsFinishedBoostForThisCycle() = True Then
+							SetLog("All Barrackses Boosted Successfully.", $COLOR_GREEN)
+							If $icmbBoostBarracks >= 1 Then $icmbBoostBarracks -= 1
+							Setlog(" Total remain cycles to boost Barracks:" & $icmbBoostBarracks, $COLOR_GREEN)
+							GUICtrlSetData($cmbBoostBarracks, $icmbBoostBarracks)
+							checkMainScreen(False) ; Check for errors during function
+							Return True
+						EndIf
+					EndIf
 				Next
 				SetLog("All Barrackses Boosted Successfully.", $COLOR_GREEN)
 				checkMainScreen(False) ; Check for errors during function
-				GUICtrlSetData($cmbBoostBarracks, $icmbBoostBarracks)
 				Return True
 			EndIf
 			checkMainScreen(False) ; Check for errors during function
@@ -79,9 +86,14 @@ Func BoostBarracks()
 
 	;################################ Number Of Barrackses Too Boost Is NOT Number Of Total Barrackses In Village, SO Boost Barrackses One-By-One ###########################
 	SetLog("Boosting Barrackses One-By-One", $COLOR_BLUE)
-	Local $BoostedBarrackses = 0
 	For $i = 1 To $numBarracks
-		If $BoostedBarrackses >= $icmbQuantBoostBarracks Then
+		If IsFinishedBoostForThisCycle() = True Then
+			_Sleep($iDelayBoostBarracks5)
+			checkMainScreen(False) ; Check for errors during function
+			SetLog("Barrackses Boosted Successfully", $COLOR_GREEN)
+			Return True
+			ExitLoop
+		ElseIf CanBoostOneMoreBarrack() = False Then
 			_Sleep($iDelayBoostBarracks5)
 			checkMainScreen(False) ; Check for errors during function
 			SetLog("Barrackses Boosted Successfully", $COLOR_GREEN)
@@ -90,19 +102,22 @@ Func BoostBarracks()
 		EndIf
 		SetLog("Boosting Barrack nº: " & $i, $COLOR_BLUE)
 		ClickP($aAway, 1, 0, "#0157")
-		_Sleep($iDelayBoostBarracks1)
+		If _Sleep($iDelayBoostBarracks1) Then Return
 		$btnStatus = CheckIfBoostButtonAvailable($i)
 		If @error Or $btnStatus = False Then ContinueLoop
 
 		If $btnStatus = True Then
-			If IsGemWindowOpen("icmbBoostBarracks", "icmbBoostBarracks", True) = True Then ; If Gem Window Was Open, Then Click On GREEN Button And Boost Barrack
-				$BoostedBarrackses += 1
-				$icmbBoostBarracks += 1
-				$InitBoostTime[$i - 1][0] = 1
-				$InitBoostTime[$i - 1][1] = TimerInit()
-				SetLog("Barrack nº: " & $i & " Boosted Successfully.", $COLOR_GREEN)
-				If $BoostedBarrackses = $icmbQuantBoostBarracks Then
-					$icmbBoostBarracks -= 1
+			If IsGemWindowOpen("", "", True) = True Then ; If Gem Window Was Open, Then Click On GREEN Button And Boost Barrack
+				If IsBoostedSuccessfully($i) = True Then
+					$InitBoostTime[$i - 1][0] = 1
+					$InitBoostTime[$i - 1][1] = TimerInit()
+					$totalPossibleBoostTimes -= 1
+					$totalPossibleBoostBarrackses -= 1
+					WorksWithBoostedBarrackses()
+					SetLog("Barrack nº: " & $i & " Boosted Successfully.", $COLOR_GREEN)
+				EndIf
+				If IsFinishedBoostForThisCycle() = True Then
+					If $icmbBoostBarracks >= 1 Then $icmbBoostBarracks -= 1
 					Setlog(" Total remain cycles to boost Barracks:" & $icmbBoostBarracks, $COLOR_GREEN)
 					GUICtrlSetData($cmbBoostBarracks, $icmbBoostBarracks)
 				EndIf
@@ -114,11 +129,120 @@ Func BoostBarracks()
 	Return True
 EndFunc   ;==>BoostBarracks
 
+Func BoostDarkBarracks()
+	If $bTrainEnabled = False Then Return
+	If $icmbQuantBoostDarkBarracks = 0 Or $icmbBoostDarkBarracks = 0 Then Return
+	If $icmbQuantBoostDarkBarracks > 1 Then
+		Local $hour = StringSplit(_NowTime(4), ":", $STR_NOCOUNT)
+		If $iPlannedBoostBarracksHours[$hour[0]] = 0 Then
+			SetLog("Boost Dark Barracks are not Planned, Skipped..", $COLOR_BLUE)
+			Return ; exit func if no planned Boost Barracks checkmarks
+		EndIf
+	EndIf
+
+	If $numDarkBarracksAvaiables = 0 Then
+		openArmyOverview()
+		BarracksStatus()
+	EndIf
+
+	If $numDarkBarracksAvaiables = 0 Then Return
+	If isEnoughBarracksesAlreadyBoostedDARK() = True Then Return ; Exit function if Number of already boosted DARK barracks is equal to Number of barrackses to boost
+
+	SetLog("Boost Dark Barracks started...", $COLOR_BLUE)
+	If _Sleep($iDelaycheckArmyCamp1) Then Return
+
+	If $totalPossibleBoostTimesDARK = 0 Then $totalPossibleBoostTimesDARK = (Number($icmbBoostDarkBarracks) * Number($icmbQuantBoostDarkBarracks))
+
+	;######################## CHECK If Number Of Barrackses To Boost Is Number Of Total Barrackses In Village, If True Then Use Boost All Button #####################
+
+	If $icmbQuantBoostDarkBarracks = $numDarkBarracksAvaiables Then
+		SetLog("Boosting All Dark Barrackses", $COLOR_BLUE)
+		$btnStatus = CheckIfDarkBoostButtonAvailable(1, True) ; Check If Boost All Button Is Available With Barrack '1'
+		If @error Or $btnStatus = False Then ; If Failed To Select Barrack 1,
+			$btnStatus = CheckIfDarkBoostButtonAvailable(2, True) ; Check If Boost All Button Is Available With Barrack '2'
+			If @error Or $btnStatus = False Then
+				SetLog("No Boost Button Found, Or Maybe No Dark Barrack Selected Successfully! Trying Another way...", $COLOR_ORANGE)
+			EndIf
+		EndIf ; EndIf For @error or $btnStatus = False
+
+		If $btnStatus = True Then
+			If IsGemWindowOpen("", "", True) = True Then ;If Gem Window Was Open, Then Click On GREEN Button And Boost ALL Barrackses
+				For $i = 0 To $numDarkBarracks - 1
+					If IsBoostedSuccessfully($i + 1, True) = True Then
+						$InitBoostTimeDark[$i][0] = 1
+						$InitBoostTimeDark[$i][1] = TimerInit()
+						$totalPossibleBoostTimesDARK -= 1
+						$totalPossibleBoostBarracksesDARK -= $totalPossibleBoostBarracksesDARK
+						WorksWithBoostedBarrackses("DARK")
+						If IsFinishedBoostForThisCycleDARK() = True Then
+							SetLog("All Dark Barrackses Boosted Successfully.", $COLOR_GREEN)
+							If $icmbBoostDarkBarracks >= 1 Then $icmbBoostDarkBarracks -= 1
+							Setlog(" Total remain cycles to boost Dark Barracks:" & $icmbBoostDarkBarracks, $COLOR_GREEN)
+							GUICtrlSetData($cmbBoostDarkBarracks, $icmbBoostDarkBarracks)
+							checkMainScreen(False) ; Check for errors during function
+							Return True
+						EndIf
+					EndIf
+				Next
+				SetLog("All Dark Barracks Boosted Successfully.", $COLOR_GREEN)
+				checkMainScreen(False) ; Check for errors during function
+				Return True
+			EndIf
+			checkMainScreen(False) ; Check for errors during function
+			SetLog("Failed To Boost All DARK Barracks, GEM Window Not Displayed", $COLOR_ORANGE)
+		EndIf ; EndIf For $btnStatus = True
+	EndIf ; EndIf For $icmbQuantBoostDarkBarracks = $numBarracks
+
+	;################################ Number Of Barrackses Too Boost Is NOT Number Of Total Barrackses In Village, SO Boost Barrackses One-By-One ###########################
+	SetLog("Boosting Dark Barracks One-By-One", $COLOR_BLUE)
+	For $i = 1 To $numDarkBarracks
+		If IsFinishedBoostForThisCycleDARK() Then
+			_Sleep($iDelayBoostBarracks5)
+			checkMainScreen(False) ; Check for errors during function
+			SetLog("Dark Barracks Boosted Successfully", $COLOR_GREEN)
+			Return True
+			ExitLoop
+		ElseIf CanBoostOneMoreBarrack(True) = False Then
+			_Sleep($iDelayBoostBarracks5)
+			checkMainScreen(False) ; Check for errors during function
+			SetLog("Barrackses Boosted Successfully", $COLOR_GREEN)
+			Return True
+			ExitLoop
+		EndIf
+		SetLog("Boosting Dark Barrack nº: " & $i, $COLOR_BLUE)
+		ClickP($aAway, 1, 0, "#0157")
+		If _Sleep($iDelayBoostBarracks1) Then Return
+		$btnStatus = CheckIfDarkBoostButtonAvailable($i)
+		If @error Or $btnStatus = False Then ContinueLoop
+
+		If $btnStatus = True Then
+			If IsGemWindowOpen("", "", True) = True Then ; If Gem Window Was Open, Then Click On GREEN Button And Boost Barrack
+				If IsBoostedSuccessfully($i, True) = True Then
+				$InitBoostTimeDark[$i - 1][0] = 1
+				$InitBoostTimeDark[$i - 1][1] = TimerInit()
+				$totalPossibleBoostTimesDARK -= 1
+				$totalPossibleBoostBarracksesDARK -= 1
+				WorksWithBoostedBarrackses("DARK")
+				SetLog("Dark Barrack nº: " & $i & " Boosted Successfully.", $COLOR_GREEN)
+				EndIf
+				If $BoostedBarracksesDARK = $icmbQuantBoostDarkBarracks Then
+					$icmbBoostDarkBarracks -= 1
+					Setlog(" Total remain cycles to boost Barracks:" & $icmbBoostDarkBarracks, $COLOR_GREEN)
+					GUICtrlSetData($cmbBoostDarkBarracks, $icmbBoostDarkBarracks)
+				EndIf
+			EndIf
+		EndIf
+	Next
+	_Sleep($iDelayBoostBarracks5)
+	checkMainScreen(False) ; Check for errors during function
+	Return True
+EndFunc   ;==>BoostDarkBarracks
+
 Func BoostSpellFactory()
 	If $bTrainEnabled = False Then Return
 	If $icmbBoostSpellFactory > 0 And $boostsEnabled = 1 Then
 		SetLog("Boosting Spell Factory...", $COLOR_BLUE)
-		If $SFPos[0] = -1 or $SFPos[0] = 0 or $SFPos[0] = "" Then
+		If $SFPos[0] = -1 Or $SFPos[0] = 0 Or $SFPos[0] = "" Then
 			LocateSpellFactory()
 			SaveConfig()
 			_Sleep($iDelayBoostSpellFactory2)
@@ -145,7 +269,7 @@ Func BoostDarkSpellFactory()
 	If $bTrainEnabled = False Then Return
 	If $icmbBoostDarkSpellFactory > 0 And ($boostsEnabled = 1) Then
 		SetLog("Boosting Dark Spell Factory...", $COLOR_BLUE)
-		If $DSFPos[0] = -1 or $DSFPos[0] = 0 or $DSFPos[0] = "" Then
+		If $DSFPos[0] = -1 Or $DSFPos[0] = 0 Or $DSFPos[0] = "" Then
 			LocateDarkSpellFactory()
 			SaveConfig()
 			If _Sleep($iDelayBoostSpellFactory2) Then Return
@@ -169,22 +293,184 @@ Func BoostDarkSpellFactory()
 	EndIf
 EndFunc   ;==>BoostDarkSpellFactory
 
-Func IsGemWindowOpen($varToChange1, $varToChange2, $AcceptGem = False, $NeedCapture = True)
+Func CanBoostOneMoreBarrack($isDarkBoost = False)
+	Select
+		Case $isDarkBoost = False
+			If $totalPossibleBoostBarrackses <= 0 Then Return False
+			Return True
+		Case Else
+			If $totalPossibleBoostBarracksesDARK <= 0 Then Return False
+			Return True
+	EndSelect
+EndFunc   ;==>CanBoostOneMoreBarrack
+
+Func isEnoughBarracksesAlreadyBoosted()
+	If $totalPossibleBoostBarrackses <= 0 Then $totalPossibleBoostBarrackses = $icmbQuantBoostBarracks
+	$tAlreadyBoosted = 0
+	For $i = 1 To $numBarracks
+		SelectBarrack($i)
+		$res = IsBoosted()
+		If $res = True Then $tAlreadyBoosted += 1
+	Next
+	If $DebugBarrackBoost = 1 Then SetLog("$tAlreadyBoosted = " & $tAlreadyBoosted & "  $icmbQuantBoostBarracks = " & $icmbQuantBoostBarracks, $COLOR_BLUE)
+	If $tAlreadyBoosted > 0 Then $totalPossibleBoostBarrackses -= $tAlreadyBoosted
+	If $DebugBarrackBoost = 1 Then SetLog("$totalPossibleBoostBarrackses = " & $totalPossibleBoostBarrackses, $COLOR_BLUE)
+	If $tAlreadyBoosted = $icmbQuantBoostBarracks Then
+		SetLog("Enough Barrackses are already boosted, Skipping Barracks boost", $COLOR_BLUE)
+		Return True
+	ElseIf $tAlreadyBoosted > $icmbQuantBoostBarracks Then
+		SetLog($tAlreadyBoosted & " Barracks are Already boosted, Higher than Number Setted in GUI! Maybe Something is wrong, Otherwise Skipping Barracks Boost", $COLOR_ORANGE)
+		Return True
+	Else
+		Return False
+	EndIf
+EndFunc   ;==>isEnoughBarracksesAlreadyBoosted
+
+Func isEnoughBarracksesAlreadyBoostedDARK()
+	If $totalPossibleBoostBarracksesDARK <= 0 Then $totalPossibleBoostBarracksesDARK = $icmbQuantBoostDarkBarracks
+	$tAlreadyBoostedDARK = 0
+	For $i = 1 To $numDarkBarracks
+		SelectDarkBarrack($i)
+		$res = IsBoosted()
+		If $res = True Then $tAlreadyBoostedDARK += 1
+	Next
+	If $DebugBarrackBoost = 1 Then SetLog("$tAlreadyBoostedDARK = " & $tAlreadyBoostedDARK & "  $icmbQuantBoostDarkBarracks = " & $icmbQuantBoostDarkBarracks, $COLOR_BLUE)
+	If $tAlreadyBoostedDARK > 0 Then $totalPossibleBoostBarracksesDARK -= $tAlreadyBoostedDARK
+	If $DebugBarrackBoost = 1 Then SetLog("$totalPossibleBoostBarracksesDARK = " & $totalPossibleBoostBarracksesDARK, $COLOR_BLUE)
+	If $tAlreadyBoostedDARK = $icmbQuantBoostDarkBarracks Then
+		SetLog("Enough Dark Barrackses are already boosted, Skipping Dark Barracks boost", $COLOR_BLUE)
+		Return True
+	ElseIf $tAlreadyBoostedDARK > $icmbQuantBoostDarkBarracks Then
+		SetLog($tAlreadyBoostedDARK & " Dark Barracks are Already boosted, Higher than Number Setted in GUI! Maybe Something is wrong, Otherwise Skipping Dark Barracks Boost", $COLOR_ORANGE)
+		Return True
+	Else
+		Return False
+	EndIf
+EndFunc   ;==>isEnoughBarracksesAlreadyBoostedDARK
+
+Func WorksWithBoostedBarrackses($BType = "ELIXIR", $operator = "+", $iNumWorksWith = 1)
+	Select
+		Case $BType = "ELIXIR"
+			Select
+				Case $operator = "+"
+					$BoostedBarrackses += $iNumWorksWith
+				Case $operator = "-"
+					$BoostedBarrackses -= $iNumWorksWith
+			EndSelect
+		Case $BType = "DARK"
+			Select
+				Case $operator = "+"
+					$BoostedBarracksesDARK += $iNumWorksWith
+				Case $operator = "-"
+					$BoostedBarracksesDARK -= $iNumWorksWith
+			EndSelect
+	EndSelect
+	Return $BoostedBarrackses
+EndFunc   ;==>WorksWithBoostedBarrackses
+
+Func IsFinishedBoostForThisCycle()
+	If $totalPossibleBoostTimes <= 0 Then
+		If $DebugBarrackBoost = 1 Then SetLog("Possible Boost Times is lower than 0 and value is = " & $totalPossibleBoostTimes, $COLOR_ORANGE)
+		Return True
+	EndIf
+	Return GetDifferenceOfBoostBarrackTimer()
+EndFunc   ;==>IsFinishedBoostForThisCycle
+
+Func IsFinishedBoostForThisCycleDARK()
+	If $totalPossibleBoostTimesDARK <= 0 Then
+		If $DebugBarrackBoost = 1 Then SetLog("Possible Boost Times is lower than 0 and value is = " & $totalPossibleBoostTimesDARK, $COLOR_ORANGE)
+		Return True
+	EndIf
+	Return GetDifferenceOfBoostBarrackTimerDARK()
+EndFunc   ;==>IsFinishedBoostForThisCycleDARK
+
+Func GetDifferenceOfBoostBarrackTimer()
+	Local $totalRecentlyBoosted = 0
+	For $i = 0 To $numBarracks - 1
+		$fDiff = TimerDiff($InitBoostTime[$i][1])
+		If $DebugBarrackBoost = 1 Then SetLog("$InitBoostTime[" & $i & "][1] = " & $InitBoostTime[$i][1], $COLOR_ORANGE)
+		$fDiff = Int($fDiff, 2)
+		If $fDiff <= 300000 Then
+			$totalRecentlyBoosted += 1
+			If $DebugBarrackBoost = 1 Then SetLog("$totalRecentlyBoosted = " & $totalRecentlyBoosted, $COLOR_ORANGE)
+		EndIf
+	Next
+	$iNumTotalBarracksToBoostInGUI = $icmbQuantBoostBarracks
+	If $DebugBarrackBoost = 1 Then SetLog("$iNumTotalBarracksToBoostInGUI = " & $iNumTotalBarracksToBoostInGUI, $COLOR_ORANGE)
+	If $totalRecentlyBoosted >= $iNumTotalBarracksToBoostInGUI Then
+		If $DebugBarrackBoost = 1 Then SetLog("$totalRecentlyBoosted >= $iNumTotalBarracksToBoostInGUI = " & $totalRecentlyBoosted >= $iNumTotalBarracksToBoostInGUI, $COLOR_ORANGE)
+		Return True
+	EndIf
+	Return False
+EndFunc   ;==>GetDifferenceOfBoostBarrackTimer
+
+Func GetDifferenceOfBoostBarrackTimerDARK()
+	Local $totalRecentlyBoostedDARK = 0
+	For $i = 0 To $numDarkBarracks - 1
+		$fDiff = TimerDiff($InitBoostTimeDark[$i][1])
+		If $DebugBarrackBoost = 1 Then SetLog("$InitBoostTimeDark[" & $i & "][1] = " & $InitBoostTimeDark[$i][1], $COLOR_ORANGE)
+		$fDiff = Int($fDiff, 2)
+		If $fDiff <= 300000 Then
+			$totalRecentlyBoostedDARK += 1
+			If $DebugBarrackBoost = 1 Then SetLog("$totalRecentlyBoostedDARK = " & $totalRecentlyBoostedDARK, $COLOR_ORANGE)
+		EndIf
+	Next
+	$iNumTotalBarracksToBoostInGUIDARK = $icmbQuantBoostDarkBarracks
+	If $DebugBarrackBoost = 1 Then SetLog("$iNumTotalBarracksToBoostInGUIDARK = " & $iNumTotalBarracksToBoostInGUIDARK, $COLOR_ORANGE)
+	If $totalRecentlyBoostedDARK >= $iNumTotalBarracksToBoostInGUIDARK Then
+		If $DebugBarrackBoost = 1 Then SetLog("$totalRecentlyBoostedDARK >= $iNumTotalBarracksToBoostInGUIDARK = " & $totalRecentlyBoostedDARK >= $iNumTotalBarracksToBoostInGUIDARK, $COLOR_ORANGE)
+		Return True
+	EndIf
+	Return False
+EndFunc   ;==>GetDifferenceOfBoostBarrackTimerDARK
+
+Func IsBoostedSuccessfully($BRNum, $isDarkBarrack = False)
+	If $DebugBarrackBoost = 1 Then SetLog("Func IsBoostedSuccessfully(" & $BRNum & ", " & $isDarkBarrack & ")", $COLOR_PURPLE)
+	ClickP($aAway, 1, 0, "#0161")
+	If _Sleep(250) Then Return
+	$selectResult = -1
+	Select
+		Case $isDarkBarrack = False
+			$selectResult = SelectBarrack($BRNum)
+		Case Else
+			$selectResult = SelectDarkBarrack($BRNum)
+	EndSelect
+	If $selectResult = True Then
+		If _Sleep(1000) Then Return
+		If IsBoosted() = True Then
+			If $DebugBarrackBoost = 1 Then SetLog(IIf($isDarkBarrack = True, "Dark ", "") & "Barrack nº: " & $BRNum & " Boost Verified.", $COLOR_BLUE)
+			If $DebugBarrackBoost = 1 Then SetLog("Func IsBoostedSuccessfully(" & $BRNum & ", " & $isDarkBarrack & ") = True", $COLOR_PURPLE)
+			Return True
+		Else
+			If $DebugBarrackBoost = 1 Then SetLog(IIf($isDarkBarrack = True, "Dark ", "") & "Barrack nº: " & $BRNum & " Not Boosted, Failed To Verify.", $COLOR_BLUE)
+			If $DebugBarrackBoost = 1 Then SetLog("Func IsBoostedSuccessfully(" & $BRNum & ", " & $isDarkBarrack & ") = False", $COLOR_PURPLE)
+			Return False
+		EndIf
+		Return IsBoosted()
+	Else
+		If $DebugBarrackBoost = 1 Then SetLog("Failed To Select " & IIf($isDarkBarrack = True, "Dark ", "") & "Barrack nº: " & $BRNum & ", " & $isDarkBarrack & " To Verify Boost", $COLOR_BLUE)
+		If $DebugBarrackBoost = 1 Then SetLog("Func IsBoostedSuccessfully(" & $BRNum & ", " & $isDarkBarrack & ") = False", $COLOR_PURPLE)
+		Return False
+	EndIf
+	If $DebugBarrackBoost = 1 Then SetLog("END Func IsBoostedSuccessfully(" & $BRNum & ", " & $isDarkBarrack & ")", $COLOR_PURPLE)
+EndFunc   ;==>IsBoostedSuccessfully
+
+Func IsGemWindowOpen($varToChange1 = "", $varToChange2 = "", $AcceptGem = False, $NeedCapture = True)
 	If $DebugBarrackBoost = 1 Then SetLog("Func IsGemWindowOpen(" & $AcceptGem & ", " & $NeedCapture & ")", $COLOR_PURPLE)
 	_Sleep($iDelayisGemOpen1)
 	If _ColorCheck(_GetPixelColor(314, 249 + $midOffsetY, True), Hex(0xFFFFFF, 6), 20) Then
 		If _ColorCheck(_GetPixelColor(440, 424 + $midOffsetY, True), Hex(0x0d1903, 6), 20) Then
-			If $debugSetlog = 1 or $DebugBarrackBoost = 1 Then Setlog("DETECTED, GEM Window Is OPEN", $COLOR_PURPLE)
+			If $debugSetlog = 1 Or $DebugBarrackBoost = 1 Then Setlog("DETECTED, GEM Window Is OPEN", $COLOR_PURPLE)
 			If $AcceptGem = True Then
 				Click(425, 425)
 				_Sleep($iDelayBoostBarracks2)
 				If _ColorCheck(_GetPixelColor(586, 267 + $midOffsetY, True), Hex(0xd80405, 6), 20) Then
-					Assign($varToChange1, 0, 4)
+					If $varToChange1 = "" = False Then Assign($varToChange1, 0, 4)
 					SetLog("Not enough gems", $COLOR_RED)
 					ClickP($aAway, 1, 0, "#0161")
 				Else
-					Assign($varToChange2, Eval($varToChange2) - 1, 4)
-					SetLog('Boost completed. Remaining : ' & Eval($varToChange2), $COLOR_GREEN)
+					If $varToChange2 = "" = False Then Assign($varToChange2, Eval($varToChange2) - 1, 4)
+					If $varToChange2 = "" = False Then SetLog('Boost completed. Remaining : ' & Eval($varToChange2), $COLOR_GREEN)
 				EndIf
 			Else
 				PureClickP($aAway, 1, 0, "#0140") ; click away to close gem window
@@ -197,7 +483,7 @@ Func IsGemWindowOpen($varToChange1, $varToChange2, $AcceptGem = False, $NeedCapt
 	EndIf
 	If $DebugBarrackBoost = 1 Then SetLog("Func IsGemWindowOpen(" & $AcceptGem & ", " & $NeedCapture & ") = FALSE", $COLOR_GREEN)
 	Return False
-EndFunc
+EndFunc   ;==>IsGemWindowOpen
 
 Func CheckIfBoostButtonAvailable($BRNum, $BoostAllBtn = False, $ClickAlso = True)
 	If $DebugBarrackBoost = 1 Then SetLog("Func CheckIfBoostButtonAvailable(" & $BRNum & ", " & $BoostAllBtn & ", " & $ClickAlso & ")", $COLOR_PURPLE)
@@ -207,7 +493,8 @@ Func CheckIfBoostButtonAvailable($BRNum, $BoostAllBtn = False, $ClickAlso = True
 	;$ImagesToUse[2] = @ScriptDir & "\images\Button\BoostedBarrack.png"
 	If FileExists($ImagesToUse[0]) And FileExists($ImagesToUse[1]) Then
 		$ToleranceImgLoc = 0.92
-		If SelectBarrack($BRNum) or $BRNum = -1 Then
+		If SelectBarrack($BRNum) Or $BRNum = -1 Then
+			If _Sleep(500) Then Return
 			_CaptureRegion2(125, 610, 740, 715)
 			$res = ""
 			If $BoostAllBtn = True Then ; Determine What Button It Should Search For
@@ -244,6 +531,7 @@ Func CheckIfBoostButtonAvailable($BRNum, $BoostAllBtn = False, $ClickAlso = True
 				EndIf
 			EndIf ;EndIf for: If IsArray($res)
 		Else
+			SetLog("Failed to Select Barrack #" & $BRNum & " to Boost", $COLOR_RED)
 			SetError(1, 0)
 		EndIf ;EndIf For SelectBarrack($BRNum)
 	Else
@@ -283,7 +571,7 @@ EndFunc   ;==>IsBoosted
 
 Func SelectBarrack($BRNum) ; 3
 	If $DebugBarrackBoost = 1 Then SetLog("Func SelectBarrack(" & $BRNum & ")", $COLOR_PURPLE)
-	If $BRNum = 0 or $BRNum > 4 Then CheckForBarrackNoPos()
+	If $BRNum = 0 Or $BRNum > 4 Then CheckForBarrackNoPos()
 	Local $CorrectBRNum
 
 	; $Trainavailable = [1, 0, 1, 1, 1, 1, 0, 0, 0]
@@ -397,96 +685,6 @@ Func CheckForBarrackNoPos()
 	Next
 	Return True
 EndFunc   ;==>CheckForBarrackNoPos
-
-Func BoostDarkBarracks()
-	If $bTrainEnabled = False Then Return
-	If $icmbQuantBoostDarkBarracks = 0 Or $icmbBoostDarkBarracks = 0 Then Return
-	If $icmbQuantBoostDarkBarracks > 1 Then
-		Local $hour = StringSplit(_NowTime(4), ":", $STR_NOCOUNT)
-		If $iPlannedBoostBarracksHours[$hour[0]] = 0 Then
-			SetLog("Boost Dark Barracks are not Planned, Skipped..", $COLOR_BLUE)
-			Return ; exit func if no planned Boost Barracks checkmarks
-		EndIf
-	EndIf
-
-	If $numDarkBarracksAvaiables = 0 Then
-		If $DebugBarrackBoost = 1 Then
-			openArmyOverview()
-			BarracksStatus()
-		EndIf
-	EndIf
-
-	If $numDarkBarracksAvaiables = 0 then return
-
-	If $icmbQuantBoostDarkBarracks > $numDarkBarracksAvaiables Then
-		SetLog("Hey Chief! I can not Boost more than: " & $numDarkBarracksAvaiables & " Dark Barracks .... ")
-		Return
-	EndIf
-
-	SetLog("Boost Dark Barracks started, checking available Barracks...", $COLOR_BLUE)
-	If _Sleep($iDelaycheckArmyCamp1) Then Return
-
-	;######################## CHECK If Number Of Barrackses To Boost Is Number Of Total Barrackses In Village, If True Then Use Boost All Button #####################
-
-	If $icmbQuantBoostDarkBarracks = $numDarkBarracksAvaiables Then
-		SetLog("Boosting All Dark Barrackses", $COLOR_BLUE)
-		$btnStatus = CheckIfDarkBoostButtonAvailable(1, True) ; Check If Boost All Button Is Available With Barrack '1'
-		If @error Or $btnStatus = False Then ; If Failed To Select Barrack 1,
-			$btnStatus = CheckIfDarkBoostButtonAvailable(2, True) ; Check If Boost All Button Is Available With Barrack '2'
-		EndIf ; EndIf For @error or $btnStatus = False
-
-		If $btnStatus = True Then
-			If IsGemWindowOpen("icmbBoostDarkBarracks", "icmbBoostDarkBarracks", True) = True Then ;If Gem Window Was Open, Then Click On GREEN Button And Boost ALL Barrackses
-				For $i = 0 To $numDarkBarracks - 1
-					$InitBoostTimeDark[$i][0] = 1
-					$InitBoostTimeDark[$i][1] = TimerInit()
-				Next
-				SetLog("All Dark Barracks Boosted Successfully.", $COLOR_GREEN)
-				checkMainScreen(False) ; Check for errors during function
-				GUICtrlSetData($cmbBoostDarkBarracks, $icmbBoostDarkBarracks)
-				Return True
-			EndIf
-			checkMainScreen(False) ; Check for errors during function
-			SetLog("Failed To Boost All DARK Barracks, GEM Window Not Displayed", $COLOR_ORANGE)
-		EndIf ; EndIf For $btnStatus = True
-	EndIf ; EndIf For $icmbQuantBoostDarkBarracks = $numBarracks
-
-	;################################ Number Of Barrackses Too Boost Is NOT Number Of Total Barrackses In Village, SO Boost Barrackses One-By-One ###########################
-	SetLog("Boosting Dark Barracks One-By-One", $COLOR_BLUE)
-	Local $BoostedBarrackses = 0
-	For $i = 1 To $numDarkBarracks
-		If $BoostedBarrackses >= $icmbQuantBoostDarkBarracks Then
-			_Sleep($iDelayBoostBarracks5)
-			checkMainScreen(False) ; Check for errors during function
-			SetLog("Dark Barracks Boosted Successfully", $COLOR_GREEN)
-			Return True
-			ExitLoop
-		EndIf
-		SetLog("Boosting Dark Barrack nº: " & $i, $COLOR_BLUE)
-		ClickP($aAway, 1, 0, "#0157")
-		_Sleep($iDelayBoostBarracks1)
-		$btnStatus = CheckIfDarkBoostButtonAvailable($i)
-		If @error Or $btnStatus = False Then ContinueLoop
-
-		If $btnStatus = True Then
-			If IsGemWindowOpen("icmbBoostDarkBarracks", "icmbBoostDarkBarracks", True) = True Then ; If Gem Window Was Open, Then Click On GREEN Button And Boost Barrack
-				$BoostedBarrackses += 1
-				$icmbBoostDarkBarracks += 1
-				$InitBoostTimeDark[$i - 1][0] = 1
-				$InitBoostTimeDark[$i - 1][1] = TimerInit()
-				SetLog("Barrack nº: " & $i & " Boosted Successfully.", $COLOR_GREEN)
-				If $BoostedBarrackses = $icmbQuantBoostDarkBarracks Then
-					$icmbBoostDarkBarracks -= 1
-					Setlog(" Total remain cycles to boost Barracks:" & $icmbBoostDarkBarracks, $COLOR_GREEN)
-					GUICtrlSetData($cmbBoostDarkBarracks, $icmbBoostDarkBarracks)
-				EndIf
-			EndIf
-		EndIf
-	Next
-	_Sleep($iDelayBoostBarracks5)
-	checkMainScreen(False) ; Check for errors during function
-	Return True
-EndFunc   ;==>BoostDarkBarracks
 
 Func CheckIfDarkBoostButtonAvailable($BRNum, $BoostAllBtn = False, $ClickAlso = True)
 	If $DebugBarrackBoost = 1 Then SetLog("Func CheckIfDarkBoostButtonAvailable(" & $BRNum & ", " & $BoostAllBtn & ", " & $ClickAlso & ")", $COLOR_PURPLE)

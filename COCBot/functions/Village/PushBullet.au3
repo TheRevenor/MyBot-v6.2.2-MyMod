@@ -20,8 +20,8 @@
 #include <String.au3>
 
 ;Prevent crashes
-$oMyError = ObjEvent("AutoIt.Error","MyErrFunc")
-Func MyErrFunc()
+;$oMyError = ObjEvent("AutoIt.Error","MyErrFunc")
+;Func MyErrFunc()
   ;SetLog("COM Error!"    & @CRLF  & @CRLF & _
   ;           "err.description is: " & @TAB & $oMyError.description  & @CRLF & _
   ;           "err.windescription:"   & @TAB & $oMyError.windescription & @CRLF & _
@@ -32,7 +32,7 @@ Func MyErrFunc()
   ;           "err.helpfile is: "       & @TAB & $oMyError.helpfile     & @CRLF & _
   ;           "err.helpcontext is: " & @TAB & $oMyError.helpcontext _
   ;          )
-Endfunc
+;Endfunc
 
 Func _RemoteControlPushBullet()
 	If ($PushBulletEnabled = 0 And $TelegramEnabled = 0) Or $pRemote = 0 Then Return
@@ -88,6 +88,9 @@ Func _RemoteControlPushBullet()
 							$txtHelp &= '\n' & GetTranslated(620, 1, -1) & " <" & $iOrigPushBullet & "> SWITCHPROFILE <PROFILENAME> - Swap Profile Village and restart bot"
 							$txtHelp &= '\n' & GetTranslated(620, 1, -1) & " <" & $iOrigPushBullet & "> SENDCHAT <TEXT> - send TEXT in clan chat of <Village Name>"
 							$txtHelp &= '\n' & GetTranslated(620, 1, -1) & " <" & $iOrigPushBullet & "> GETCHATS <STOP|NOW|INTERVAL> - select any of this three option to do"
+							$txtHelp &= '\n' & GetTranslated(620, 1, -1) & " <" & $iOrigPushBullet & "> RESETSTATS - reset Village Statistics"
+							$txtHelp &= '\n' & GetTranslated(620, 1, -1) & " <" & $iOrigPushBullet & "> HALTATTACKON - Turn On 'Halt Attack' in the 'Misc' Tab with the default options"
+							$txtHelp &= '\n' & GetTranslated(620, 1, -1) & " <" & $iOrigPushBullet & "> HALTATTACKOFF - Turn Off 'Halt Attack' in the 'Misc' Tab"
 							$txtHelp &= '\n'
 							$txtHelp &= '\n' & GetTranslated(620, 25, "Examples:")
 							$txtHelp &= '\n' & GetTranslated(620, 1, -1) & " " & $iOrigPushBullet & " " & GetTranslated(620, 18, "PAUSE")
@@ -141,7 +144,7 @@ Func _RemoteControlPushBullet()
 							EndIf
 							SetLog("Pushbullet: Push Last Raid Snapshot...", $COLOR_GREEN)
 							_DeleteMessageOfPushBullet($iden[$x])
-						Case GetTranslated(620, 1, -1) & " " & StringUpper($iOrigPushBullet) & " " & GetTranslated(20, 23, -1) ;"LASTRAIDTXT"
+						Case GetTranslated(620, 1, -1) & " " & StringUpper($iOrigPushBullet) & " " & GetTranslated(620, 23, -1) ;"LASTRAIDTXT"
 							SetLog("Pusbullet: Your request has been received. Last Raid txt sent", $COLOR_GREEN)
 							_PushToPushBullet($iOrigPushBullet & " | " & GetTranslated(620, 34, "Last Raid txt") & "\n" & "[" & GetTranslated(620, 35, "G") & "]: " & _NumberFormat($iGoldLast) & " [" & GetTranslated(620, 36, "E") & "]: " & _NumberFormat($iElixirLast) & " [" & GetTranslated(620, 37, "D") & "]: " & _NumberFormat($iDarkLast) & " [" & GetTranslated(620, 38, "T") & "]: " & $iTrophyLast)
 							_DeleteMessageOfPushBullet($iden[$x])
@@ -170,6 +173,16 @@ Func _RemoteControlPushBullet()
 								_PushToPushBullet($iOrigPushBullet & " | " & GetTranslated(620, 48, "Request to Stop") & "..." & "\n" & GetTranslated(620, 50, "Your bot is currently stopped, no action was taken"))
 							EndIf
 									;=================================== "TheRevenor Notify" ===================================
+						Case GetTranslated(620, 1, -1) & " START"
+							btnStart()
+							SetLog("Pushbullet: Your request has been received. Bot is now Started", $COLOR_BLUE)
+							_PushToPushBullet("Request to Start..." & "\n" & "Your bot is now Starting.")
+							_DeleteMessageOfPushBullet($iden[$x])
+						Case GetTranslated(620, 1, -1) & " " & StringUpper($iOrigPushBullet) & " RESETSTATS"
+							btnResetStats()
+							SetLog("Pushbullet: Your request has been received. Statistics resetted", $COLOR_GREEN)
+							_PushToPushBullet($iOrigPushBullet & " | Request for RESETSTATS has been resetted.")
+							_DeleteMessageOfPushBullet($iden[$x])
 						Case GetTranslated(620, 1, -1) & " " & StringUpper($iOrigPushBullet) & " HALTATTACKON"
 							GUICtrlSetState($chkBotStop, $GUI_CHECKED)
 							btnStop()
@@ -221,32 +234,28 @@ Func _RemoteControlPushBullet()
 										ChatbotPushbulletIntervalChatRead(Number($Interval))
 										_PushToPushBullet($iOrigPushBullet & " | Command queued, will send clan chat image on interval")
 									Else
+										$FoundChatMessage = 0
 										SetLog("Chatbot: incorrect command syntax, Example: BOT <VillageName> GETCHATS NOW|STOP|INTERVAL", $COLOR_RED)
 										_PushToPushBullet($iOrigPushBullet & " | Command not recognized" & "\n" & "Example: BOT <VillageName> GETCHATS NOW|STOP|INTERVAL")
 									EndIf
 								EndIf
 									_DeleteMessageOfPushBullet($iden[$x])
-							ElseIf $body[$x] = "BOT START" Then ;TheRevenor Start
-								btnStart()
-								SetLog("Pushbullet: Your request has been received. Bot is now Started", $COLOR_BLUE)
-								_PushToPushBullet("Request to Start..." & "\n" & "Your bot is now Starting.")
-								_DeleteMessageOfPushBullet($iden[$x])
 							ElseIf StringInStr($body[$x], StringUpper($iOrigPushBullet) & " SWITCHPROFILE") Then
 								$VillageSelect = StringRight($body[$x], StringLen($body[$x]) - StringLen("BOT " & StringUpper($iOrigPushBullet) & " SWITCHPROFILE "))
 								Local $iIndex = _GUICtrlComboBox_FindString($cmbProfile, $VillageSelect)
 								If $iIndex = -1 Then
-								SetLog("PushBullet: Profile Switch failed", $COLOR_RED)
-								$profileString = StringReplace(_GUICtrlComboBox_GetList($cmbProfile), "|", "\n")
-								_PushToPushBullet($iOrigPushBullet & " | " & GetTranslated(18, 128, "Error Switch Profile") & ":\n" & GetTranslated(18, 129, "Available Profiles") & ":\n" & $profileString)
-							Else
-								btnStop()
-								_GUICtrlComboBox_SetCurSel($cmbProfile, $iIndex)
-								cmbProfile()
-								SetLog("PushBullet: Profile Switch success!", $COLOR_GREEN)
-								_PushToPushBullet($iOrigPushBullet & " | " & GetTranslated(18, 130, "Switched to Profile") & ": " & $VillageSelect & GetTranslated(18, 131, " Success!"))
-								btnStart()
-							EndIf
-								_DeleteMessageOfPushBullet($iden[$x])
+									SetLog("PushBullet: Profile Switch failed", $COLOR_RED)
+									$profileString = StringReplace(_GUICtrlComboBox_GetList($cmbProfile), "|", "\n")
+									_PushToPushBullet($iOrigPushBullet & " | " & GetTranslated(18, 128, "Error Switch Profile") & ":\n" & GetTranslated(18, 129, "Available Profiles") & ":\n" & $profileString)
+								Else
+									btnStop()
+									_GUICtrlComboBox_SetCurSel($cmbProfile, $iIndex)
+									cmbProfile()
+									SetLog("PushBullet: Profile Switch success!", $COLOR_GREEN)
+									_PushToPushBullet($iOrigPushBullet & " | " & GetTranslated(18, 130, "Switched to Profile") & ": " & $VillageSelect & GetTranslated(18, 131, " Success!"))
+									btnStart()
+								EndIf
+									_DeleteMessageOfPushBullet($iden[$x])
 							Else
 								Local $lenstr = StringLen(GetTranslated(620, 1, -1) & " " & StringUpper($iOrigPushBullet) & " " & "")
 								Local $teststr = StringLeft($body[$x], $lenstr)
@@ -459,6 +468,7 @@ Func _RemoteControlPushBullet()
 									ChatbotPushbulletIntervalChatRead(Number($Interval))
 									_PushToPushBullet($iOrigPushBullet & " | " & GetTranslated(18, 119, "Command queued, will send clan chat image on interval"))
 								Else
+									$FoundChatMessage = 0
 									SetLog("Telegram: received command syntax wrong, command ignored.", $COLOR_RED)
 									_PushToPushBullet($iOrigPushBullet & " | " & GetTranslated(18, 46, "Command not recognized") & "\n" & GetTranslated(18, 47, "Please push BOT HELP to obtain a complete command list."))
 								EndIf
@@ -938,10 +948,10 @@ Func PushMsgToPushBullet($Message, $Source = "")
 		Case "RequestScreenshot"
 			Local $Date = @YEAR & "-" & @MON & "-" & @MDAY
 			Local $Time = @HOUR & "." & @MIN & "." & @SEC
+			_CaptureRegion()
 			If $RequestScreenshotHD = 1 Then
 				$hBitmap_Scaled = $hBitmap
 			Else
-			_CaptureRegion()
 			$hBitmap_Scaled = _GDIPlus_ImageResize($hBitmap, _GDIPlus_ImageGetWidth($hBitmap) / 2, _GDIPlus_ImageGetHeight($hBitmap) / 2) ;resize image
 			EndIf
 			Local $Screnshotfilename = "Screenshot_" & $Date & "_" & $Time & ".jpg"

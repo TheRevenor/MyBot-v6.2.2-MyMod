@@ -2578,15 +2578,6 @@ Func applyConfig($bRedrawAtExit = True) ;Applies the data from config to the con
 	LoadABSnipeAttacks() ; recreate combo box values
 	_GUICtrlComboBox_SetCurSel($cmbTHSnipeBeforeLBScript, _GUICtrlComboBox_FindStringExact($cmbTHSnipeBeforeLBScript, $THSnipeBeforeLBScript))
 	
-	; Android Settings - Added by LunaEclipse
-	If _GUICtrlComboBox_FindStringExact($cmbAndroid, String($sAndroid)) <> -1 Then
-		_GUICtrlComboBox_SelectString($cmbAndroid, String($sAndroid))
-	Else
-		_GUICtrlComboBox_SetCurSel($cmbAndroid, 0)
-	EndIf
-	GUICtrlSetData($txtAndroidInstance, $sAndroidInstance)
-	modifyAndroid()
-	
 	; SmartZap Settings - Added by LunaEclipse
 	If $ichkSmartZap = 1 Then
 		GUICtrlSetState($chkExtLightSpell, $GUI_DISABLE)
@@ -2738,6 +2729,13 @@ Func applyConfig($bRedrawAtExit = True) ;Applies the data from config to the con
 		GUICtrlSetState($chkAlertSmartUpgrade, $GUI_UNCHECKED)
 	EndIf
 	
+	; Upgrade Management - Added by MMHK
+	If $bUpdateNewUpgradesOnly = 1 Then
+		GUICtrlSetState($chkUpdateNewUpgradesOnly, $GUI_CHECKED)
+	Else
+		GUICtrlSetState($chkUpdateNewUpgradesOnly, $GUI_UNCHECKED)
+	EndIf
+
 	; Profile Switch
 	If $ichkGoldSwitchMax = 1 Then
 		GUICtrlSetState($chkGoldSwitchMax, $GUI_CHECKED)

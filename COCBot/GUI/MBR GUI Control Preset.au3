@@ -149,7 +149,7 @@ Func MakeSavePresetMessage()
 		For $i = 0 To UBound($TroopName) - 1
 			If Eval($TroopName[$i] & "Comp") > 0 Then
 				$message &= "  " & $TroopName[$i] & " " & Eval($TroopName[$i] & "Comp")
-				If $TroopName[$i] = "Arch" Or $TroopName[$i] = "Barb" Or $TroopName[$i] = "Gobl" Then $message &= "%"
+				;If $TroopName[$i] = "Arch" Or $TroopName[$i] = "Barb" Or $TroopName[$i] = "Gobl" Then $message &= "%"
 				If Mod($i + 1, 4) = 0 Then $message &= @CRLF
 			EndIf
 		Next

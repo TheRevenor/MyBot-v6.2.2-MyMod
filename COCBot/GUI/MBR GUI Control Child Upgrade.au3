@@ -352,3 +352,56 @@ Func btnWalls()
 	$RunState = $wasRunState
 	AndroidShield("btnWalls") ; Update shield status due to manual $RunState
 EndFunc   ;==>btnWalls
+
+; Upgrade Management ---------------------------------------------------------------------------------------------------------------
+Func chkUpgradeAllOrNone()
+	If GUICtrlRead($chkUpgradeAllOrNone) = $GUI_CHECKED And GUICtrlRead($chkbxUpgrade[0]) = $GUI_CHECKED Then
+		For $i = 0 To $iUpgradeSlots - 1
+			GUICtrlSetState($chkbxUpgrade[$i], $GUI_UNCHECKED)
+		Next
+	Else
+		For $i = 0 To $iUpgradeSlots - 1
+			GUICtrlSetState($chkbxUpgrade[$i], $GUI_CHECKED)
+		Next
+	EndIf
+	Sleep(300)
+	GUICtrlSetState($chkUpgradeAllOrNone, $GUI_UNCHECKED)
+EndFunc   ;==>chkUpgradeAllOrNone
+
+Func chkUpgradeRepeatAllOrNone()
+	If GUICtrlRead($chkUpgradeRepeatAllOrNone) = $GUI_CHECKED And GUICtrlRead($chkUpgrdeRepeat[0]) = $GUI_CHECKED Then
+		For $i = 0 To $iUpgradeSlots - 1
+			GUICtrlSetState($chkUpgrdeRepeat[$i], $GUI_UNCHECKED)
+		Next
+	Else
+		For $i = 0 To $iUpgradeSlots - 1
+			GUICtrlSetState($chkUpgrdeRepeat[$i], $GUI_CHECKED)
+		Next
+	EndIf
+	Sleep(300)
+	GUICtrlSetState($chkUpgradeRepeatAllOrNone, $GUI_UNCHECKED)
+EndFunc   ;==>chkUpgradeRepeatAllOrNone
+
+Func chkUpdateNewUpgradesOnly()
+	If GUICtrlRead($chkUpdateNewUpgradesOnly) = $GUI_CHECKED Then
+		$bUpdateNewUpgradesOnly = True
+	Else
+		$bUpdateNewUpgradesOnly = False
+	EndIf
+EndFunc   ;==>chkUpdateNewUpgradesOnly
+
+Func btnTop()
+	MoveUpgrades($UP, $TILL_END)
+EndFunc   ;==>btnTop
+
+Func btnUp()
+	MoveUpgrades($UP)
+EndFunc   ;==>btnUp
+
+Func btnDown()
+	MoveUpgrades($DOWN)
+EndFunc   ;==>btnDown
+
+Func btnBottom()
+	MoveUpgrades($DOWN, $TILL_END)
+EndFunc   ;==>btnBottom

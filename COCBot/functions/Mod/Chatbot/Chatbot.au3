@@ -1,11 +1,11 @@
 ; #FUNCTION# ====================================================================================================================
 ; Name ..........: Chat Bot
-; Description ...: Sends chat messages in global and clan chat
+; Description ...: Sends chat messages in global, clan chat and new chat
 ; Syntax ........:
 ; Parameters ....:
 ; Return values .:
 ; Author ........: ChrisDuh
-; Modified ......: TheRevenor(2016)
+; Modified ......: TheRevenor(09-14-2016)
 ; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2016
 ;                  MyBot is distributed under the terms of the GNU GPL
 ; Related .......:
@@ -85,8 +85,8 @@ Func ChatbotReadSettings()
    If IniRead($chatIni, "clan", "pushbullet", "False") = "True" Then $ChatbotUsePushbullet    = True
    If IniRead($chatIni, "clan", "pbsendnew",  "False")  = "True" Then $ChatbotPbSendNew       = True
 
-   $ClanMessages = StringSplit(IniRead($chatIni, "clan", "genericMsg", "Testing on Chat|Hey all"), "|", 2)
-   Local $ClanResponses0 = StringSplit(IniRead($chatIni, "clan", "responseMsg", "keyword:Response|hello:Hi, Welcome to the clan|hey:Hey, how's it going?"), "|", 2)
+   $ClanMessages = StringSplit(IniRead($chatIni, "clan", "genericMsg", "Testing on Chat|Hey all|By TheRevenor"), "|", 2)
+   Local $ClanResponses0 = StringSplit(IniRead($chatIni, "clan", "responseMsg", "keyword:Response|hello:Hi, Welcome to the clan|hey:Hey, how are you?"), "|", 2)
    Local $ClanResponses1[UBound($ClanResponses0)][2];
    For $a = 0 To UBound($ClanResponses0) - 1
 	  $TmpResp = StringSplit($ClanResponses0[$a], ":", 2)
@@ -328,40 +328,7 @@ Func ChatbotIsInterval()
 	  Return False
    EndIf
 EndFunc
-#Cs
-; Returns the response from cleverbot or simsimi, if any
-Func runHelper($msg, $isCleverbot) ; run a script to get a response from cleverbot.com or simsimi.com
-   Dim $DOS, $Message = ''
 
-   $command = '" /c' & @ScriptDir & '\lib\phantomjs.exe phantom-cleverbot-helper.js'
-	If Not $isCleverbot Then
-		$command = '" /c' & @ScriptDir & '\lib\phantomjs.exe phantom-simsimi-helper.js'
-	EndIf
-
-   $DOS = Run(@ComSpec & $command & $msg & '"', "", @SW_HIDE, 8)
-   $HelperStartTime = TimerInit()
-   SetLog(GetTranslated(106,32,"Waiting for chatbot helper...")
-   While ProcessExists($DOS)
-	  ProcessWaitClose($DOS, 10)
-	  SetLog(GetTranslated(106,33,"Still waiting for chatbot helper...")
-	  $Time_Difference = TimerDiff($HelperStartTime)
-	  If $Time_Difference > 50000 Then
-		 SetLog(GetTranslated(106,34,"Chatbot helper is taking too long!", $COLOR_RED)
-		 ProcessClose($DOS)
-		 _RunDos("taskkill -f -im phantomjs.exe") ; force kill
-		 Return ""
-	  EndIf
-   WEnd
-   $Message = ''
-   While 1
-	  $Message &= StdoutRead($DOS)
-	  If @error Then
-		 ExitLoop
-	  EndIf
-   WEnd
-   Return StringStripWS($Message, 7)
-EndFunc
-#Ce
 Func ChatbotIsLastChatNew() ; returns true if the last chat was not by you, false otherwise
    _CaptureRegion()  
 	If _ColorCheck(_GetPixelColor(26, 312 + $midOffsetY, True), Hex(0xf00810, 6), 20) Then Return True ; detect the new chat
@@ -389,23 +356,27 @@ EndFunc
 Func ChatbotPushbulletQueueChat($Chat)
    If Not $ChatbotUsePushbullet Then Return
    _ArrayAdd($ChatbotQueuedChats, $Chat)
+   $FoundChatMessage = 1
 EndFunc
 
 Func ChatbotPushbulletQueueChatRead()
    If Not $ChatbotUsePushbullet Then Return
    $ChatbotReadQueued = True
+   $FoundChatMessage = 1
 EndFunc
 
 Func ChatbotPushbulletStopChatRead()
    If Not $ChatbotUsePushbullet Then Return
    $ChatbotReadInterval = 0
    $ChatbotIsOnInterval = False
+   $FoundChatMessage = 0
 EndFunc
 
 Func ChatbotPushbulletIntervalChatRead($Interval)
    If Not $ChatbotUsePushbullet Then Return
    $ChatbotReadInterval = $Interval
    $ChatbotIsOnInterval = True
+   $FoundChatMessage = 1
    ChatbotStartTimer()
 EndFunc
 
@@ -439,40 +410,40 @@ EndFunc
 
 ; MAIN SCRIPT ==============================================
 
-Func ChatbotMessage() ; run the chatbot
-If $FoundChatMessage = 1 Or $ChatbotChatGlobal Then
+Func ChatbotMessage()
+If ($ChatbotChatClan And $FoundChatMessage = 1) Or $ChatbotChatGlobal  Then
 	If $ChatbotChatGlobal Then
-		SetLog("==== Request Chatbot to Chat Global ====", $COLOR_GREEN)
+		SetLog("==== Request Chatbot to Chat Global ====", $COLOR_BLUE)
 	ElseIf $ChatbotChatClan Then
-		SetLog("==== Request Chatbot to Chat Clan ====", $COLOR_GREEN)
+		SetLog("==== Request Chatbot to Chat Clan ====", $COLOR_BLUE)
 	EndIf
 
 	If $ChatbotChatGlobal Then
 		If $chatdelaycount < $ichkchatdelay Then
-		SetLog(GetTranslated(106, 39, "Delaying Chat ") & ($ichkchatdelay-$chatdelaycount) & GetTranslated(106, 40, " more times") , $COLOR_GREEN)
-		$chatdelaycount += 1
-		Return
+			SetLog(GetTranslated(106, 39, "Delaying Chat ") & ($ichkchatdelay - $chatdelaycount) & GetTranslated(106, 40, " more times"), $COLOR_GREEN)
+			$chatdelaycount += 1
+			Return
 		ElseIf $chatdelaycount = $ichkchatdelay Then
 			$chatdelaycount = 0
 		EndIf
-		If Not ChatbotChatOpen() Then Return
+		ChatbotChatOpen()
 		SetLog(GetTranslated(106, 41, "Chatbot: Sending chats to global"), $COLOR_GREEN)
 		; assemble a message
-		Local $Message[4]
-		$Message[0] = $GlobalMessages1[Random(0, UBound($GlobalMessages1) - 1, 1)]
-		$Message[1] = $GlobalMessages2[Random(0, UBound($GlobalMessages2) - 1, 1)]
-		$Message[2] = $GlobalMessages3[Random(0, UBound($GlobalMessages3) - 1, 1)]
-		$Message[3] = $GlobalMessages4[Random(0, UBound($GlobalMessages4) - 1, 1)]
+		Global $message[4]
+		$message[0] = $GlobalMessages1[Random(0, UBound($GlobalMessages1) - 1, 1)]
+		$message[1] = $GlobalMessages2[Random(0, UBound($GlobalMessages2) - 1, 1)]
+		$message[2] = $GlobalMessages3[Random(0, UBound($GlobalMessages3) - 1, 1)]
+		$message[3] = $GlobalMessages4[Random(0, UBound($GlobalMessages4) - 1, 1)]
 		If $ChatbotScrambleGlobal Then
-			_ArrayShuffle($Message)
+			_ArrayShuffle($message)
 		EndIf
 		; Send the message
-		If Not ChatbotSelectGlobalChat() Then Return
-		If Not ChatbotChatGlobalInput() Then Return
-		If Not ChatbotChatInput(_ArrayToString($Message, " ")) Then Return
-		If Not ChatbotChatSendGlobal() Then Return
-		If Not ChatbotChatClose() Then Return
-		
+		ChatbotSelectGlobalChat()
+		ChatbotChatGlobalInput()
+		ChatbotChatInput(_ArrayToString($message, " "))
+		ChatbotChatSendGlobal()
+		ChatbotChatClose()
+
 		If $ChatbotSwitchLang Then
 			SetLog(GetTranslated(106, 42, "Chatbot: Switching languages"), $COLOR_GREEN)
 			ChangeLanguageToRU()
@@ -480,12 +451,11 @@ If $FoundChatMessage = 1 Or $ChatbotChatGlobal Then
 			ChangeLanguageToEN()
 			waitMainScreen()
 		EndIf
-	EndIf
 
-	If $ChatbotChatClan Then
-		If Not ChatbotChatOpen() Then Return
+	ElseIf $ChatbotChatClan Then
+		ChatbotChatOpen()
 		SetLog(GetTranslated(106, 43, "Chatbot: Sending chats to clan"), $COLOR_GREEN)
-		If Not ChatbotSelectClanChat() Then Return
+		ChatbotSelectClanChat()
 
 		$SentClanChat = False
 
@@ -495,69 +465,49 @@ If $FoundChatMessage = 1 Or $ChatbotChatGlobal Then
 			$SentClanChat = True
 		ElseIf $ChatbotIsOnInterval Then
 			If ChatbotIsInterval() Then
-			ChatbotStartTimer()
-			ChatbotPushbulletSendChat()
-			$SentClanChat = True
+				ChatbotStartTimer()
+				ChatbotPushbulletSendChat()
+				$SentClanChat = True
 			EndIf
 		EndIf
 
 		If UBound($ChatbotQueuedChats) > 0 Then
-		SetLog(GetTranslated(106, 44, "Chatbot: Sending pushbullet/telegram chats"), $COLOR_GREEN)
-		
-		For $a = 0 To UBound($ChatbotQueuedChats) - 1
-			$ChatToSend = $ChatbotQueuedChats[$a]
-			If Not ChatbotChatClanInput() Then Return
-			If Not ChatbotChatInput($ChatToSend) Then Return
-			If Not ChatbotChatSendClan() Then Return
-		Next
+			SetLog(GetTranslated(106, 44, "Chatbot: Sending pushbullet chats"), $COLOR_GREEN)
 
-		Dim $Tmp[0] ; clear queue
-		$ChatbotQueuedChats = $Tmp
+			For $a = 0 To UBound($ChatbotQueuedChats) - 1
+				$ChatToSend = $ChatbotQueuedChats[$a]
+				ChatbotChatClanInput()
+				ChatbotChatInput($ChatToSend)
+				ChatbotChatSendClan()
+			Next
 
-		ChatbotPushbulletSendChat()
+			Dim $Tmp[0] ; clear queue
+			$ChatbotQueuedChats = $Tmp
 
-		If Not ChatbotChatClose() Then Return
+			ChatbotPushbulletSendChat()
+
 			SetLog(GetTranslated(106, 45, "Chatbot: Done"), $COLOR_GREEN)
-			$FoundChatMessage = 0
-		Return
-		
-		;If Not $SentMessage Then
-		;	If $ChatbotClanAlwaysMsg Then
-		;	   If Not ChatbotChatClanInput() Then Return
-		;	   If Not ChatbotChatInput($ClanMessages[Random(0, UBound($ClanMessages) - 1, 1)]) Then Return
-		;	   If Not ChatbotChatSendClan() Then Return
-		;	EndIf
-		;EndIf
-		
-		; send it via pushbullet/telegram
-		If $ChatbotUsePushbullet Then
-			If Not $SentClanChat Then ChatbotPushbulletSendChat()
-			$FoundChatMessage = 0
-			EndIf
+			Return
 		EndIf
-	
-	ElseIf $ChatbotClanAlwaysMsg Then
-		If Not ChatbotChatClanInput() Then Return
-		If Not ChatbotChatInput($ClanMessages[Random(0, UBound($ClanMessages) - 1, 1)]) Then Return
-		If Not ChatbotChatSendClan() Then Return
+		ChatbotChatClose()
 	EndIf
-	
-	If Not ChatbotChatClose() Then Return
-	
 	If $ChatbotChatGlobal Then
-		SetLog(GetTranslated(106, 49, "Chatbot: Done chatting"), $COLOR_GREEN)
-		$FoundChatMessage = 0
+		SetLog(GetTranslated(106, 49, "Chatbot Chat Global: Done chatting"), $COLOR_GREEN)
 	ElseIf $ChatbotChatClan Then
-		SetLog(GetTranslated(106, 50, "Chatbot: Done chatting"), $COLOR_GREEN)
-		$FoundChatMessage = 0
+		SetLog(GetTranslated(106, 50, "Chatbot Chat Clan: Done chatting"), $COLOR_GREEN)
 	EndIf
-EndIf  
-EndFunc ;==>ChatbotMessage
+EndIf
+If $ChatbotReadInterval > 0 Then
+	$FoundChatMessage = 1
+Else
+	$FoundChatMessage = 0
+EndIf
+EndFunc   ;==>ChatbotMessage
 
 Func CheckNewChat()
-If $ChatbotUsePushbullet And $ChatbotPbSendNew Then
+If $ChatbotChatClan And $ChatbotPbSendNew Then
 	If ChatbotIsLastChatNew() Then
-	$FoundChatMessage = 1
+		SetLog("==== Chatbot Found New Message ====", $COLOR_BLUE)
 		ClickZone($aOpenChat[0], $aOpenChat[1], 10) ; Clicks chat tab
 		If _Sleep(2000) Then Return
 		; get text of the latest message
@@ -570,59 +520,43 @@ If $ChatbotUsePushbullet And $ChatbotPbSendNew Then
 
 		If $ChatMsg = "" Or $ChatMsg = " " Then
 			If $ChatbotClanAlwaysMsg Then
-				If Not ChatbotChatClanInput() Then Return
-				If Not ChatbotChatInput($ClanMessages[Random(0, UBound($ClanMessages) - 1, 1)]) Then Return
-				If Not ChatbotChatSendClan() Then Return
+				ChatbotChatClanInput()
+				ChatbotChatInput($ClanMessages[Random(0, UBound($ClanMessages) - 1, 1)])
+				ChatbotChatSendClan()
 				$SentMessage = True
 			EndIf
 		EndIf
 		
 		If $ChatbotClanUseResponses And Not $SentMessage Then
-			;$FoundChatMessage = 1
 			For $a = 0 To UBound($ClanResponses) - 1
 				If StringInStr($ChatMsg, $ClanResponses[$a][0]) Then
 					$Response = $ClanResponses[$a][1]
 					SetLog(GetTranslated(106, 47, "Sending response: ") & $Response, $COLOR_GREEN)
-					If Not ChatbotChatClanInput() Then Return
-					If Not ChatbotChatInput($Response) Then Return
-					If Not ChatbotChatSendClan() Then Return
+					ChatbotChatClanInput()
+					ChatbotChatInput($Response)
+					ChatbotChatSendClan()
 					$SentMessage = True
 					ExitLoop
 				EndIf
 			Next
 		EndIf
 		
-		;If Not $SentMessage Then
-		;	If $ChatbotClanAlwaysMsg Then
-		;	   If Not ChatbotChatClanInput() Then Return
-		;	   If Not ChatbotChatInput($ClanMessages[Random(0, UBound($ClanMessages) - 1, 1)]) Then Return
-		;	   If Not ChatbotChatSendClan() Then Return
-		;	EndIf
-		;EndIf
-		
 		$SentClanChat = False
 		; send it via pushbullet if it's new
-		; putting the code here makes sure the (cleverbot, specifically) response is sent as well :P
 		If $ChatbotUsePushbullet And $ChatbotPbSendNew Then
 		If Not $SentClanChat Then ChatbotPushbulletSendChat()
-		$FoundChatMessage = 0
 		EndIf
-	;ElseIf $ChatbotClanAlwaysMsg Then
-	;	If Not ChatbotChatClanInput() Then Return
-	;	If Not ChatbotChatInput($ClanMessages[Random(0, UBound($ClanMessages) - 1, 1)]) Then Return
-	;	If Not ChatbotChatSendClan() Then Return
-	Else
-		ChatbotChatClose()
-		$FoundChatMessage = 0
+	SetLog("Chatbot send new chat and image, Done..", $COLOR_GREEN)
+	ChatbotChatClose()
 	EndIf
-Else
-$FoundChatMessage = 0
 EndIf
 EndFunc ;==>CheckNewChat
-#cs ----------------------------------------------------------------------------
+#cs
+----------------------------------------------------------------------------
    AutoIt Version: 3.6.0
-   This file was made to software MyBot v6.1.4
+   This file was made to software MyBot v6.2.2
    Author:         ChrisDuh
-   Modified:	   TheRevenor(2016)
+   Modified:	   TheRevenor(09-14-2016)
    Script Function: Sends chat messages in global and clan chat
-#ce ----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+#ce 

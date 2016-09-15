@@ -68,7 +68,7 @@ Local $x = $xStart +  25, $y = $yStart +  75 + 25
 		$x -= 5
 		$icnBarb = GUICtrlCreateIcon ($pIconLib, $eIcnBarbarian, $x - 10, $y - 5, 24, 24)
 		$lblBarbarians = GUICtrlCreateLabel($sTxtBarbarians, $x + 20, $y, -1, -1)
-		$txtNumBarb = GUICtrlCreateInput("50", $x + 80, $y - 3, 30, -1, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
+		$txtNumBarb = GUICtrlCreateInput("90", $x + 80, $y - 3, 30, -1, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
 			_GUICtrlSetTip(-1, $sTxtSetPerc & " " & $sTxtBarbarians & " " & $sTxtSetPerc2)
 			GUICtrlSetLimit(-1, 3)
 			GUICtrlSetOnEvent(-1, "lblTotalCount")
@@ -76,7 +76,7 @@ Local $x = $xStart +  25, $y = $yStart +  75 + 25
 		$y += 25
 		$icnArch = GUICtrlCreateIcon ($pIconLib, $eIcnArcher, $x - 10, $y - 5, 24, 24)
 		$lblArchers = GUICtrlCreateLabel($sTxtArchers, $x + 20, $y, -1, -1)
-		$txtNumArch = GUICtrlCreateInput("50", $x + 80, $y - 3, 30, -1, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
+		$txtNumArch = GUICtrlCreateInput("90", $x + 80, $y - 3, 30, -1, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
 			_GUICtrlSetTip(-1, $sTxtSetPerc & " " & $sTxtArchers & " " & $sTxtSetPerc2)
 			GUICtrlSetLimit(-1, 3)
 			GUICtrlSetOnEvent(-1, "lblTotalCount")

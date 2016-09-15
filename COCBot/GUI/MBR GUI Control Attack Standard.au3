@@ -84,7 +84,7 @@ EndFunc   ;==>chkSmartAttackRedAreaDB
 ;===== Attack Now Button (Useful for Standart Attack Testing) By TheRevenor =====
 Func AttackNowDB1()
 	If $RunState Then Return
-	LockGUI()
+	DisableGuiControls()
 	$iMatchMode = $DB			; Select Dead Base As Attack Type
 	GuiCtrlRead($cmbDeployDB)
 	$iMatchMode = $DB			; Select Dead Base As Attack Type
@@ -92,5 +92,5 @@ Func AttackNowDB1()
 	PrepareAttack($iMatchMode)
 	Attack()					; Fire xD
 	$RunState = False
-	UnLockGUI()
+	EnableGuiControls()
 EndFunc   ;==>AttackNow Dead Base

@@ -263,6 +263,7 @@ Global Const $iDelayCollect3 = 500
 Global Const $iDelayDonateCC1 = 200
 Global Const $iDelayDonateCC2 = 250
 Global Const $iDelayDonateCC3 = 50 ; click
+Global Const $iDelayDonateCC4 = 1000
 
 ;DonateTroopType
 Global Const $iDelayDonateTroopType1 = 250
