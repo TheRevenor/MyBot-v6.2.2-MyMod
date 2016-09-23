@@ -38,52 +38,54 @@ Func UpgradeHeroes()
 		If $WardenAltarPos[0] = -1 Or $WardenAltarPos[1] = -1 Then LocateWardenAltar()
 	EndIf
 
-	;##### Verify the Upgrade troop kind in Laboratory , if is a Dark Spell/Troop , the Lab haves priority #####;
+	;	Verify the Upgrade troop kind in Laboratory , if is a Dark Spell/Troop , the Lab haves priority
 	If $ichkLab = 1 And $icmbLaboratory >= 19 Then
 		Setlog("Laboratory needs DE to Upgrade :  " & $aLabTroops[$icmbLaboratory][3])
 		SetLog("Skipping the Heroes Upgrade!")
 		Return
 	EndIf
 
-	SetLog("Upgrading Heroes", $COLOR_BLUE)
-	;;;;;;;;;;;;;;;;;;;;;;;;##### Archer Queen #####;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	;##### Verify Builders available #####;
-	If getBuilderCount() = False Then Return  ; update builder data, return if problem
-	If _Sleep($iDelayRespond) Then Return
-	If $iFreeBuilderCount < 1 + $iSaveWallBldr Then
-		SetLog("Not Enough Builders for Queen", $COLOR_RED)
-		Return
+	SetLog(" »» Upgrading Heroes", $COLOR_BLUE)
+
+	If $ichkUpgradeQueen = 1 Then
+		; Archer Queen
+		If getBuilderCount() = False Then Return  ; update builder data, return if problem
+		If _Sleep($iDelayRespond) Then Return
+		If $iFreeBuilderCount < 1 + $iSaveWallBldr Then
+			SetLog("Not Enough Builders for Queen", $COLOR_RED)
+			Return
+		EndIf
+		QueenUpgrade()
+		If _Sleep($iDelayUpgradeHero1) Then Return
 	EndIf
-	;#### upgrade queen ####;
-	QueenUpgrade()
-	If _Sleep($iDelayUpgradeHero1) Then Return
-	;;;;;;;;;;;;;;;;;;;;;;;;##### Barbarian King #####;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	;##### Verify Builders available #####;
-	If getBuilderCount() = False Then Return  ; update builder data, return if problem
-	If _Sleep($iDelayRespond) Then Return
-	If $iFreeBuilderCount < 1 + $iSaveWallBldr Then
-		SetLog("Not Enough Builders for King", $COLOR_RED)
-		Return
+
+	If $ichkUpgradeKing = 1 Then
+		;	Barbarian King
+		If getBuilderCount() = False Then Return  ; update builder data, return if problem
+		If _Sleep($iDelayRespond) Then Return
+		If $iFreeBuilderCount < 1 + $iSaveWallBldr Then
+			SetLog("Not Enough Builders for King", $COLOR_RED)
+			Return
+		EndIf
+		KingUpgrade()
+		If _Sleep($iDelayUpgradeHero1) Then Return
 	EndIf
-	;##### Upgrade King #####;
-	KingUpgrade()
-	If _Sleep($iDelayUpgradeHero1) Then Return
-	;;;;;;;;;;;;;;;;;;;;;;;;##### Grand Warden #####;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	;##### Verify Builders available
-	If getBuilderCount() = False Then Return  ; update builder data, return if problem
-	If _Sleep($iDelayRespond) Then Return
-	If $iFreeBuilderCount < 1 + $iSaveWallBldr Then
-		SetLog("Not Enough Builder for Warden", $COLOR_RED)
-		Return
-	EndIf
-	;##### Upg Warden
-	WardenUpgrade()
+
+	If $ichkUpgradeWarden = 1 Then
+		;	Grand Warden
+		If getBuilderCount() = False Then Return  ; update builder data, return if problem
+		If _Sleep($iDelayRespond) Then Return
+		If $iFreeBuilderCount < 1 + $iSaveWallBldr Then
+			SetLog("Not Enough Builder for Warden", $COLOR_RED)
+			Return
+		EndIf
+		WardenUpgrade()
+	EndIF
 
 EndFunc   ;==>UpgradeHeroes
 
 Func QueenUpgrade()
 
-	If $ichkUpgradeQueen = 0 Then Return
 	Local $aHeroLevel = 0
 
 	SetLog("Upgrade Queen")
@@ -187,8 +189,7 @@ Func QueenUpgrade()
 EndFunc   ;==>QueenUpgrade
 
 Func KingUpgrade()
-	;upgradeking
-	If $ichkUpgradeKing = 0 Then Return
+
 	Local $aHeroLevel = 0
 
 	SetLog("Upgrade King")
@@ -291,8 +292,6 @@ Func KingUpgrade()
 EndFunc   ;==>KingUpgrade
 
 Func WardenUpgrade()
-
-	If $ichkUpgradeWarden = 0 Then Return
 
 	If Number($iTownHallLevel) <= 10 Then
 		Setlog("Must have TH 11 for Grand Warden upgrade", $COLOR_RED)

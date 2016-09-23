@@ -1,6 +1,6 @@
 ; #FUNCTION# ====================================================================================================================
 ; Name ..........: Chat Bot
-; Description ...: Sends chat messages in global, clan chat and new chat
+; Description ...: Sends chat messages in global, clan chat and found new chat
 ; Syntax ........:
 ; Parameters ....:
 ; Return values .:
@@ -24,12 +24,10 @@ Global $ChatbotChatGlobal       = False
 Global $ChatbotScrambleGlobal   = False
 Global $ChatbotSwitchLang       = False
 Global $ChatbotChatClan         = False
-Global $ChatbotClanUseCleverbot = False
-Global $ChatbotClanUseSimsimi   = False
 Global $ChatbotClanUseResponses = False
 Global $ChatbotClanAlwaysMsg    = False
 Global $ChatbotUsePushbullet    = False
-Global $ChatbotPbSendNew        = True
+Global $ChatbotPbSendNew        = False
 Global $ClanMessages = ""
 Global $ClanResponses = ""
 Global $GlobalMessages1 = ""
@@ -52,8 +50,6 @@ Global $chatdelaycount = 0
 
 Global $chkClanChat;
 Global $chkUseResponses;
-Global $chkUseCleverbot;
-Global $chkUseSimsimi;
 Global $chkUseGeneric;
 Global $chkChatPushbullet;
 Global $chkPbSendNewChats;
@@ -76,14 +72,11 @@ Func ChatbotReadSettings()
    If IniRead($chatIni, "global", "scramble", "False") = "True" Then $ChatbotScrambleGlobal   = True
    If IniRead($chatIni, "global", "swlang",   "False") = "True" Then $ChatbotSwitchLang       = True
 
-
    If IniRead($chatIni, "clan", "use",        "False") = "True" Then $ChatbotChatClan         = True
-   If IniRead($chatIni, "clan", "cleverbot",  "False") = "True" Then $ChatbotClanUseCleverbot = True
-   If IniRead($chatIni, "clan", "simsimi",    "False") = "True" Then $ChatbotClanUseSimsimi   = True
    If IniRead($chatIni, "clan", "responses",  "False") = "True" Then $ChatbotClanUseResponses = True
    If IniRead($chatIni, "clan", "always",     "False") = "True" Then $ChatbotClanAlwaysMsg    = True
    If IniRead($chatIni, "clan", "pushbullet", "False") = "True" Then $ChatbotUsePushbullet    = True
-   If IniRead($chatIni, "clan", "pbsendnew",  "False")  = "True" Then $ChatbotPbSendNew       = True
+   If IniRead($chatIni, "clan", "pbsendnew",  "False") = "True" Then $ChatbotPbSendNew        = True
 
    $ClanMessages = StringSplit(IniRead($chatIni, "clan", "genericMsg", "Testing on Chat|Hey all|By TheRevenor"), "|", 2)
    Local $ClanResponses0 = StringSplit(IniRead($chatIni, "clan", "responseMsg", "keyword:Response|hello:Hi, Welcome to the clan|hey:Hey, how are you?"), "|", 2)
@@ -111,44 +104,22 @@ Func ChatbotReadSettings()
 EndFunc
 
 Func ChatGuiCheckboxUpdate()
-   $SimsimiOld = $ChatbotClanUseSimsimi
-   $CleverbotOld = $ChatbotClanUseCleverbot
 
    $ChatbotChatGlobal       = GuiCtrlRead($chkGlobalChat)     = $GUI_CHECKED
    $ChatbotScrambleGlobal   = GuiCtrlRead($chkGlobalScramble) = $GUI_CHECKED
    $ChatbotSwitchLang       = GuiCtrlRead($chkSwitchLang)     = $GUI_CHECKED
 
    $ChatbotChatClan         = GuiCtrlRead($chkClanChat)       = $GUI_CHECKED
-   $ChatbotClanUseCleverbot = GuiCtrlRead($chkUseCleverbot)   = $GUI_CHECKED
-   $ChatbotClanUseSimsimi   = GuiCtrlRead($chkUseSimsimi)     = $GUI_CHECKED
    $ChatbotClanUseResponses = GuiCtrlRead($chkUseResponses)   = $GUI_CHECKED
    $ChatbotClanAlwaysMsg    = GuiCtrlRead($chkUseGeneric)     = $GUI_CHECKED
    $ChatbotUsePushbullet    = GuiCtrlRead($chkChatPushbullet) = $GUI_CHECKED
    $ChatbotPbSendNew        = GuiCtrlRead($chkPbSendNewChats) = $GUI_CHECKED
-
-   If $ChatbotClanUseSimsimi And $CleverbotOld Then
-	  GUICtrlSetState($chkUseCleverbot, 4) ; 4 = unchecked
-	  $FoundChatMessage = 0
-	  $ChatbotClanUseCleverbot = False
-   ElseIf $ChatbotClanUseCleverbot And $SimsimiOld Then
-	  GUICtrlSetState($chkUseSimsimi, 4)
-	  $FoundChatMessage = 0
-	  $ChatbotClanUseSimsimi = False
-   EndIf
-
-   If $ChatbotClanUseCleverbot And $ChatbotClanUseSimsimi Then
-	  GUICtrlSetState($chkUseSimsimi, 4)
-	  $FoundChatMessage = 0
-	  $ChatbotClanUseSimsimi = False
-   EndIf
 
    IniWrite($chatIni, "global", "use",      $ChatbotChatGlobal)
    IniWrite($chatIni, "global", "scramble", $ChatbotScrambleGlobal)
    IniWrite($chatIni, "global", "swlang",   $ChatbotSwitchLang)
 
    IniWrite($chatIni, "clan", "use",        $ChatbotChatClan)
-   IniWrite($chatIni, "clan", "cleverbot",  $ChatbotClanUseCleverbot)
-   IniWrite($chatIni, "clan", "simsimi",    $ChatbotClanUseSimsimi)
    IniWrite($chatIni, "clan", "responses",  $ChatbotClanUseResponses)
    IniWrite($chatIni, "clan", "always",     $ChatbotClanAlwaysMsg)
    IniWrite($chatIni, "clan", "pushbullet", $ChatbotUsePushbullet)
@@ -170,7 +141,6 @@ Func ChatGuiCheckboxUpdateAT()
 		GUICtrlSetState($editGlobalMessages3, $GUI_ENABLE)
 		GUICtrlSetState($editGlobalMessages4, $GUI_ENABLE)
 	Else
-		$FoundChatMessage = 0
 		GUICtrlSetState($chkClanChat, $GUI_ENABLE)
 		GUICtrlSetState($chkGlobalScramble, $GUI_DISABLE)
 		GUICtrlSetState($chkSwitchLang, $GUI_DISABLE)
@@ -181,29 +151,24 @@ Func ChatGuiCheckboxUpdateAT()
 		GUICtrlSetState($editGlobalMessages3, $GUI_DISABLE)
 		GUICtrlSetState($editGlobalMessages4, $GUI_DISABLE)
 	EndIf
+
 	If GUICtrlRead($chkClanChat) = $GUI_CHECKED Then
 		GUICtrlSetState($chkGlobalChat, $GUI_DISABLE)
-		GUICtrlSetState($chkChatPushbullet, $GUI_CHECKED)
-		GUICtrlSetState($chkUseResponses, $GUI_ENABLE)
-		GUICtrlSetState($chkUseCleverbot, $GUI_ENABLE)
-		GUICtrlSetState($chkUseSimsimi, $GUI_ENABLE)
-		GUICtrlSetState($chkUseGeneric, $GUI_ENABLE)
 		GUICtrlSetState($chkChatPushbullet, $GUI_ENABLE)
+		GUICtrlSetState($chkUseResponses, $GUI_ENABLE)
+		GUICtrlSetState($chkUseGeneric, $GUI_ENABLE)
 		GUICtrlSetState($chkPbSendNewChats, $GUI_ENABLE)
 		GUICtrlSetState($editResponses, $GUI_ENABLE)
 		GUICtrlSetState($editGeneric, $GUI_ENABLE)
 		GUICtrlSetState($ChatbotChatDelayLabel, $GUI_ENABLE)
 		GUICtrlSetState($chkchatdelay, $GUI_ENABLE)
 	Else
-		$FoundChatMessage = 0
 		GUICtrlSetState($chkGlobalChat, $GUI_ENABLE)
 		GUICtrlSetState($chkChatPushbullet, $GUI_UNCHECKED)
 		GUICtrlSetState($chkUseResponses, $GUI_UNCHECKED)
 		GUICtrlSetState($chkUseGeneric, $GUI_UNCHECKED)
-		GUICtrlSetState($chkChatPushbullet, $GUI_UNCHECKED)
+		GUICtrlSetState($chkPbSendNewChats, $GUI_UNCHECKED)
 		GUICtrlSetState($chkUseResponses, $GUI_DISABLE)
-		GUICtrlSetState($chkUseCleverbot, $GUI_DISABLE)
-		GUICtrlSetState($chkUseSimsimi, $GUI_DISABLE)
 		GUICtrlSetState($chkUseGeneric, $GUI_DISABLE)
 		GUICtrlSetState($chkChatPushbullet, $GUI_DISABLE)
 		GUICtrlSetState($chkPbSendNewChats, $GUI_DISABLE)
@@ -217,13 +182,13 @@ Func ChatGuiCheckboxDisableAT()
 		GUICtrlSetState($i, $GUI_DISABLE)
 	Next
 EndFunc
+
 Func ChatGuiCheckboxEnableAT()
 	For $i = $chkGlobalChat To $editGeneric ; Save state of all controls on tabs
 		GUICtrlSetState($i, $GUI_ENABLE)
 	Next
 	ChatGuiCheckboxUpdateAT()
 EndFunc
-
 
 Func ChatGuiEditUpdate()
    $glb1 = GUICtrlRead($editGlobalMessages1)
@@ -409,7 +374,6 @@ Func ChangeLanguageToRU()
 EndFunc
 
 ; MAIN SCRIPT ==============================================
-
 Func ChatbotMessage()
 If ($ChatbotChatClan And $FoundChatMessage = 1) Or $ChatbotChatGlobal  Then
 	If $ChatbotChatGlobal Then
@@ -497,6 +461,7 @@ If ($ChatbotChatClan And $FoundChatMessage = 1) Or $ChatbotChatGlobal  Then
 		SetLog(GetTranslated(106, 50, "Chatbot Chat Clan: Done chatting"), $COLOR_GREEN)
 	EndIf
 EndIf
+
 If $ChatbotReadInterval > 0 Then
 	$FoundChatMessage = 1
 Else
@@ -526,7 +491,7 @@ If $ChatbotChatClan And $ChatbotPbSendNew Then
 				$SentMessage = True
 			EndIf
 		EndIf
-		
+
 		If $ChatbotClanUseResponses And Not $SentMessage Then
 			For $a = 0 To UBound($ClanResponses) - 1
 				If StringInStr($ChatMsg, $ClanResponses[$a][0]) Then
@@ -540,7 +505,7 @@ If $ChatbotChatClan And $ChatbotPbSendNew Then
 				EndIf
 			Next
 		EndIf
-		
+
 		$SentClanChat = False
 		; send it via pushbullet if it's new
 		If $ChatbotUsePushbullet And $ChatbotPbSendNew Then
@@ -551,12 +516,12 @@ If $ChatbotChatClan And $ChatbotPbSendNew Then
 	EndIf
 EndIf
 EndFunc ;==>CheckNewChat
-#cs
-----------------------------------------------------------------------------
-   AutoIt Version: 3.6.0
+
+#cs -------------------------------------------------------------------------------
+   AutoIt Version: 3.3.14.2
    This file was made to software MyBot v6.2.2
-   Author:         ChrisDuh
-   Modified:	   TheRevenor(09-14-2016)
-   Script Function: Sends chat messages in global and clan chat
-----------------------------------------------------------------------------
-#ce 
+   Author:          ChrisDuh
+   Modified:	    TheRevenor(09-14-2016)
+   Script Function: Sends chat messages in global and clan chat and found new chat
+#ce -------------------------------------------------------------------------------
+ 

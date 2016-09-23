@@ -65,7 +65,7 @@ Local $x = 25, $y = 45
 		$txtDBArmyCamps = GUICtrlCreateInput("80", $x + 120, $y, 40, 18, BitOR($GUI_SS_DEFAULT_INPUT, $ES_CENTER, $ES_NUMBER))
 			_GUICtrlSetTip(-1, $txtTip)
 			GUICtrlSetState(-1,$GUI_DISABLE)
-			GUICtrlSetLimit(-1, 6)
+			GUICtrlSetLimit(-1, 3)
 		$txtDBArmyCampsPerc = GUICtrlCreateLabel("%", $x + 163 + 3, $y + 4, -1, -1)
 			GUICtrlSetState(-1,$GUI_DISABLE)
 	$y +=23

@@ -225,9 +225,9 @@ Func BoostDarkBarracks()
 				WorksWithBoostedBarrackses("DARK")
 				SetLog("Dark Barrack nº: " & $i & " Boosted Successfully.", $COLOR_GREEN)
 				EndIf
-				If $BoostedBarracksesDARK = $icmbQuantBoostDarkBarracks Then
-					$icmbBoostDarkBarracks -= 1
-					Setlog(" Total remain cycles to boost Barracks:" & $icmbBoostDarkBarracks, $COLOR_GREEN)
+				If IsFinishedBoostForThisCycleDARK() = True Then
+					If $icmbBoostDarkBarracks >= 1 Then $icmbBoostDarkBarracks -= 1
+					Setlog(" Total remain cycles to boost Dark Barracks:" & $icmbBoostDarkBarracks, $COLOR_GREEN)
 					GUICtrlSetData($cmbBoostDarkBarracks, $icmbBoostDarkBarracks)
 				EndIf
 			EndIf

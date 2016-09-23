@@ -126,7 +126,7 @@ Func checkObstacles() ;Checks if something is in the way for mainscreen
 					Btnstop() ; stop bot
 					Return True
 				EndIf
-				$result = getOcrRateCoc(228, 380 + $midOffsetY)
+				$result = getOcrRateCoc(228, 380 + 12 + $midOffsetY)
 				If $debugsetlog = 1 Then SetLog("Check Obstacles getOCRRateCoC= " & $result, $COLOR_PURPLE)  ; debug only
 				If StringInStr($result, "never", $STR_NOCASESENSEBASIC) Then
 					SetLog("Clash feedback window found, permanently closed!", $COLOR_RED)

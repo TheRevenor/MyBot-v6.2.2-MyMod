@@ -234,12 +234,14 @@ Func chkDBActivateCamps()
 	If GUICtrlRead($chkDBActivateCamps) = $GUI_CHECKED Then
 		GUICtrlSetState($lblDBArmyCamps, $GUI_ENABLE)
 		GUICtrlSetState($txtDBArmyCamps, $GUI_ENABLE)
+		GUICtrlSetState($txtDBArmyCampsPerc, $GUI_ENABLE)
 		;_GUI_Value_STATE("SHOW", $groupSearchDB)
 		;cmbDBGoldElixir()
 		;_GUI_Value_STATE("SHOW", $groupHerosDB)
 	Else
 		GUICtrlSetState($lblDBArmyCamps, $GUI_DISABLE)
 		GUICtrlSetState($txtDBArmyCamps, $GUI_DISABLE)
+		GUICtrlSetState($txtDBArmyCampsPerc, $GUI_DISABLE)
 		;_GUI_Value_STATE("HIDE", $groupSearchDB)
 		;_GUI_Value_STATE("HIDE", $groupHerosDB)
 	EndIf

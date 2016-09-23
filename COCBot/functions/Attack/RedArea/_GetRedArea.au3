@@ -35,9 +35,15 @@ Func _GetRedArea()
 		Local $result = DllCall($hFuncLib, "str", "getRedAreaSideBuilding", "ptr", $hHBitmap2, "int", $xSkip, "int", $ySkip, "int", $colorVariation, "int", $eSideBuildingTH)
 		If $debugSetlog Then Setlog("Debug: Redline with TH Side chosen")
 	Else ; Normal getRedArea
-		Local $result = DllCall($hFuncLib, "str", "getRedArea", "ptr", $hHBitmap2, "int", $xSkip, "int", $ySkip, "int", $colorVariation)
+		;Local $result = DllCall($hFuncLib, "str", "getRedArea", "ptr", $hHBitmap2, "int", $xSkip, "int", $ySkip, "int", $colorVariation)
+		Local $result[1]
+		Local $hTimer = TimerInit()
+		$result[0] = GetImgLoc2MBR()
 		If $debugSetlog Then Setlog("Debug: Redline chosen")
+		;Setlog(" »» NEW REDlines Imgloc: " & $result[0])
+		Setlog("> NEW REDlines Imgloc in  " & Round(TimerDiff($hTimer) / 1000, 2) & " seconds", $COLOR_BLUE)
 	EndIf
+
 	Local $listPixelBySide = StringSplit($result[0], "#")
 	$PixelTopLeft = GetPixelSide($listPixelBySide, 1)
 	$PixelBottomLeft = GetPixelSide($listPixelBySide, 2)
@@ -51,9 +57,9 @@ Func _GetRedArea()
 
 	;If Milking Attack ($iAtkAlgorithm[$DB] = 2) or AttackCSV skip calc of troops further offset (archers drop points for standard attack)
 	; but need complete calc if use standard attack after milking attack ($MilkAttackAfterStandardAtk =1) and use redarea ($iChkRedArea[$MA] = 1)
-    ;If $debugsetlog = 1 Then Setlog("REDAREA matchmode " & $iMatchMode & " atkalgorithm[0] = " & $iAtkAlgorithm[$DB] & " $MilkAttackAfterScriptedAtk = " & $MilkAttackAfterScriptedAtk , $color_aqua)
-    If ($iMatchMode = $DB And $iAtkAlgorithm[$DB] = 2  ) OR ($iMatchMode = $DB and $ichkUseAttackDBCSV = 1) OR ($iMatchMode = $LB and $ichkUseAttackABCSV = 1) Then
-	   If $debugsetlog=1 Then setlog("redarea no calc pixel further (quick)",$color_purple)
+	;If $debugsetlog = 1 Then Setlog("REDAREA matchmode " & $iMatchMode & " atkalgorithm[0] = " & $iAtkAlgorithm[$DB] & " $MilkAttackAfterScriptedAtk = " & $MilkAttackAfterScriptedAtk , $color_aqua)
+	If ($iMatchMode = $DB And $iAtkAlgorithm[$DB] = 2) Or ($iMatchMode = $DB And $ichkUseAttackDBCSV = 1) Or ($iMatchMode = $LB And $ichkUseAttackABCSV = 1) Then
+		If $debugsetlog = 1 Then setlog("redarea no calc pixel further (quick)", $color_purple)
 		$count = 0
 		ReDim $PixelTopLeftFurther[UBound($PixelTopLeft)]
 		For $i = 0 To UBound($PixelTopLeft) - 1
@@ -84,8 +90,8 @@ Func _GetRedArea()
 			$count += 1
 		Next
 		debugRedArea("PixelTopLeftFurther* " & UBound($PixelTopLeftFurther))
-	 Else
-		If $debugsetlog=1 Then setlog("redarea calc pixel further",$color_purple)
+	Else
+		If $debugsetlog = 1 Then setlog("redarea calc pixel further", $color_purple)
 		$count = 0
 		ReDim $PixelTopLeftFurther[UBound($PixelTopLeft)]
 		For $i = 0 To UBound($PixelTopLeft) - 1
@@ -140,4 +146,49 @@ Func _GetRedArea()
 	debugRedArea($nameFunc & " OUT ")
 EndFunc   ;==>_GetRedArea
 
+Func GetImgLoc2MBR()
 
+	Local $directory = @ScriptDir & "\images\WeakBase\Eagle"
+	Local $return = returnHighestLevelSingleMatch($directory)
+
+	Local $AllPoints = StringSplit($return[6], "|", $STR_NOCOUNT)
+	Local $EachPoint[UBound($AllPoints)][2]
+	Local $_PixelTopLeft, $_PixelBottomLeft, $_PixelBottomRight, $_PixelTopRight
+
+	For $i = 0 To UBound($AllPoints) - 1
+		Local $temp = StringSplit($AllPoints[$i], ",", $STR_NOCOUNT)
+		$EachPoint[$i][0] = Number($temp[0])
+		$EachPoint[$i][1] = Number($temp[1])
+		; Setlog(" $EachPoint[0]: " & $EachPoint[$i][0] & " | $EachPoint[1]: " & $EachPoint[$i][1])
+	Next
+
+	_ArraySort($EachPoint, 0, 0, 0, 0)
+
+	For $i = 0 To UBound($EachPoint) - 1
+		If $EachPoint[$i][0] > 60 And $EachPoint[$i][0] < 430 And $EachPoint[$i][1] > 35 And $EachPoint[$i][1] < 336 Then
+			$_PixelTopLeft &= String("|" & $EachPoint[$i][0] & "-" & $EachPoint[$i][1])
+
+		ElseIf $EachPoint[$i][0] > 60 And $EachPoint[$i][0] < 430 And $EachPoint[$i][1] > 336 And $EachPoint[$i][1] < 630 Then
+			$_PixelBottomLeft &= String("|" & $EachPoint[$i][0] & "-" & $EachPoint[$i][1])
+
+		ElseIf $EachPoint[$i][0] > 430 And $EachPoint[$i][0] < 805 And $EachPoint[$i][1] > 336 And $EachPoint[$i][1] < 630 Then
+			$_PixelBottomRight &= String("|" & $EachPoint[$i][0] & "-" & $EachPoint[$i][1])
+
+		ElseIf $EachPoint[$i][0] > 430 And $EachPoint[$i][0] < 805 And $EachPoint[$i][1] > 35 And $EachPoint[$i][1] < 336 Then
+			$_PixelTopRight &= String("|" & $EachPoint[$i][0] & "-" & $EachPoint[$i][1])
+
+		EndIf
+	Next
+
+	If Not StringIsSpace($_PixelTopLeft) Then $_PixelTopLeft = StringTrimLeft($_PixelTopLeft, 1)
+	If Not StringIsSpace($_PixelBottomLeft) Then $_PixelBottomLeft = StringTrimLeft($_PixelBottomLeft, 1)
+	If Not StringIsSpace($_PixelBottomRight) Then $_PixelBottomRight = StringTrimLeft($_PixelBottomRight, 1)
+	If Not StringIsSpace($_PixelTopRight) Then $_PixelTopRight = StringTrimLeft($_PixelTopRight, 1)
+
+	Local $NewRedLineString = $_PixelTopLeft & "#" & $_PixelBottomLeft & "#" & $_PixelBottomRight & "#" & $_PixelTopRight
+
+	;Setlog(" »» NEW REDlines Imgloc: " & $NewRedLineString)
+
+	Return $NewRedLineString
+
+EndFunc   ;==>GetImgLoc2MBR

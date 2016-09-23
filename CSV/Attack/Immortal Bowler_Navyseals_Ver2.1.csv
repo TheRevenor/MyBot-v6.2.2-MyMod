@@ -2,7 +2,7 @@ NOTE  |Author: NavySeals - Ver. 2.1,Column 2 , ProMac
 NOTE  |Immortal Bowler Attack ,TH11
 NOTE  |Make Troops: 22-28Bowlers," 4-6healers, 4-12Giants(opt), 2-JSpells (opt), 1PSpell (Opt), 6-12WBs, 3Rage & 4EQ"
       |EXTR. GOLD |EXTR.ELIXIR|EXTR. DARK |DEPO. GOLD |DEPO.ELIXIR|DEPO. DARK |TOWNHALL   |FORCED SIDE|,
-SIDE  |0          |0          |0          |0          |0          |0          |10         |           |,
+SIDE  |0          |0          |0          |0          |0          |0          |10         |EAGLE      |,
       |VECTOR_____|SIDE_______|DROP_POINTS|ADDTILES___|VERSUS_____|RANDOMX_PX_|RANDOMY_PX_|___________|,
 MAKE  |N          |FRONT-LEFT |10         |6          |INT-EXT    |0          |1          |           |,
 MAKE  |A          |FRONT-RIGHT|10         |6          |INT-EXT    |0          |1          |           |,
@@ -46,5 +46,3 @@ DROP  |L          |2          |1          |RSpell     |0          |0          |0
 WAIT  |4000-5500  |           |           |           |           |           |           |           |,
 DROP  |N-A        |1-8        |40         |arch       |50         |0          |10-20      |           |,
 RECALC|           |           |           |           |           |           |           |           |,
-,
-,

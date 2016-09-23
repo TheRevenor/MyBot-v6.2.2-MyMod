@@ -778,7 +778,7 @@ $x += $Offx
 			GUICtrlSetState(-1, $GUI_HIDE)
 		$txtDonateMiners = GUICtrlCreateEdit("", $x - 5, $y + 20, 205, 125, BitOR($ES_WANTRETURN, $ES_CENTER, $ES_AUTOVSCROLL))
 			GUICtrlSetState(-1, $GUI_HIDE)
-			GUICtrlSetData(-1, StringFormat(GetTranslated(612,97, "miner|mine")))
+			GUICtrlSetData(-1, StringFormat(GetTranslated(612,97, "miner\r\nmine")))
 			_GUICtrlSetTip(-1, $sTxtKeywords & " " & $sTxtMiners)
 		$lblBlacklistMiners = GUICtrlCreateLabel($sTxtKeywordsNo & ":", $x + 215, $y + 70, -1, -1)
 			GUICtrlSetState(-1, $GUI_HIDE)

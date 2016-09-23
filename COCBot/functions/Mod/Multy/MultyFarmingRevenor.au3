@@ -974,7 +974,7 @@ EndFunc ; Switch Account
 Func SwitchDonate()
 		;..............Switch Account & Donate Then Switch Back...................
 	If $ichkSwitchDonate = 1 Then
-		SetLog("Loading Switching Account For Donate...", $COLOR_BLUE)
+		SetLog("Loading Switching Account...", $COLOR_BLUE)
 		;DetectAccount()
 		If _Sleep(1500) Then Return
 		If $sCurrProfile = "[01] Main" Then
@@ -1125,7 +1125,7 @@ Func SwitchDonate()
 			checkMainScreen()
 		EndIf
 		If _Sleep(1500) Then Return
-		SetLog("Switching Account For Donate Completed", $COLOR_BLUE)
+		SetLog("Switching Account Completed", $COLOR_GREEN)
 		DetectAccount()
 	EndIf
 EndFunc ; Switch Donate

@@ -214,32 +214,42 @@ Func _RemoteControlPushBullet()
 									;=================================== "Chat Bot" ===================================
 						Case Else
 							If StringInStr($body[$x], StringUpper($iOrigPushBullet) & " SENDCHAT") Then
-								$FoundChatMessage = 1
-								$chatMessage = StringRight($body[$x], StringLen($body[$x]) - StringLen("BOT " & StringUpper($iOrigPushBullet) & " SENDCHAT "))
-								$chatMessage = StringLower($chatMessage)
-								ChatbotPushbulletQueueChat($chatMessage)
-								_PushToPushBullet($iOrigPushBullet & " | Chat queued, will send on next idle")
-								_DeleteMessageOfPushBullet($iden[$x])
-							ElseIf StringInStr($body[$x], StringUpper($iOrigPushBullet) & " GETCHATS") Then
-								$FoundChatMessage = 1
-								$Interval = StringRight($body[$x], StringLen($body[$x]) - StringLen("BOT " & StringUpper($iOrigPushBullet) & " GETCHATS "))
-								If $Interval = "STOP" Then
-									ChatbotPushbulletStopChatRead()
-									_PushToPushBullet($iOrigPushBullet & " | Stopping interval sending")
-								ElseIf $Interval = "NOW" Then
-									ChatbotPushbulletQueueChatRead()
-									_PushToPushBullet($iOrigPushBullet & " | Command queued, will send clan chat image on next idle")
-								Else
-									If Number($Interval) <> 0 Then
-										ChatbotPushbulletIntervalChatRead(Number($Interval))
-										_PushToPushBullet($iOrigPushBullet & " | Command queued, will send clan chat image on interval")
-									Else
-										$FoundChatMessage = 0
-										SetLog("Chatbot: incorrect command syntax, Example: BOT <VillageName> GETCHATS NOW|STOP|INTERVAL", $COLOR_RED)
-										_PushToPushBullet($iOrigPushBullet & " | Command not recognized" & "\n" & "Example: BOT <VillageName> GETCHATS NOW|STOP|INTERVAL")
-									EndIf
-								EndIf
+								If $ChatbotChatClan And $ChatbotUsePushbullet Then
+									$FoundChatMessage = 1
+									$chatMessage = StringRight($body[$x], StringLen($body[$x]) - StringLen("BOT " & StringUpper($iOrigPushBullet) & " SENDCHAT "))
+									$chatMessage = StringLower($chatMessage)
+									ChatbotPushbulletQueueChat($chatMessage)
+									_PushToPushBullet($iOrigPushBullet & " | Chat queued, will send on next idle")
 									_DeleteMessageOfPushBullet($iden[$x])
+								Else
+									_PushToPushBullet($iOrigPushBullet & " | You not activate chatbot feature, please check..")
+									_DeleteMessageOfPushBullet($iden[$x])
+								EndIf
+							ElseIf StringInStr($body[$x], StringUpper($iOrigPushBullet) & " GETCHATS") Then
+								If $ChatbotChatClan And $ChatbotUsePushbullet Then
+									$FoundChatMessage = 1
+									$Interval = StringRight($body[$x], StringLen($body[$x]) - StringLen("BOT " & StringUpper($iOrigPushBullet) & " GETCHATS "))
+									If $Interval = "STOP" Then
+										ChatbotPushbulletStopChatRead()
+										_PushToPushBullet($iOrigPushBullet & " | Stopping interval sending")
+									ElseIf $Interval = "NOW" Then
+										ChatbotPushbulletQueueChatRead()
+										_PushToPushBullet($iOrigPushBullet & " | Command queued, will send clan chat image on next idle")
+									Else
+										If Number($Interval) <> 0 Then
+											ChatbotPushbulletIntervalChatRead(Number($Interval))
+											_PushToPushBullet($iOrigPushBullet & " | Command queued, will send clan chat image on interval")
+										Else
+											$FoundChatMessage = 0
+											SetLog("Chatbot: incorrect command syntax, Example: BOT <VillageName> GETCHATS NOW|STOP|INTERVAL", $COLOR_RED)
+											_PushToPushBullet($iOrigPushBullet & " | Command not recognized" & "\n" & "Example: BOT <VillageName> GETCHATS NOW|STOP|INTERVAL")
+										EndIf
+									EndIf
+										_DeleteMessageOfPushBullet($iden[$x])
+								Else
+									_PushToPushBullet($iOrigPushBullet & " | You not activate chatbot feature, please check..")
+									_DeleteMessageOfPushBullet($iden[$x])
+								EndIf
 							ElseIf StringInStr($body[$x], StringUpper($iOrigPushBullet) & " SWITCHPROFILE") Then
 								$VillageSelect = StringRight($body[$x], StringLen($body[$x]) - StringLen("BOT " & StringUpper($iOrigPushBullet) & " SWITCHPROFILE "))
 								Local $iIndex = _GUICtrlComboBox_FindString($cmbProfile, $VillageSelect)
@@ -449,29 +459,39 @@ Func _RemoteControlPushBullet()
 								;=================================== "Chat Bot" ===================================
 					Case Else
 						If StringInStr($body2, "SENDCHAT") Then
-							$FoundChatMessage = 1
-							$chatMessage = StringRight($body2, StringLen($body2) - StringLen("SENDCHAT "))
-							$chatMessage = StringLower($chatMessage)
-							ChatbotPushbulletQueueChat($chatMessage)
-							_PushToPushBullet($iOrigPushBullet & " | " & GetTranslated(18, 97, "Chat queued, will send on next idle"))
-						ElseIf StringInStr($body2, "GETCHATS") Then
-							$FoundChatMessage = 1
-							$Interval = StringRight($body2, StringLen($body2) - StringLen("GETCHATS "))
-							If $Interval = "STOP" Then
-								ChatbotPushbulletStopChatRead()
-								_PushToPushBullet($iOrigPushBullet & " | " & GetTranslated(18, 117, "Stopping interval sending"))
-							ElseIf $Interval = "NOW" Then
-								ChatbotPushbulletQueueChatRead()
-								_PushToPushBullet($iOrigPushBullet & " | " & GetTranslated(18, 118, "Command queued, will send clan chat image on next idle"))
+							If $ChatbotChatClan And $ChatbotUsePushbullet Then
+								$FoundChatMessage = 1
+								$chatMessage = StringRight($body2, StringLen($body2) - StringLen("SENDCHAT "))
+								$chatMessage = StringLower($chatMessage)
+								ChatbotPushbulletQueueChat($chatMessage)
+								_PushToPushBullet($iOrigPushBullet & " | " & GetTranslated(18, 97, "Chat queued, will send on next idle"))
 							Else
-								If Number($Interval) <> 0 Then
-									ChatbotPushbulletIntervalChatRead(Number($Interval))
-									_PushToPushBullet($iOrigPushBullet & " | " & GetTranslated(18, 119, "Command queued, will send clan chat image on interval"))
+								_PushToPushBullet($iOrigPushBullet & " | You not activate chatbot feature, please check..")
+								_DeleteMessageOfPushBullet($iden[$x])
+							EndIf
+						ElseIf StringInStr($body2, "GETCHATS") Then
+							If $ChatbotChatClan And $ChatbotUsePushbullet Then
+								$FoundChatMessage = 1
+								$Interval = StringRight($body2, StringLen($body2) - StringLen("GETCHATS "))
+								If $Interval = "STOP" Then
+									ChatbotPushbulletStopChatRead()
+									_PushToPushBullet($iOrigPushBullet & " | " & GetTranslated(18, 117, "Stopping interval sending"))
+								ElseIf $Interval = "NOW" Then
+									ChatbotPushbulletQueueChatRead()
+									_PushToPushBullet($iOrigPushBullet & " | " & GetTranslated(18, 118, "Command queued, will send clan chat image on next idle"))
 								Else
-									$FoundChatMessage = 0
-									SetLog("Telegram: received command syntax wrong, command ignored.", $COLOR_RED)
-									_PushToPushBullet($iOrigPushBullet & " | " & GetTranslated(18, 46, "Command not recognized") & "\n" & GetTranslated(18, 47, "Please push BOT HELP to obtain a complete command list."))
+									If Number($Interval) <> 0 Then
+										ChatbotPushbulletIntervalChatRead(Number($Interval))
+										_PushToPushBullet($iOrigPushBullet & " | " & GetTranslated(18, 119, "Command queued, will send clan chat image on interval"))
+									Else
+										$FoundChatMessage = 0
+										SetLog("Telegram: received command syntax wrong, command ignored.", $COLOR_RED)
+										_PushToPushBullet($iOrigPushBullet & " | " & GetTranslated(18, 46, "Command not recognized") & "\n" & GetTranslated(18, 47, "Please push BOT HELP to obtain a complete command list."))
+									EndIf
 								EndIf
+							Else
+								_PushToPushBullet($iOrigPushBullet & " | You not activate chatbot feature, please check..")
+								_DeleteMessageOfPushBullet($iden[$x])
 							EndIf
 						ElseIf StringInStr($body2, "DONATEON") Then
 							$DonateAtivated = 0
@@ -523,6 +543,30 @@ Func _RemoteControlPushBullet()
 								$DragComp = $TroopQuantity
 								GUICtrlSetState($ChkDonateDragons, $GUI_CHECKED)
 								$iChkDonateDragons = 1
+								$DonateAtivated = 1
+							ElseIf StringInStr($TroopType, "BABYDRAGON") Then
+								$TroopQuantity = Number(StringRight($TroopType, (StringLen($TroopType) - 5)))
+								SetLog("Telegram: Request to Donate BabyD has been activated", $COLOR_GREEN)
+								GUICtrlSetData($txtNumBabyD, $TroopQuantity)
+								$BabyDComp = $TroopQuantity
+								GUICtrlSetState($chkDonateBabyDragons, $GUI_CHECKED)
+								$ichkDonateBabyDragons = 1
+								$DonateAtivated = 1
+							ElseIf StringInStr($TroopType, "MINER") Then
+								$TroopQuantity = Number(StringRight($TroopType, (StringLen($TroopType) - 6)))
+								SetLog("Telegram: Request to Donate Miner has been activated", $COLOR_GREEN)
+								GUICtrlSetData($txtNumMine, $TroopQuantity)
+								$MineComp = $TroopQuantity
+								GUICtrlSetState($chkDonateMiners, $GUI_CHECKED)
+								$ichkDonateMiners = 1
+								$DonateAtivated = 1
+							ElseIf StringInStr($TroopType, "BOWLER") Then
+								$TroopQuantity = Number(StringRight($TroopType, (StringLen($TroopType) - 7)))
+								SetLog("Telegram: Request to Donate Bowler has been activated", $COLOR_GREEN)
+								GUICtrlSetData($txtNumBowl, $TroopQuantity)
+								$BowlComp = $TroopQuantity
+								GUICtrlSetState($chkDonateBowlers, $GUI_CHECKED)
+								$ichkDonateBowlers = 1
 								$DonateAtivated = 1
 							Else
 								_PushToPushBullet($iOrigPushBullet & " | " & GetTranslated(18, 120, "DONATEON Failed, Invalid TroopType") & "\n" & GetTranslated(18, 121, "Available Troops: GOLEM|LAVA|PEKKA|BALLOON|HOGS|DRAGON") & "\n" & GetTranslated(18, 122, "Example: DONATEON GOLEM 1"))
@@ -581,6 +625,30 @@ Func _RemoteControlPushBullet()
 								$DragComp = $TroopQuantity
 								GUICtrlSetState($ChkDonateDragons, $GUI_UNCHECKED)
 								$iChkDonateDragons = 0
+								$DonateAtivated = 1
+							ElseIf StringInStr($TroopType, "BABYDRAGON") Then
+								$TroopQuantity = Number(StringRight($TroopType, (StringLen($TroopType) - 5)))
+								SetLog("Telegram: Request to Donate BabyD has been de-activated", $COLOR_GREEN)
+								GUICtrlSetData($txtNumBabyD, $TroopQuantity)
+								$BabyDComp = $TroopQuantity
+								GUICtrlSetState($chkDonateBabyDragons, $GUI_UNCHECKED)
+								$ichkDonateBabyDragons = 0
+								$DonateAtivated = 1
+							ElseIf StringInStr($TroopType, "MINER") Then
+								$TroopQuantity = Number(StringRight($TroopType, (StringLen($TroopType) - 6)))
+								SetLog("Telegram: Request to Donate Miner has been de-activated", $COLOR_GREEN)
+								GUICtrlSetData($txtNumMine, $TroopQuantity)
+								$MineComp = $TroopQuantity
+								GUICtrlSetState($chkDonateMiners, $GUI_UNCHECKED)
+								$ichkDonateMiners = 0
+								$DonateAtivated = 1
+							ElseIf StringInStr($TroopType, "BOWLER") Then
+								$TroopQuantity = Number(StringRight($TroopType, (StringLen($TroopType) - 7)))
+								SetLog("Telegram: Request to Donate Bowler has been de-activated", $COLOR_GREEN)
+								GUICtrlSetData($txtNumBowl, $TroopQuantity)
+								$BowlComp = $TroopQuantity
+								GUICtrlSetState($chkDonateBowlers, $GUI_UNCHECKED)
+								$ichkDonateBowlers = 0
 								$DonateAtivated = 1
 							Else
 								_PushToPushBullet($iOrigPushBullet & " | " & GetTranslated(18, 125, "DONATEOFF Failed, Invalid TroopType") & "\n" & GetTranslated(18, 121, "Available Troops: GOLEM|LAVA|PEKKA|BALLOON|HOGS|DRAGON") & "\n" & GetTranslated(18, 126, "Example: DONATEOFF GOLEM 1"))

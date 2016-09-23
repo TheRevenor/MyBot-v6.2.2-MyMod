@@ -89,7 +89,6 @@ $chkPbSendNewChats = GUICtrlCreateCheckbox("Notify me new clan chat", $x - 9, $y
 _GUICtrlSetTip($chkPbSendNewChats, "Will send an image of your clan chat via pushbullet & telegram when a new chat is detected. Not guaranteed to be 100% accurate.")
 GUICtrlSetState($chkPbSendNewChats, $ChatbotPbSendNew)
 GUICtrlSetOnEvent(-1, "ChatGuiCheckboxUpdate")
-GUICtrlSetState(-1, $GUI_CHECKED)
 $y += 29
 $ChatbotChatDelayLabel = GUICtrlCreateLabel("Chat Delay", $x - 9, $y)
 _GUICtrlSetTip($ChatbotChatDelayLabel, "Delay chat between number of bot cycles")

@@ -130,7 +130,14 @@ Func getArmySpellCount($bOpenArmyWindow = False, $bCloseArmyWindow = False, $tes
 		$iTotalSpellSpace += $iMissingSpellCount * Int(($CurSFactory - $iTotalSpellSpace) / $iMissingSpellCount)
 	EndIf
 
-	$bFullArmySpells = $iTotalSpellSpace >= $iTotalTrainSpaceSpell
+	; $bFullArmySpells is a Booleans not a Numeric number <> 0 or 1 | USe on IsSearchModeActive
+	; To use on Spells()
+    If $iTotalSpellSpace >= $iTotalTrainSpaceSpell Then
+        $bFullArmySpells = True
+    Else
+        $bFullArmySpells = False
+    EndIf
+
 	If $debugsetlogTrain = 1 Then SETLOG("$bFullArmySpells: " & $bFullArmySpells & ", $iTotalSpellSpace:$iTotalTrainSpaceSpell " & $iTotalSpellSpace & "|" & $iTotalTrainSpaceSpell, $COLOR_PURPLE)
 
 	If $bCloseArmyWindow = True Then

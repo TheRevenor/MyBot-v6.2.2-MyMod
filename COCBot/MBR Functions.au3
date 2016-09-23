@@ -290,6 +290,9 @@
 ; DonateStats - Added by Cutidudz
 #include "functions\Mod\DonateStats\DonateStats.au3"
 
+; DonateStats - Added by MR.ViPER
+#include "functions\Mod\DonateStats\DonateStats2.au3"
+
 ; Check Collector Outside
 #include "functions\Mod\CollectorsOutside\AreCollectorsOutside.au3"
 

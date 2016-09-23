@@ -358,7 +358,7 @@ Global Const $iDelayTrain4 = 200
 Global Const $iDelayTrain5 = 250 ; click
 Global Const $iDelayTrain6 = 20 ; click
 Global Const $iDelayTrain7 = 5 ; Spells Creation
-Global Const $iDelayTrain8 = 800
+Global Const $iDelayTrain8 = 5000 ; wait for a while to desapear the 'received castle troops' msg
 
 ;IsTrainPage
 Global Const $iDelayIsTrainPage1 = 100

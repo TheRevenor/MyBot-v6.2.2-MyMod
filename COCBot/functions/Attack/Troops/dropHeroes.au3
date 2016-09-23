@@ -43,7 +43,7 @@ Func dropHeroes($x, $y, $KingSlot = -1, $QueenSlot = -1, $WardenSlot = -1) ;Drop
 	If $debugSetLog = 1 Then SetLog("drop WARDEN = " & $dropWarden, $Color_Purple)
 
 	If $dropKing Then
-		SetLog("Dropping King", $COLOR_BLUE)
+		SetLog(" » Deploying King", $COLOR_BLUE)
 		Click(GetXPosOfArmySlot($KingSlot, 68), 595 + $bottomOffsetY, 1, 0, "#0092") ;Select King 860x780
 		If _Sleep($iDelaydropHeroes2) Then Return
 		Click($x, $y, 1, 0, "#0093")
@@ -53,7 +53,7 @@ Func dropHeroes($x, $y, $KingSlot = -1, $QueenSlot = -1, $WardenSlot = -1) ;Drop
 	If _Sleep($iDelaydropHeroes1) Then Return
 
 	If $dropQueen Then
-		SetLog("Dropping Queen", $COLOR_BLUE)
+		SetLog(" » Deploying Queen", $COLOR_BLUE)
 		Click(GetXPosOfArmySlot($QueenSlot, 68), 595 + $bottomOffsetY, 1, 0, "#0094") ;Select Queen 860x780
 		If _Sleep($iDelaydropHeroes2) Then Return
 		Click($x, $y, 1, 0, "#0095")
@@ -63,7 +63,7 @@ Func dropHeroes($x, $y, $KingSlot = -1, $QueenSlot = -1, $WardenSlot = -1) ;Drop
 	If _Sleep($iDelaydropHeroes1) Then Return
 
 	If $dropWarden Then
-		SetLog("Dropping Grand Warden", $COLOR_BLUE)
+		SetLog(" » Deploying Grand Warden", $COLOR_BLUE)
 		Click(GetXPosOfArmySlot($WardenSlot, 68), 595 + $bottomOffsetY, 1, 0, "#X998") ;Select Warden 860x780
 		If _Sleep($iDelaydropHeroes2) Then Return
 		Click($x, $y, 1, 0, "#x999")

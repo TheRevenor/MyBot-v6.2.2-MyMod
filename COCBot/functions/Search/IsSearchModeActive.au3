@@ -25,18 +25,32 @@ Func IsSearchModeActive($iMatchMode, $nocheckHeroes = False)
 	Local $checkArmyCamps = Int($currentArmyCamps) >= Int($iEnableAfterArmyCamps[$iMatchMode]) Or $fullarmy = True And $iEnableSearchCamps[$iMatchMode] = 1
 	Local $checkHeroes = Not ($iHeroWait[$iMatchMode] > $HERO_NOHERO And (BitAND($iHeroAttack[$iMatchMode], $iHeroWait[$iMatchMode], $iHeroAvailable) = $iHeroWait[$iMatchMode]) = False) Or $nocheckHeroes
 	Local $checkSpells = ($bFullArmySpells And $iEnableSpellsWait[$iMatchMode] = 1) Or $iEnableSpellsWait[$iMatchMode] = 0
+	Local $totalSpellsToBrew = 0
+	;--- To Brew
+	$totalSpellsToBrew += $iPoisonSpellComp + $iEarthSpellComp + $iHasteSpellComp + $iSkeletonSpellComp + _
+	$iLightningSpellComp + $iRageSpellComp + $iHealSpellComp + $iJumpSpellComp + $iFreezeSpellComp + $iCloneSpellComp
+	;---
+	If GetCurTotalSpell() = $totalSpellsToBrew And $iEnableSpellsWait[$iMatchMode] = 1 Then
+		$checkSpells = True
+	ElseIf $bFullArmySpells = True And $iEnableSpellsWait[$iMatchMode] = 1 Then
+		$checkSpells = True
+	ElseIf $iEnableSpellsWait[$iMatchMode] = 0 Then
+		$checkSpells = True
+	Else
+		$checkSpells = False
+	EndIf
 
 	Switch $iMatchMode
 		Case $DB
-            If $iDBcheck = 1 Then $bMatchModeEnabled = True
+			If $iDBcheck = 1 Then $bMatchModeEnabled = True
 		Case $LB
-            If $iABcheck = 1 Then $bMatchModeEnabled = True
+			If $iABcheck = 1 Then $bMatchModeEnabled = True
 		Case $TS
-            If $iTScheck = 1 Then $bMatchModeEnabled = True
+			If $iTScheck = 1 Then $bMatchModeEnabled = True
 	EndSwitch
 
 	If $bMatchModeEnabled = False Then Return False
-	
+
 	If $checkHeroes And $checkSpells Then ;If $checkHeroes Then
 		If $bMatchModeEnabled And ($checkSearches Or $iEnableSearchSearches[$iMatchMode] = 0) And ($checkTropies Or $iEnableSearchTropies[$iMatchMode] = 0) And ($checkArmyCamps Or $iEnableSearchCamps[$iMatchMode] = 0) Then
 			If $debugsetlog = 1 Then Setlog($sModeText[$iMatchMode] & " active! ($checkSearches=" & $checkSearches & ",$checkTropies=" & $checkTropies & ",$checkArmyCamps=" & $checkArmyCamps & ",$checkHeroes=" & $checkHeroes & ",$checkSpells=" & $checkSpells & ")", $Color_Blue) ;If $debugsetlog = 1 Then Setlog($sModeText[$iMatchMode] & " active! ($checkSearches=" & $checkSearches & ",$checkTropies=" & $checkTropies &",$checkArmyCamps=" & $checkArmyCamps & ",$checkHeroes=" & $checkHeroes & ")" , $Color_Blue)
@@ -66,10 +80,10 @@ Func IsSearchModeActive($iMatchMode, $nocheckHeroes = False)
 		EndIf
 	ElseIf $checkHeroes = 0 Then
 		If $debugsetlog = 1 Then Setlog("Heroes not ready", $color_purple)
-        Return False
+		Return False
 	Else
 		If $debugsetlog = 1 Then Setlog("Spells not ready", $color_purple)
-        Return False
+		Return False
 	EndIf
 EndFunc   ;==>IsSearchModeActive
 
@@ -100,11 +114,11 @@ Func IsWaitforSpellsActive()
 				$bMatchModeEnabled = ($iTScheck = 1)
 		EndSwitch
 		If $bMatchModeEnabled And $iEnableSpellsWait[$i] = 1 Then
-			If $debugsetlogTrain = 1 Or $debugSetlog = 1 Then Setlog("IsWaitforSpellsActive = True", $COLOR_PURPLE)
+			If $debugsetlogTrain = 1 Or $debugsetlog = 1 Then Setlog("IsWaitforSpellsActive = True", $COLOR_PURPLE)
 			Return True
 		EndIf
 	Next
-	If $debugsetlogTrain = 1 Or $debugSetlog = 1 Then Setlog("IsWaitforSpellsActive = False", $COLOR_PURPLE)
+	If $debugsetlogTrain = 1 Or $debugsetlog = 1 Then Setlog("IsWaitforSpellsActive = False", $COLOR_PURPLE)
 	Return False
 EndFunc   ;==>IsWaitforSpellsActive
 
@@ -135,10 +149,10 @@ Func IsWaitforHeroesActive()
 				$bMatchModeEnabled = ($iTScheck = 1)
 		EndSwitch
 		If $bMatchModeEnabled And ($iHeroWait[$i] > $HERO_NOHERO And (BitAND($iHeroAttack[$i], $iHeroWait[$i]) = $iHeroWait[$i])) Then
-			If $debugsetlogTrain = 1 Or $debugSetlog = 1 Then Setlog("IsWaitforHeroesActive = True", $COLOR_PURPLE)
+			If $debugsetlogTrain = 1 Or $debugsetlog = 1 Then Setlog("IsWaitforHeroesActive = True", $COLOR_PURPLE)
 			Return True
 		EndIf
 	Next
-	If $debugsetlogTrain = 1 Or $debugSetlog = 1 Then Setlog("IsWaitforHeroesActive = False", $COLOR_PURPLE)
+	If $debugsetlogTrain = 1 Or $debugsetlog = 1 Then Setlog("IsWaitforHeroesActive = False", $COLOR_PURPLE)
 	Return False
 EndFunc   ;==>IsWaitforHeroesActive

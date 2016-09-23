@@ -15,7 +15,7 @@
 
 Func Initiate()
 	WinGetAndroidHandle()
-    If $HWnD <> 0 And ($AndroidBackgroundLaunched = True Or AndroidControlAvailable()) Then
+	If $HWnD <> 0 And ($AndroidBackgroundLaunched = True Or AndroidControlAvailable()) Then
 		SetLog(_PadStringCenter(" " & $sBotTitle & " Powered by MyBot.run ", 50, "~"), $COLOR_PURPLE)
 		SetLog($Compiled & " running on " & @OSVersion & " " & @OSServicePack & " " & @OSArch)
 		If Not $bSearchMode Then
@@ -211,7 +211,7 @@ Func updateBtnHideState($newState = $GUI_ENABLE)
 	Local $hideState = GUICtrlGetState($btnHide)
 	Local $newHideState = ($AndroidEmbedded = True ? $GUI_DISABLE : $newState)
 	If $hideState <> $newHideState Then GUICtrlSetState($btnHide, $newHideState)
-EndFunc	  ;==>updateBtnHideState
+EndFunc   ;==>updateBtnHideState
 
 Func btnHide()
 	ResumeAndroid()
@@ -262,7 +262,7 @@ Func btnEmbed()
 	WinGetPos($HWnD)
 	If @error <> 0 Then Return SetError(0, 0, 0)
 	AndroidEmbed(Not $AndroidEmbedded)
-EndFunc   ;==>btnHide
+EndFunc   ;==>btnEmbed
 
 Func btnMakeScreenshot()
 	If $RunState Then $iMakeScreenshotNow = True
@@ -579,12 +579,112 @@ Func ButtonBoost()
 	SETLOG("MBRSearchImage TEST..................STOP")
 	$RunState = False
 
-EndFunc
+EndFunc   ;==>ButtonBoost
 
+Func btnEagle()
+
+	Local $PixelEaglePos[2]
+	Local $colorVariation = 40
+	Local $xSkip = 1
+	Local $ySkip = 5
+	$hTimer = TimerInit()
+
+	Local $directory = @ScriptDir & "\images\WeakBase\Eagle"
+	Local $return = returnHighestLevelSingleMatch($directory)
+	Local $NotdetectedEagle = True
+
+	Setlog(" »» Ubound ROW $return: " & UBound($return, $UBOUND_ROWS))
+	Setlog(" »» Ubound COLUMNS $return: " & UBound($return, $UBOUND_COLUMNS))
+	Setlog(" »» Ubound DIMENSIONS $return: " & UBound($return, $UBOUND_DIMENSIONS))
+
+	Local $result = DllCall($hFuncLib, "str", "getRedArea", "ptr", $hHBitmap2, "int", $xSkip, "int", $ySkip, "int", $colorVariation)
+	
+	If UBound($return) > 0 Then
+		Setlog(" »» Image: " & $return[0])
+		Setlog(" »» Build: " & $return[1])
+		Setlog(" »» Level: " & $return[2])
+		Local $EaglePosition = $return[5]
+ 		Setlog(" »» $EaglePosition[0] X: " & $EaglePosition[0][0])
+ 		Setlog(" »» $EaglePosition[1] Y: " & $EaglePosition[0][1])
+		Setlog(" »» Ubound ROW $EaglePosition: " & UBound($EaglePosition, $UBOUND_ROWS))
+		Setlog(" »» Ubound COLUMNS $EaglePosition: " & UBound($EaglePosition, $UBOUND_COLUMNS))
+		Setlog(" »» Ubound DIMENSIONS $EaglePosition: " & UBound($EaglePosition, $UBOUND_DIMENSIONS))
+		Setlog(" »» REDlines Imgloc: " & $return[6])
+		Setlog(" »» REDlines MBRFunction: " & $result[0])
+
+		Local $AllPoints = StringSplit($return[6], "|", $STR_NOCOUNT)
+		Dim $EachPoint[UBound($AllPoints)][2]
+		Local $PixelTopLeft, $PixelBottomLeft, $PixelBottomRight, $PixelTopRight
+
+		For $i = 0 To UBound($AllPoints) - 1
+			Local $temp = StringSplit($AllPoints[$i], ",", $STR_NOCOUNT)
+			$EachPoint[$i][0] = Number($temp[0])
+			$EachPoint[$i][1] = Number($temp[1])
+			Setlog(" $EachPoint[0]: " & $EachPoint[$i][0] & " | $EachPoint[1]: " & $EachPoint[$i][1])
+		Next
+
+		_ArraySort($EachPoint, 0, 0, 0, 0)
+
+		For $i = 0 To UBound($EachPoint) - 1
+
+			If $EachPoint[$i][0] > 0 And $EachPoint[$i][0] < 430 And $EachPoint[$i][1] > 0 And $EachPoint[$i][1] < 338 Then
+
+				$PixelTopLeft &= String("|" & $EachPoint[$i][0] & "-" & $EachPoint[$i][1])
+
+			ElseIf $EachPoint[$i][0] > 0 And $EachPoint[$i][0] < 430 And $EachPoint[$i][1] > 338 And $EachPoint[$i][1] < 650 Then
+
+				$PixelBottomLeft &= String("|" & $EachPoint[$i][0] & "-" & $EachPoint[$i][1])
+
+			ElseIf $EachPoint[$i][0] > 430 And $EachPoint[$i][0] < 840 And $EachPoint[$i][1] > 338 And $EachPoint[$i][1] < 650 Then
+
+				$PixelBottomRight &= String("|" & $EachPoint[$i][0] & "-" & $EachPoint[$i][1])
+
+			ElseIf $EachPoint[$i][0] > 430 And $EachPoint[$i][0] < 840 And $EachPoint[$i][1] > 0 And $EachPoint[$i][1] < 338 Then
+
+				$PixelTopRight &= String("|" & $EachPoint[$i][0] & "-" & $EachPoint[$i][1])
+			EndIf
+
+		Next
+
+		If Not StringIsSpace($PixelTopLeft) Then $PixelTopLeft = StringTrimLeft($PixelTopLeft, 1)
+		If Not StringIsSpace($PixelBottomLeft) Then $PixelBottomLeft = StringTrimLeft($PixelBottomLeft, 1)
+		If Not StringIsSpace($PixelBottomRight) Then $PixelBottomRight = StringTrimLeft($PixelBottomRight, 1)
+		If Not StringIsSpace($PixelTopRight) Then $PixelTopRight = StringTrimLeft($PixelTopRight, 1)
+
+		Local $NewRedLineString = $PixelTopLeft & "#" & $PixelBottomLeft & "#" & $PixelBottomRight & "#" & $PixelTopRight
+
+		Setlog(" »» NEW REDlines Imgloc: " & $NewRedLineString)
+
+		If $EaglePosition[0][0] <> "" Then
+			$PixelEaglePos[0] = $EaglePosition[0][0]
+			$PixelEaglePos[1] = $EaglePosition[0][1]
+			Setlog(" »» Eagle located in " & Round(TimerDiff($hTimer) / 1000, 2) & " seconds")
+			Switch StringLeft(Slice8($PixelEaglePos), 1)
+				Case 1, 2
+					$MAINSIDE = "BOTTOM-RIGHT"
+				Case 3, 4
+					$MAINSIDE = "TOP-RIGHT"
+				Case 5, 6
+					$MAINSIDE = "TOP-LEFT"
+				Case 7, 8
+					$MAINSIDE = "BOTTOM-LEFT"
+			EndSwitch
+			Setlog(" » Eagle located : " & $MAINSIDE, $COLOR_BLUE)
+			$NotdetectedEagle = False
+		Else
+			Setlog("> Eagle not detected!", $COLOR_BLUE)
+			DebugImageSave("EagleDetection_NotDetected_", True)
+		EndIf
+	Else
+		Setlog("> Eagle not detected!", $COLOR_BLUE)
+		DebugImageSave("EagleDetection_NotPresent_", True)
+	EndIf
+
+EndFunc   ;==>btnEagle
 
 Func arrows()
 	getArmyHeroCount()
-EndFunc
+EndFunc   ;==>arrows
 
 Func EnableGuiControls($OptimizedRedraw = True)
 	Return ToggleGuiControls(True, $OptimizedRedraw)

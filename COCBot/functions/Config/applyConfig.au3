@@ -2549,7 +2549,7 @@ Func applyConfig($bRedrawAtExit = True) ;Applies the data from config to the con
 	_GUICtrlComboBox_SetCurSel($cmbLvl11, $cmbLvl11Fill)
 	_GUICtrlComboBox_SetCurSel($cmbLvl12, $cmbLvl12Fill)
 	GUICtrlSetData($sldCollectorTolerance, $toleranceOffset)
-	;checkCollectors()
+	checkCollectors()
 
 	;Share Attack Settings----------------------------------------
 	GUICtrlSetData($txtShareMinGold, $iShareminGold)

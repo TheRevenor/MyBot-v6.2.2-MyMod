@@ -176,14 +176,14 @@ Func getArmyTroopCount($bOpenArmyWindow = False, $bCloseArmyWindow = False, $tes
 				ElseIf $Troops[0] = $eBabyD Then
 					$TroopQ = $Troops[2]
 					If $FirstStart Or $fullArmy Or IsTroopToDonateOnly($eBabyD) Then
-						$CurPekk = -($TroopQ)
+						$CurBabyD  = -($TroopQ)
 						$SlotInArmyBabyD = $i - 1
 					EndIf
 
 				ElseIf $Troops[0] = $eMine Then
 					$TroopQ = $Troops[2]
 					If $FirstStart Or $fullArmy Or IsTroopToDonateOnly($eMine) Then
-						$CurPekk = -($TroopQ)
+						$CurMine  = -($TroopQ)
 						$SlotInArmyMine = $i - 1
 					EndIf
 

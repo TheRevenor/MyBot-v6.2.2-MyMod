@@ -224,9 +224,9 @@ Func VillageSearch() ;Control for searching a village that meets conditions
 					SetLog("Collectors are outside, match found !", $COLOR_GREEN, "Lucida Console", 7.5)
 					$iMatchMode = $DB
 					If $debugDeadBaseImage = 1 Then
-					_CaptureRegion()
-					_GDIPlus_ImageSaveToFile($hBitmap, @ScriptDir & "\Zombies\" & $Date & " at " & $Time & ".png")
-					_WinAPI_DeleteObject($hBitmap)
+						_CaptureRegion()
+						_GDIPlus_ImageSaveToFile($hBitmap, @ScriptDir & "\Zombies\" & $Date & " at " & $Time & ".png")
+						_WinAPI_DeleteObject($hBitmap)
 					EndIf
 			ExitLoop
 				Else

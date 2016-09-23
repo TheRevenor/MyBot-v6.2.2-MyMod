@@ -2496,9 +2496,9 @@ Func saveConfig() ;Saves the controls settings to the config
 	
 	;ExtremeZap - Added by TheRvenor
 	If GUICtrlRead($chkExtLightSpell) = $GUI_CHECKED Then
-		IniWrite($config, "MOD", "ExtLightSpell", "1")
+		IniWrite($config, "MOD", "ExtLightSpell", 1)
 	Else
-		IniWrite($config, "MOD", "ExtLightSpell", "0")
+		IniWrite($config, "MOD", "ExtLightSpell", 0)
 	EndIf
 	IniWrite($config, "MOD", "MinDE", GUICtrlRead($txtMinDark))
 	

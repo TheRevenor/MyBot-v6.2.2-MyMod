@@ -724,10 +724,10 @@ Func getArmyNormalTroopCount()
 					$CurPekk = -($TroopQ)
 				ElseIf $Troops[0] = $eBabyD Then
 					$TroopQ = $Troops[2]
-					$CurPekk = -($TroopQ)
+					$CurBabyD = -($TroopQ)
 				ElseIf $Troops[0] = $eMine Then
 					$TroopQ = $Troops[2]
-					$CurPekk = -($TroopQ)
+					$CurMine = -($TroopQ)
 				EndIf
 				Local $plural = 0
 				If $TroopQ > 1 Then $plural = 1
@@ -1430,7 +1430,7 @@ Func GoesToFirstDarkBarrack()
 			Click($btnpos[5][0], $btnpos[5][1], 1, $iDelayTrain5, "#0336") ; Click on tab and go to last barrack
 			If _Sleep(1000) Then Return
 		Else
-			Click($btnpos[6][6], $btnpos[5][1], 1, $iDelayTrain5, "#0336") ; Click on tab and go to last barrack
+			Click($btnpos[6][0], $btnpos[6][1], 1, $iDelayTrain5, "#0336") ; Click on tab and go to last barrack
 			If _Sleep(1000) Then Return
 		EndIf
 	Else

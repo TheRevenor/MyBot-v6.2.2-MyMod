@@ -398,7 +398,72 @@ Func ParseAttackCSV($debug = False)
 					Case "SIDE"
 						ReleaseClicks()
 						Setlog("Calculate main side... ")
-						If StringUpper($value8) = "TOP-LEFT" Or StringUpper($value8) = "TOP-RIGHT" Or StringUpper($value8) = "BOTTOM-LEFT" Or StringUpper($value8) = "BOTTOM-RIGHT" Then
+						;If StringUpper($value8) = "TOP-LEFT" Or StringUpper($value8) = "TOP-RIGHT" Or StringUpper($value8) = "BOTTOM-LEFT" Or StringUpper($value8) = "BOTTOM-RIGHT" Then
+						If StringUpper($value8) = "EAGLE" Then
+							Setlog("Forced side: " & StringUpper($value8))
+							Local $PixelEaglePos[2]
+							$hTimer = TimerInit()
+
+							Local $directory = @ScriptDir & "\images\WeakBase\Eagle"
+							Local $return = returnHighestLevelSingleMatch($directory)
+							Local $NotdetectedEagle = True
+								If $DebugSetLog = 1 Then Setlog(" »» Ubound ROW $return: " & UBound($return, $UBOUND_ROWS))
+								If $DebugSetLog = 1 Then Setlog(" »» Ubound COLUMNS $return: " & UBound($return, $UBOUND_COLUMNS))
+								If $DebugSetLog = 1 Then Setlog(" »» Ubound DIMENSIONS $return: " & UBound($return, $UBOUND_DIMENSIONS))
+
+
+
+							If UBound($return) > 0 Then
+								If $DebugSetLog = 1 Then Setlog(" »» Image: " & $return[0])
+								If $DebugSetLog = 1 Then Setlog(" »» Build: " & $return[1])
+								If $DebugSetLog = 1 Then Setlog(" »» Level: " & $return[2])
+								local $EaglePosition = $return[5]
+								If $DebugSetLog = 1 Then Setlog(" »» $EaglePosition[0] X: " & $EaglePosition[0][0])
+								If $DebugSetLog = 1 Then Setlog(" »» $EaglePosition[1] Y: " & $EaglePosition[0][1])
+								If $DebugSetLog = 1 Then Setlog(" »» Ubound ROW $EaglePosition: " & UBound($EaglePosition, $UBOUND_ROWS))
+								If $DebugSetLog = 1 Then Setlog(" »» Ubound COLUMNS $EaglePosition: " & UBound($EaglePosition, $UBOUND_COLUMNS))
+								If $DebugSetLog = 1 Then Setlog(" »» Ubound DIMENSIONS $EaglePosition: " & UBound($EaglePosition, $UBOUND_DIMENSIONS))
+
+								If $EaglePosition[0][0] <> "" Then
+									$PixelEaglePos[0] = $EaglePosition[0][0]
+									$PixelEaglePos[1] = $EaglePosition[0][1]
+									Setlog(" »» Eagle located in " & Round(TimerDiff($hTimer) / 1000, 2) & " seconds")
+									Switch StringLeft(Slice8($PixelEaglePos), 1)
+										Case 1, 2
+											$MAINSIDE = "BOTTOM-RIGHT"
+										Case 3, 4
+											$MAINSIDE = "TOP-RIGHT"
+										Case 5, 6
+											$MAINSIDE = "TOP-LEFT"
+										Case 7, 8
+											$MAINSIDE = "BOTTOM-LEFT"
+									EndSwitch
+									Setlog(" » Eagle located : " & $MAINSIDE, $COLOR_BLUE)
+									$NotdetectedEagle = False
+								Else
+									Setlog("> Eagle not detected!", $COLOR_BLUE)
+									DebugImageSave("EagleDetection_NotDetected_", True)
+								EndIf
+							Else
+								Setlog("> Eagle not Present!", $COLOR_BLUE)
+								DebugImageSave("EagleDetection_NotPresent_", True)
+							EndIf
+
+							If $MAINSIDE = "" Then $MAINSIDE = "TOP-RIGHT" ; Just in csae of any error
+							If $attackcsv_locate_townhall = 1 And $NotdetectedEagle = True Then
+								$pixel = StringSplit($thx & "-" & $thy, "-", 2)
+								Switch StringLeft(Slice8($pixel), 1)
+									Case 1, 2
+										$MAINSIDE = "BOTTOM-RIGHT"
+									Case 3, 4
+										$MAINSIDE = "TOP-RIGHT"
+									Case 5, 6
+										$MAINSIDE = "TOP-LEFT"
+									Case 7, 8
+										$MAINSIDE = "BOTTOM-LEFT"
+								EndSwitch
+							EndIf
+						ElseIf StringUpper($value8) = "TOP-LEFT" Or StringUpper($value8) = "TOP-RIGHT" Or StringUpper($value8) = "BOTTOM-LEFT" Or StringUpper($value8) = "BOTTOM-RIGHT" Then
 							$MAINSIDE = StringUpper($value8)
 							Setlog("Forced side: " & StringUpper($value8))
 						Else
@@ -573,7 +638,7 @@ Func ParseAttackCSV($debug = False)
 								$BACK_LEFT = "BOTTOM-LEFT-DOWN"
 								$BACK_RIGHT = "BOTTOM-LEFT-UP"
 						EndSwitch
-
+						ParseAndMakeDropLines($MAINSIDE)
 					Case Else
 						Setlog("attack row bad, discard :row " & $rownum, $COLOR_RED)
 				EndSwitch

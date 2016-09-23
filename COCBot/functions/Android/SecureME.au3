@@ -5,7 +5,7 @@
 ; Parameters ....:
 ; Return values .:
 ; Author ........: MR.ViPER
-; Modified ......: MR.ViPER (9-15-2016)
+; Modified ......: MR.ViPER (9-15-2016), MR.ViPER (9-22-2016)
 ; Remarks .......: This file is part of MyBot, previously known as ClashGameBot. Copyright 2015-2016
 ;                  MyBot is distributed under the terms of the GNU GPL
 ; Related .......:
@@ -55,7 +55,7 @@ Func RemoveFolderFromInUseList($folder = "")
 			;---- Update inUse Registery
 			RegWrite($inUsePath, "inUse", "REG_SZ", $inUseList)
 	EndSelect
-	RemoveUnAvailableFoldersFromInUseList()
+	;RemoveUnAvailableFoldersFromInUseList()
 EndFunc   ;==>RemoveFolderFromInUseList
 
 Func AddFolderToInUseList($folder = "")
@@ -133,7 +133,7 @@ Func IsAllowedTimeForFile($curDate, $fCreatedDate)
 					Local $startDate = $fCreatedDate[0] & "/" & $fCreatedDate[1] & "/" & $fCreatedDate[2] & " " & $fCreatedDate[3] & ":" & $fCreatedDate[4] & ":" & $fCreatedDate[5]
 					Local $endDate = $curDate[0] & "/" & $curDate[1] & "/" & $curDate[2] & " " & $curDate[3] & ":" & $curDate[4] & ":" & $curDate[5]
 					Local $hDiff = _DateDiff("n", $startDate, $endDate)
-					If $hDiff <= 60 And $hDiff >= 0 Then		; If Modified Date Is <= 60 Minutes Ago Then Return True
+					If $hDiff <= 60 And $hDiff >= 0 Then ; If Modified Date Is <= 60 Minutes Ago Then Return True
 						Return True
 					Else
 						Return False
@@ -162,7 +162,7 @@ Func IsAllowedTimeForFolder($curDate, $folderCreatedDate, $RemoveallEmptyFolders
 				Local $startDate = $folderCreatedDate[0] & "/" & $folderCreatedDate[1] & "/" & $folderCreatedDate[2] & " " & $folderCreatedDate[3] & ":" & $folderCreatedDate[4] & ":" & $folderCreatedDate[5]
 				Local $endDate = $curDate[0] & "/" & $curDate[1] & "/" & $curDate[2] & " " & $curDate[3] & ":" & $curDate[4] & ":" & $curDate[5]
 				Local $hDiff = _DateDiff("n", $startDate, $endDate)
-				If $hDiff <= 540 And $hDiff >= 0 Then		; If Modified Date Is <= 9 Hours Ago Then Return True
+				If $hDiff <= 540 And $hDiff >= 0 Then ; If Modified Date Is <= 9 Hours Ago Then Return True
 					Return True
 				Else
 					Return False
@@ -205,19 +205,23 @@ EndFunc   ;==>AfterAADBSSCMD
 Func DeleteOtherFoldersInSharedFolder()
 	$allFolders = _FileListToArray($AndroidPicturesHostPath, "*", 2, False)
 	For $i = 1 To UBound($allFolders) - 1
-		If IsFolderInUse($allFolders[$i]) = False Then
-			RemoveFolderFromInUseList($allFolders[$i])
-			DirRemove($AndroidPicturesHostPath & $allFolders[$i], 1)
+		If $AndroidPicturesHostPath & $allFolders[$i] <> $AndroidPicturesHostPath Then
+			If IsFolderInUse($allFolders[$i]) = False Then
+				RemoveFolderFromInUseList($allFolders[$i])
+				DirRemove($AndroidPicturesHostPath & $allFolders[$i], 1)
+			EndIf
 		EndIf
 	Next
 EndFunc   ;==>DeleteOtherFoldersInSharedFolder
 
 Func DeletePicturesHostFolder($isClosingBot = True)
-	DirRemove($AndroidPicturesHostPath & $AndroidPicturesHostFolder, 1)
+	If $AndroidPicturesHostPath & $AndroidPicturesHostFolder <> $AndroidPicturesHostPath Then DirRemove($AndroidPicturesHostPath & $AndroidPicturesHostFolder, 1)
 	$allFolders = _FileListToArray($AndroidPicturesHostPath, "*", 2, False)
 	For $i = 1 To UBound($allFolders) - 1
-		If IsFolderInUse($allFolders[$i]) = False Then
-			DirRemove($AndroidPicturesHostPath & $allFolders[$i], 1)
+		If $AndroidPicturesHostPath & $allFolders[$i] <> $AndroidPicturesHostPath Then
+			If IsFolderInUse($allFolders[$i]) = False Then
+				DirRemove($AndroidPicturesHostPath & $allFolders[$i], 1)
+			EndIf
 		EndIf
 	Next
 	If $isClosingBot = True Then RemoveFolderFromInUseList()

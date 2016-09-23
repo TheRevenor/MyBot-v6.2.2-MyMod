@@ -178,7 +178,7 @@ Func ExtremeZap()
 				For $i = 0 To UBound($aDarkDrills, 2) - 1
 					$aDarkDrills[0][$i] = -1
 				Next
-				SetLog("Removing drill since it wasn't found, so it was probably destroyed.", $COLOR_FUCHSIA)
+				SetLog("Removing drill since it wasn't found, so it was probably destroyed.", $COLOR_ORANGE)
 				; Resort the array
 				_ArraySort($aDarkDrills, 1, 0, 0, 3)
 			EndIf
