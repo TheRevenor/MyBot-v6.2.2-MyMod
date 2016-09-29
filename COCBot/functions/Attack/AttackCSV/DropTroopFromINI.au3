@@ -276,13 +276,8 @@ Func DropTroopFromINI($vectors, $indexStart, $indexEnd, $indexArray, $qtaMin, $q
 									PureClick($pixel[0], $pixel[1], $qty2, $delayPoint)
 									Setlog(" » Deploying " & $qty2 & " of "& NameOfTroop(Eval("e" & $troopName), $plural))
 								Else
-									If $AndroidAdbClicksEnabled Then 
-										AttackClick($pixel[0], $pixel[1], $qty2, Int($delayPoint/4), 0, "#0666")
-										Setlog(" » Deploying " & $qty2 & " of "& NameOfTroop(Eval("e" & $troopName), $plural))
-									Else
-										AttackClick($pixel[0], $pixel[1], $qty2, $delayPoint, 0, "#0666")
-										Setlog(" » Deploying " & $qty2 & " of "& NameOfTroop(Eval("e" & $troopName), $plural))
-									EndIf
+									AttackClick($pixel[0], $pixel[1], $qty2, $delayPoint, 0, "#0666")
+									Setlog(" » Deploying " & $qty2 & " of "& NameOfTroop(Eval("e" & $troopName), $plural))
 								EndIf
 								$tempquant += $qty2
 								If $tempquant > 0 And $i = $indexEnd Then Setlog(" » Try to Deploy " & $tempquant & " of "& NameOfTroop(Eval("e" & $troopName), $plural))

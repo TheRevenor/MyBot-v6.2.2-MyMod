@@ -2556,12 +2556,6 @@ Func saveConfig() ;Saves the controls settings to the config
 		IniWrite($config, "Multy", "MultyFarming", 0)
 	EndIf
 	IniWrite($config, "Multy", "Account", GUICtrlRead($Account))
-	
-	If GUICtrlRead($chkMultyWithBoost) = $GUI_CHECKED Then
-		IniWrite($config, "Multy", "MultyWithBoost", 1)
-	Else
-		IniWrite($config, "Multy", "MultyWithBoost", 0)
-	EndIf
 
 	; Donate Stats - Added by cutidudz
 	If GUICtrlRead($chkDStats) = $GUI_CHECKED Then
@@ -2642,13 +2636,6 @@ Func saveConfig() ;Saves the controls settings to the config
 		IniWriteS($config, "upgrade", "UpdateNewUpgradesOnly", 0)
 	EndIf
 
-	; Deleted Wrong Troops - Added by TheRevenor
-	If GUICtrlRead($chkDeleteTroops) = $GUI_CHECKED Then
-		IniWrite($config, "Mod", "DeletedTroops", 1)
-	Else
-		IniWrite($config, "Mod", "DeletedTroops", 0)
-	EndIf
-	
 	; Profile Switch Settings
 	If GUICtrlRead($chkGoldSwitchMax) = $GUI_CHECKED Then
 		IniWrite($config, "profiles", "chkGoldSwitchMax", 1)

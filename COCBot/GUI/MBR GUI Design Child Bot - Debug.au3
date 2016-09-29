@@ -73,10 +73,7 @@ $y = 45
 	$y += 35
 
 	$btnEagle = GUICtrlCreateButton(GetTranslated(636,104, "Test Eagle"), $x  , $y , 140, 30)
-
-	$y += 35
-
-	$btnEQDeploy = GUICtrlCreateButton(GetTranslated(636,106, "EQ Deploy"), $x  , $y , 140, 30)
+	;GUICtrlSetOnEvent($btnEagle, "btnEagle")
 
 GUICtrlCreateGroup("", -99, -99, 1, 1)
 

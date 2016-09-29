@@ -37,7 +37,7 @@ Local $hBotLaunchTime = TimerInit()
 
 Global $sGitHubModOwner = "TheRevenor"
 Global $sGitHubModRepo = "MyBot-v6.2.2-MyMod"
-Global $sGitHubModLatestReleaseTag = "v2.0.5"
+Global $sGitHubModLatestReleaseTag = "v2.0.4"
 Global $sModSupportUrl = "https://mybot.run/forums/index.php?/topic/22790-v621-mod-therevenor-03-09-2016"
 
 $sBotVersion = "v6.2.2" ;~ Don't add more here, but below. Version can't be longer than vX.y.z because it it also use on Checkversion()
@@ -309,7 +309,6 @@ Func runBot() ;Bot that runs everything in order
 			IsWaitingForConnection()
 			DonateCC()
 			If _Sleep($iDelayRunBot3) Then Return
-			If $ichkDeleteTroops = 1 Then DeleteTroopsInArmyOverview()
 			If IsSearchAttackEnabled() Then  ; if attack is disabled skip reporting, requesting, donating, training, and boosting
 			   Local $aRndFuncList[6] = ['ReplayShare', 'ReportNotify', 'BoostBarracks', 'BoostSpellFactories', 'BoostHeroes', 'RequestCC']
 			   While 1
@@ -580,7 +579,7 @@ Func Idle() ;Sequence that runs until Full Army
 			getArmyHeroCount(False, False)
 			getArmySpellCount(False, True) ; use true parameter to close train overview window
 			If _Sleep($iDelayIdle1) Then Return
-			If $fullArmy = False And $bTrainEnabled = True Then
+			If Not ($fullArmy) And $bTrainEnabled = True Then
 				SetLog("Army Camp and Barracks are not full, Training Continues...", $COLOR_ORANGE)
 				$CommandStop = 0
 			EndIf
@@ -622,13 +621,13 @@ Func Idle() ;Sequence that runs until Full Army
 		If $debugsetlog = 1 Then Setlog("IDLE| $bFullArmySpells : " & $bFullArmySpells)
 		If _Sleep($iDelayIdle1) Then Return
 		If $CommandStop = 0 And $bTrainEnabled = True Then
-            If $fullArmy = False Or $bFullArmySpells = False Then
+            If $fullArmy = False or $bFullArmySpells = False Then
 				Train()
 					If $Restart = True Then ExitLoop
 					If _Sleep($iDelayIdle1) Then ExitLoop
 					checkMainScreen(False)
 			EndIf
-            If $fullArmy And $bFullArmySpells Then
+            If $fullArmy and $bFullArmySpells Then
 				SetLog("Army Camp and Barracks are full, stop Training...", $COLOR_ORANGE)
 				$CommandStop = 3
 			EndIf
