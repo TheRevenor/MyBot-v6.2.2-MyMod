@@ -131,7 +131,8 @@ Func checkAttackDisable($iSource, $Result = "")
 		Setlog("Personal Break Reset log off: " & $iValueSinglePBTimeForced & " Minutes", $COLOR_BLUE)
 		If $ichkCloseTakeBreak = 1 Then
 			If $AndroidEmbedded = True Then
-				AndroidEmbed(Not $AndroidEmbedded)
+				btnEmbed()
+				;AndroidEmbed(Not $AndroidEmbedded)
 			EndIf
 			If _Sleep(4000) Then Return
 			CloseAndroid()

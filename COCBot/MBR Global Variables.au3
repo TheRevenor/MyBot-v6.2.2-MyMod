@@ -1608,6 +1608,7 @@ Global $iMultyFarming = 0
 Global $iSwCount
 Global $ichkSwitchDonate
 Global $ichkMultyFarming
+Global $ichkMultyWithBoost
 Global $iAccount, $OkLoc, $AccountLoc
 Global $iconfirm
 Global $bAccount[6] = ["Main", "Second", "Third", "Fourth", "Fifth", "Sixth"]
@@ -1619,6 +1620,9 @@ Global $iLimitDStats = 5000
 ; Don't Barack Mode - Added by AwesomeGamer
 Global $iChkDontRemove, $chkDontRemove
 Global $iChkBarrackSpell, $chkBarrackSpell
+
+; Deleted Wrong Troops - Added by TheRevenor
+Global $ichkDeleteTroops
 
 ; Check Connections - by TheRevenor
 Global $ichkConnection = 1

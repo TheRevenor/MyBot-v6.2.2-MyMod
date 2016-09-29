@@ -5,7 +5,7 @@
 ; Parameters ....:
 ; Return values .: None
 ; Author ........: Hungle (2014)
-; Modified ......: ProMac and MR.Viper ( 08-2016 )
+; Modified ......: ProMac and MR.Viper ( 09-2016 )
 ; Remarks .......:
 ; Related .......:
 ; Link ..........: https://github.com/MyBotRun/MyBot/wiki
@@ -14,7 +14,7 @@
 
 Global $IsDontRemove = 0
 
-Func Train()
+Func Train() ; Main Train Loop on Normal and Dark Barracks
 
 	If $debugsetlogTrain = 1 Then SetLog("Func Train ", $COLOR_PURPLE)
 
@@ -25,8 +25,8 @@ Func Train()
 	Local $tempElixirSpent = 0
 	Local $tempDElixirSpent = 0
 	Local $tmpNumber
-	Local $QuantNormalTroopsInQueue[4] = [0,0,0,0]
-	Local $QuantDarkTroopsInQueue[2] = [0,0]
+	Local $QuantNormalTroopsInQueue[4] = [0, 0, 0, 0]
+	Local $QuantDarkTroopsInQueue[2] = [0, 0]
 
 	If $bTrainEnabled = False Then Return
 
@@ -44,9 +44,8 @@ Func Train()
 	; in halt attack mode Make sure army reach 100% regardless of user Percentage of full army
 	If ($CommandStop = 3 Or $CommandStop = 0) Then
 		CheckOverviewFullArmy(True)
-		If $fullarmy and $bFullArmySpells Then
+		If $fullarmy And $bFullArmySpells Then
 			SetLog("You are in halt attack mode and your Army is prepared!", $COLOR_PURPLE)
-			If $FirstStart Then $FirstStart = False
 			Return
 		EndIf
 	EndIf
@@ -101,7 +100,7 @@ Func Train()
 	If _Sleep($iDelayTrain3) Then Return
 
 	;OPEN ARMY OVERVIEW WITH NEW BUTTON
-	If openArmyOverview() = False Then Return
+	If openArmyOverview() = False Then Return ;
 
 	If WaitforPixel(762, 328 + $midOffsetY, 763, 329 + $midOffsetY, Hex(0xF18439, 6), 10, 10) Then
 		If $debugsetlogTrain = 1 Then SetLog("Wait for ArmyOverView Window", $COLOR_PURPLE)
@@ -119,35 +118,38 @@ Func Train()
 		If $numDarkBarracksAvaiables > UBound($DarkBarrackCapacity) Then SetLog(" » Now you have More Dark barracks available!")
 		If $numDarkBarracksAvaiables < UBound($DarkBarrackCapacity) Then SetLog(" » Now you have Less Dark barracks available!")
 
-		; Redim the Global Variable to existent num Barracks Available , Reset and fill it in DeleteQueueTroops()
-		ReDim $BarrackCapacity[$numBarracksAvaiables]
-		ReDim $BarrackTimeRemain[$numBarracksAvaiables]
-		ReDim $InitBoostTime[$numBarracksAvaiables][2]
-		For $i = 0 To $numBarracksAvaiables - 1
-			$BarrackCapacity[$i] = 0
-			$BarrackTimeRemain[$i] = 0
-			$InitBoostTime[$i][0] = 0
-			$InitBoostTime[$i][1] = 0
-		Next
+		If ($numBarracksAvaiables <> UBound($BarrackCapacity)) Or ($numDarkBarracksAvaiables <> UBound($DarkBarrackCapacity)) Then
+			; Redim the Global Variable to existent num Barracks Available , Reset and fill it in DeleteQueueTroops()
+			ReDim $BarrackCapacity[$numBarracksAvaiables]
+			ReDim $BarrackTimeRemain[$numBarracksAvaiables]
+			ReDim $InitBoostTime[$numBarracksAvaiables][2]
+			For $i = 0 To $numBarracksAvaiables - 1
+				$BarrackCapacity[$i] = 0
+				$BarrackTimeRemain[$i] = 0
+				$InitBoostTime[$i][0] = 0
+				$InitBoostTime[$i][1] = 0
+			Next
 
-		; Redim the Global Variable to existent num Dark Barracks Available , Reset and fill it in DeleteQueueTroops()
-		ReDim $DarkBarrackCapacity[$numDarkBarracksAvaiables]
-		ReDim $DarkBarrackTimeRemain[$numDarkBarracksAvaiables]
-		ReDim $InitBoostTimeDark[$numDarkBarracksAvaiables][2]
-		For $i = 0 To $numDarkBarracksAvaiables - 1
-			$DarkBarrackCapacity[$i] = 0
-			$DarkBarrackTimeRemain[$i] = 0
-			$InitBoostTimeDark[$i][0] = 0
-			$InitBoostTimeDark[$i][1] = 0
-		Next
+			; Redim the Global Variable to existent num Dark Barracks Available , Reset and fill it in DeleteQueueTroops()
+			ReDim $DarkBarrackCapacity[$numDarkBarracksAvaiables]
+			ReDim $DarkBarrackTimeRemain[$numDarkBarracksAvaiables]
+			ReDim $InitBoostTimeDark[$numDarkBarracksAvaiables][2]
+			For $i = 0 To $numDarkBarracksAvaiables - 1
+				$DarkBarrackCapacity[$i] = 0
+				$DarkBarrackTimeRemain[$i] = 0
+				$InitBoostTimeDark[$i][0] = 0
+				$InitBoostTimeDark[$i][1] = 0
+			Next
 
-		; Lets delete the previous queued troops
-		GoesToFirstBarrack()
-		If _Sleep($iDelayTrain3) Then Return ; ---> can be made with WaitforPixel()
-		If $debugsetlogTrain = 1 Then Setlog("Deleting Queue Troops")
-		DeleteQueueTroops()
-		If $debugsetlogTrain = 1 Then Setlog("Deleting Queue DarkTroops")
-		DeleteQueueDarkTroops()
+			; Lets delete the previous queued troops
+			GoesToFirstBarrack()
+			If _Sleep($iDelayTrain3) Then Return ; ---> can be made with WaitforPixel()
+			If $debugsetlogTrain = 1 Then Setlog("Deleting Queue Troops")
+			If $iChkDontRemove = 0 Then DeleteQueueTroops()
+			If $debugsetlogTrain = 1 Then Setlog("Deleting Queue DarkTroops")
+			If $iChkDontRemove = 0 Then DeleteQueueDarkTroops()
+		EndIf
+
 		GoesToArmyOverViewWindow()
 
 		If _Sleep($iDelayTrain3) Then Return ; ---> can be made with WaitforPixel()
@@ -338,7 +340,7 @@ Func Train()
 
 		; if exist a Flag from boostbarrack.au3 and True[=1] after Boosted Check on Barrack
 		If $InitBoostTime[$i][0] = 0 And $CheckIfWasBoostedOnBarrack[$i] = 1 Then
-			Setlog("Did You Boost the Barrack nº " & $i + 1 & " Manually?", $COLOR_RED)
+			Setlog("Did You Boost the Barrack nº " & $i + 1 & " Manually?", $COLOR_ORANGE)
 			VerifyRemainBoostTime($i + 1) ; THIS WILL NOT FLAG 0 to 1 | Forcing To Search again the Time
 			openArmyOverview()
 			If $InitBoostTime[$i][1] > 0 Then
@@ -349,10 +351,10 @@ Func Train()
 					$ichkWASCloseWaitEnable = 1
 					GUICtrlSetState($chkCloseWaitEnable, $GUI_UNCHECKED)
 				EndIf
-				If $ichkMultyFarming = 1 Then
+				If $ichkMultyFarming = 1 And $ichkMultyWithBoost = 0 Then
 					$ichkMultyFarming = 0
 					GUICtrlSetState($chkMultyFarming, $GUI_UNCHECKED)
-					Setlog(" » let's disable the 'MultyFarming'! Not Logic With Boost", $COLOR_ORANGE)
+					Setlog(" » let's disable the 'MultyFarming'!", $COLOR_ORANGE)
 				EndIf
 			EndIf
 		Else
@@ -374,10 +376,10 @@ Func Train()
 							$ichkWASCloseWaitEnable = 1
 							GUICtrlSetState($chkCloseWaitEnable, $GUI_UNCHECKED)
 						EndIf
-						If $ichkMultyFarming = 1 Then
+						If $ichkMultyFarming = 1 And $ichkMultyWithBoost = 0 Then
 							$ichkMultyFarming = 0
 							GUICtrlSetState($chkMultyFarming, $GUI_UNCHECKED)
-							Setlog(" » let's disable the 'MultyFarming'! Not Logic With Boost", $COLOR_ORANGE)
+							Setlog(" » let's disable the 'MultyFarming'!", $COLOR_ORANGE)
 						EndIf
 					EndIf
 				EndIf
@@ -401,7 +403,7 @@ Func Train()
 
 			; if exist a Flag from boostbarrack.au3 and True[=1] after Boosted Check on Barrack
 			If $InitBoostTimeDark[$i][0] = 0 And $CheckIfWasBoostedOnDarkBarrack[$i] = 1 Then
-				Setlog("Did You Boost the Dark Barrack nº " & $i + 1 & " Manually?", $COLOR_RED)
+				Setlog("Did You Boost the Dark Barrack nº " & $i + 1 & " Manually?", $COLOR_ORANGE)
 				VerifyRemainDarkBoostTime($i + 1) ; THIS WILL NOT FLAG 0 to 1 | Forcing To Search again the Time
 				openArmyOverview()
 				If $InitBoostTimeDark[$i][1] > 0 Then
@@ -411,11 +413,11 @@ Func Train()
 						$ichkCloseWaitEnable = 0
 						GUICtrlSetState($chkCloseWaitEnable, $GUI_UNCHECKED)
 					EndIf
-				If $ichkMultyFarming = 1 Then
-					$ichkMultyFarming = 0
-					GUICtrlSetState($chkMultyFarming, $GUI_UNCHECKED)
-					Setlog(" » let's disable the 'MultyFarming'! Not Logic With Boost", $COLOR_ORANGE)
-				EndIf
+					If $ichkMultyFarming = 1 And $ichkMultyWithBoost = 0 Then
+						$ichkMultyFarming = 0
+						GUICtrlSetState($chkMultyFarming, $GUI_UNCHECKED)
+						Setlog(" » let's disable the 'MultyFarming'!", $COLOR_ORANGE)
+					EndIf
 				EndIf
 			Else
 				If $InitBoostTimeDark[$i][0] = 1 Then
@@ -434,11 +436,11 @@ Func Train()
 								$ichkCloseWaitEnable = 0
 								GUICtrlSetState($chkCloseWaitEnable, $GUI_UNCHECKED)
 							EndIf
-						If $ichkMultyFarming = 1 Then
-							$ichkMultyFarming = 0
-							GUICtrlSetState($chkMultyFarming, $GUI_UNCHECKED)
-							Setlog(" » let's disable the 'MultyFarming'! Not Logic With Boost", $COLOR_ORANGE)
-						EndIf
+							If $ichkMultyFarming = 1 And $ichkMultyWithBoost = 0 Then
+								$ichkMultyFarming = 0
+								GUICtrlSetState($chkMultyFarming, $GUI_UNCHECKED)
+								Setlog(" » let's disable the 'MultyFarming'!", $COLOR_ORANGE)
+							EndIf
 						EndIf
 					EndIf
 				EndIf
@@ -1419,7 +1421,7 @@ Func Train()
 				$TroopCapacityAfterTraining = getBarrackArmy(525, 276)
 				$TotalTime = getBarracksTotalTime(634, 203)
 
-				If IsArray($TroopCapacityAfterTraining) and  $TroopCapacityAfterTraining[0] <> "" then
+				If IsArray($TroopCapacityAfterTraining) And $TroopCapacityAfterTraining[0] <> "" Then
 					$BarrackStatusTrain[0] = $TroopCapacityAfterTraining[0]
 					$BarrackStatusTrain[1] = $TroopCapacityAfterTraining[1]
 				Else
@@ -1442,9 +1444,9 @@ Func Train()
 				EndIf
 
 				If $InitBoostTime[$BarrackToTrain][1] > 0 Then
-					SetLog(" »» NB[" & $BarrackToTrain + 1 & "] Max Queue: " & $BarrackStatusTrain[2] & " | " & $BarrackStatusTrain[0] & "/" & $BarrackStatusTrain[1] & " | Total Time: " & $BarrackStatusTrain[3] & " [B]", $COLOR_BLUE)
+					SetLog(" »» NB[" & $BarrackToTrain + 1 & "] Max Cap: " & $BarrackStatusTrain[2] & " | " & $BarrackStatusTrain[0] & "/" & $BarrackStatusTrain[1] & " | Q: " & $QuantNormalTroopsInQueue[$BarrackToTrain] & " | Total Time: " & $BarrackStatusTrain[3] & " [B]", $COLOR_BLUE)
 				Else
-					SetLog(" » NB[" & $BarrackToTrain + 1 & "] Max Queue: " & $BarrackStatusTrain[2] & " | " & $BarrackStatusTrain[0] & "/" & $BarrackStatusTrain[1] & " | Total Time: " & $BarrackStatusTrain[3], $COLOR_BLUE)
+					SetLog(" » NB[" & $BarrackToTrain + 1 & "] Max Cap: " & $BarrackStatusTrain[2] & " | " & $BarrackStatusTrain[0] & "/" & $BarrackStatusTrain[1] & " | Q: " & $QuantNormalTroopsInQueue[$BarrackToTrain] & " | Total Time: " & $BarrackStatusTrain[3], $COLOR_BLUE)
 				EndIf
 				If _Sleep($iDelayTrain2) Then Return
 			EndIf
@@ -1464,6 +1466,7 @@ Func Train()
 							If _Sleep($iDelayTrain6) Then Return ; '20' just to Pause action
 							If $TroopsToMake[$x][0] = $TroopName[$i] And Eval($TroopsToMake[$x][0] & "EBarrack" & $BarrackToTrain) > 0 Then
 								TrainIt(Eval("e" & $TroopsToMake[$x][0]), Eval($TroopsToMake[$x][0] & "EBarrack" & $BarrackToTrain))
+								$QuantNormalTroopsInQueue[$BarrackToTrain] += Eval($TroopsToMake[$x][0] & "EBarrack" & $BarrackToTrain)
 								$BarrackStatus[$BarrackToTrain] = True
 								SetLog("[NB" & $BarrackToTrain + 1 & "] » Trained " & Eval($TroopsToMake[$x][0] & "EBarrack" & $BarrackToTrain) & " " & NameOfTroop(Eval("e" & $TroopsToMake[$x][0]), 1), $COLOR_GREEN)
 								Assign("Don" & $TroopName[$i], Eval("Don" & $TroopName[$i]) - Eval($TroopsToMake[$x][0] & "EBarrack" & $BarrackToTrain))
@@ -1520,9 +1523,9 @@ Func Train()
 				ElseIf $BarrackStatus[$brrNum - 1] = False And $fullarmy = False And _
 						$BarrackCapacity[$brrNum - 1] = _ArrayMin($BarrackCapacity, 1) And _
 						_ArrayMin($BarrackCapacity, 1) + 10 <= _ArrayMax($BarrackCapacity, 1) And _
-						$LetsSortNB = False and _ArrayMax($QuantNormalTroopsInQueue, 1) > 1 Then
+						$LetsSortNB = False And _ArrayMax($QuantNormalTroopsInQueue, 1) > 1 Then
 
-					For $i = 0 to $numBarracksAvaiables
+					For $i = 0 To ($numBarracksAvaiables - 1)
 						If $QuantNormalTroopsInQueue[$i] > 1 Then Setlog("Quant queued troops on Barrack " & $i + 1 & " is " & $QuantNormalTroopsInQueue[$i], $COLOR_RED)
 					Next
 
@@ -1555,19 +1558,19 @@ Func Train()
 						($BarrackFull[3] = True Or $BarrackStatus[3] = False) And $fullarmy = False Then
 
 					; Ok all Barracks are empty or remaining capacity is lower than the Housing Space , BUT will we need Dark Troops? let check that!!
-					If (Not $isDarkBuild) Or $icmbDarkTroopComp = 3 Or _ 	 						; Dark Barrcaks are not in use
-							(($BarrackDarkStatus[0] = False Or $BarrackDarkFull[0] = True) And _ 	; Dark Barrack 1 is being used and is empty | not training any Dark troop
+					If (Not $isDarkBuild) Or $icmbDarkTroopComp = 3 Or _ 	 						 ; Dark Barrcaks are not in use
+							(($BarrackDarkStatus[0] = False Or $BarrackDarkFull[0] = True) And _ 	 ; Dark Barrack 1 is being used and is empty | not training any Dark troop
 							($BarrackDarkStatus[1] = False Or $BarrackDarkFull[1] = True)) Then ; Dark Barrack 2 is being used and is empty | not training any Dark troop
 
 						If $BarrackFull[0] = True Or $BarrackFull[1] = True Or $BarrackFull[2] = True Or $BarrackFull[3] = True Then
 							GoesToFirstBarrack()
 							If _Sleep($iDelayTrain3) Then Return ; ---> can be made with WaitforPixel()
 							If $debugsetlogTrain = 1 Then Setlog(" » Deleting Queue Troops")
-							DeleteQueueTroops()
+							If $iChkDontRemove = 0 Then DeleteQueueTroops()
 							GoesToArmyOverViewWindow()
 							If _Sleep($iDelayTrain3) Then Return ; ---> can be made with WaitforPixel()
 							If IsTrainPage() Then GetArmyCapacity()
-                            If $fullarmy = False Then
+							If $fullarmy = False Then
 								; JUST in case of any error of last queued troops on Barracks are Higer than remaning Army camp space
 								Local $LocaRemainSpaceToMake = $TotalCamp - $CurCamp
 								Assign("CurArch", $LocaRemainSpaceToMake)
@@ -1580,7 +1583,7 @@ Func Train()
 								GoesToArmyOverViewWindow()
 								If _Sleep($iDelayTrain3) Then Return ; ---> can be made with WaitforPixel()
 								If IsTrainPage() Then GetArmyCapacity()
-                                If $fullarmy = False Then
+								If $fullarmy = False Then
 									; JUST in case of Empty barracks and is not Full Army yet
 									Local $LocaRemainSpaceToMake = $TotalCamp - $CurCamp
 									; In case of some error on Making troops before attack
@@ -1607,7 +1610,7 @@ Func Train()
 				$TroopCapacityAfterTraining = getBarrackArmy(525, 276)
 				$TotalTime = getBarracksTotalTime(634, 203)
 
-				If IsArray($TroopCapacityAfterTraining) and  $TroopCapacityAfterTraining[0] <> "" then
+				If IsArray($TroopCapacityAfterTraining) And $TroopCapacityAfterTraining[0] <> "" Then
 					$BarrackStatusTrain[0] = $TroopCapacityAfterTraining[0]
 					$BarrackStatusTrain[1] = $TroopCapacityAfterTraining[1]
 				Else
@@ -1630,9 +1633,9 @@ Func Train()
 				EndIf
 
 				If $InitBoostTime[$BarrackToTrain][1] > 0 Then
-					SetLog(" »» NB[" & $BarrackToTrain + 1 & "] Max Queue: " & $BarrackStatusTrain[2] & " | " & $BarrackStatusTrain[0] & "/" & $BarrackStatusTrain[1] & " | Total Time: " & $BarrackStatusTrain[3] & " [B]", $COLOR_BLUE)
+					SetLog(" »» NB[" & $BarrackToTrain + 1 & "] Max Cap: " & $BarrackStatusTrain[2] & " | " & $BarrackStatusTrain[0] & "/" & $BarrackStatusTrain[1] & " | Q: " & $QuantNormalTroopsInQueue[$BarrackToTrain] & " | Total Time: " & $BarrackStatusTrain[3] & " [B]", $COLOR_BLUE)
 				Else
-					SetLog(" » NB[" & $BarrackToTrain + 1 & "] Max Queue: " & $BarrackStatusTrain[2] & " | " & $BarrackStatusTrain[0] & "/" & $BarrackStatusTrain[1] & " | Total Time: " & $BarrackStatusTrain[3], $COLOR_BLUE)
+					SetLog(" » NB[" & $BarrackToTrain + 1 & "] Max Cap: " & $BarrackStatusTrain[2] & " | " & $BarrackStatusTrain[0] & "/" & $BarrackStatusTrain[1] & " | Q: " & $QuantNormalTroopsInQueue[$BarrackToTrain] & " | Total Time: " & $BarrackStatusTrain[3], $COLOR_BLUE)
 				EndIf
 				If _Sleep($iDelayTrain2) Then Return
 			EndIf
@@ -1908,7 +1911,7 @@ Func Train()
 					$TroopCapacityAfterTraining = getBarrackArmy(525, 276)
 					$TotalTime = getBarracksTotalTime(634, 203)
 
-					If IsArray($TroopCapacityAfterTraining) And $TroopCapacityAfterTraining[0] <> "" then
+					If IsArray($TroopCapacityAfterTraining) And $TroopCapacityAfterTraining[0] <> "" Then
 						$BarrackStatusTrain[0] = $TroopCapacityAfterTraining[0]
 						$BarrackStatusTrain[1] = $TroopCapacityAfterTraining[1]
 					Else
@@ -1931,9 +1934,9 @@ Func Train()
 					EndIf
 
 					If $InitBoostTimeDark[$BarrackToTrain][1] > 0 Then
-						SetLog(" »» DB[" & $brrDarkNum & "] Max Queue: " & $BarrackStatusTrain[2] & " | " & $BarrackStatusTrain[0] & "/" & $BarrackStatusTrain[1] & " | Total Time: " & $BarrackStatusTrain[3] & " [B]", $COLOR_BLUE)
+						SetLog(" »» DB[" & $brrDarkNum & "] Max Cap: " & $BarrackStatusTrain[2] & " | " & $BarrackStatusTrain[0] & "/" & $BarrackStatusTrain[1] & " | Q: " & $QuantDarkTroopsInQueue[$BarrackToTrain] & " | Total Time: " & $BarrackStatusTrain[3] & " [B]", $COLOR_BLUE)
 					Else
-						SetLog(" » DB[" & $brrDarkNum & "] Max Queue: " & $BarrackStatusTrain[2] & " | " & $BarrackStatusTrain[0] & "/" & $BarrackStatusTrain[1] & " | Total Time: " & $BarrackStatusTrain[3], $COLOR_BLUE)
+						SetLog(" » DB[" & $brrDarkNum & "] Max Cap: " & $BarrackStatusTrain[2] & " | " & $BarrackStatusTrain[0] & "/" & $BarrackStatusTrain[1] & " | Q: " & $QuantDarkTroopsInQueue[$BarrackToTrain] & " | Total Time: " & $BarrackStatusTrain[3], $COLOR_BLUE)
 					EndIf
 					If _Sleep($iDelayTrain2) Then Return
 				EndIf
@@ -1954,6 +1957,7 @@ Func Train()
 								If $DtroopsToMake[$x][0] = $TroopDarkName[$i] And Eval($DtroopsToMake[$x][0] & "EBarrack" & $BarrackToTrain) > 0 Then
 									If _Sleep($iDelayTrain6) Then Return ; '20' just to Pause action
 									TrainIt(Eval("e" & $DtroopsToMake[$x][0]), Eval($DtroopsToMake[$x][0] & "EBarrack" & $BarrackToTrain))
+									$QuantDarkTroopsInQueue[$BarrackToTrain] += Eval($DtroopsToMake[$x][0] & "EBarrack" & $BarrackToTrain)
 									$BarrackDarkStatus[$BarrackToTrain] = True
 									SetLog("[DB" & $BarrackToTrain + 1 & "] » Trained " & Eval($DtroopsToMake[$x][0] & "EBarrack" & $BarrackToTrain) & " " & NameOfTroop(Eval("e" & $DtroopsToMake[$x][0]), 1), $COLOR_GREEN)
 									Assign("Don" & $TroopDarkName[$i], Eval("Don" & $TroopDarkName[$i]) - Eval($DtroopsToMake[$x][0] & "EBarrack" & $BarrackToTrain))
@@ -1980,7 +1984,7 @@ Func Train()
 						$BarrackDarkFull[$BarrackToTrain] = False ; Dark barrack isn't full
 					EndIf
 
-					If $InitBoostTimeDark[$BarrackToTrain][1] > 0 And $BarrackDarkStatus[$BarrackToTrain] = False And $fullarmy = False and _ArrayMax($QuantDarkTroopsInQueue, 1) > 1 Then
+					If $InitBoostTimeDark[$BarrackToTrain][1] > 0 And $BarrackDarkStatus[$BarrackToTrain] = False And $fullarmy = False And _ArrayMax($QuantDarkTroopsInQueue, 1) > 1 Then
 						If _Sleep($iDelayTrain4) Then Return
 						; ($checkTrainPage = True, $showlog = False, $CNormalBarrack = False, $CDarkBarrack = True)
 						$Result = CheckBarrackStatus(True, False, False, True)
@@ -2015,8 +2019,8 @@ Func Train()
 							GoesToFirstBarrack()
 							If _Sleep($iDelayTrain3) Then Return ; ---> can be made with WaitforPixel()
 							If $debugsetlogTrain = 1 Then Setlog(" » Deleting Queue Troops")
-							DeleteQueueTroops()
-							DeleteQueueDarkTroops()
+							If $iChkDontRemove = 0 Then DeleteQueueTroops()
+							If $iChkDontRemove = 0 Then DeleteQueueDarkTroops()
 							GoesToArmyOverViewWindow()
 							If _Sleep($iDelayTrain3) Then Return ; ---> can be made with WaitforPixel()
 							If IsTrainPage() Then GetArmyCapacity()
@@ -2071,7 +2075,7 @@ Func Train()
 					$TroopCapacityAfterTraining = getBarrackArmy(525, 276)
 					$TotalTime = getBarracksTotalTime(634, 203)
 
-					If IsArray($TroopCapacityAfterTraining) And $TroopCapacityAfterTraining[0] <> "" then
+					If IsArray($TroopCapacityAfterTraining) And $TroopCapacityAfterTraining[0] <> "" Then
 						$BarrackStatusTrain[0] = $TroopCapacityAfterTraining[0]
 						$BarrackStatusTrain[1] = $TroopCapacityAfterTraining[1]
 					Else
@@ -2094,9 +2098,9 @@ Func Train()
 					EndIf
 
 					If $InitBoostTimeDark[$BarrackToTrain][1] > 0 Then
-						SetLog(" »» DB[" & $brrDarkNum & "] Max Queue: " & $BarrackStatusTrain[2] & " | " & $BarrackStatusTrain[0] & "/" & $BarrackStatusTrain[1] & " | Total Time: " & $BarrackStatusTrain[3] & " [B]", $COLOR_BLUE)
+						SetLog(" »» DB[" & $brrDarkNum & "] Max Cap: " & $BarrackStatusTrain[2] & " | " & $BarrackStatusTrain[0] & "/" & $BarrackStatusTrain[1] & " | Q: " & $QuantDarkTroopsInQueue[$BarrackToTrain] & " | Total Time: " & $BarrackStatusTrain[3] & " [B]", $COLOR_BLUE)
 					Else
-						SetLog(" » DB[" & $brrDarkNum & "] Max Queue: " & $BarrackStatusTrain[2] & " | " & $BarrackStatusTrain[0] & "/" & $BarrackStatusTrain[1] & " | Total Time: " & $BarrackStatusTrain[3], $COLOR_BLUE)
+						SetLog(" » DB[" & $brrDarkNum & "] Max Cap: " & $BarrackStatusTrain[2] & " | " & $BarrackStatusTrain[0] & "/" & $BarrackStatusTrain[1] & " | Q: " & $QuantDarkTroopsInQueue[$BarrackToTrain] & " | Total Time: " & $BarrackStatusTrain[3], $COLOR_BLUE)
 					EndIf
 					If _Sleep($iDelayTrain2) Then Return
 				EndIf
@@ -2145,7 +2149,6 @@ Func Train()
 	ClickP($aAway, 2, $iDelayTrain5, "#0504") ; Click away twice with 250ms delay
 	$FirstStart = False
 
-
 	; ############################################################################################################################################
 	; ############################################################ Update Cost Values ############################################################
 	; ############################################################################################################################################
@@ -2179,17 +2182,14 @@ Func Train()
 
 EndFunc   ;==>Train
 
-; Necessary Function Converts seconds to Time H:M:S
-; Add fater the EndFunc   ;==>Train
-
-Func Sec2Time($nr_sec)
+Func Sec2Time($nr_sec) ; Convert seconds to Time format HH:MM:SS
 	$sec2time_hour = Int($nr_sec / 3600)
 	$sec2time_min = Int(($nr_sec - $sec2time_hour * 3600) / 60)
 	$sec2time_sec = $nr_sec - $sec2time_hour * 3600 - $sec2time_min * 60
 	Return StringFormat("%02d:%02d:%02d", $sec2time_hour, $sec2time_min, $sec2time_sec)
 EndFunc   ;==>Sec2Time
 
-Func GoesToFirstBarrack()
+Func GoesToFirstBarrack() ; Go To the First Normal Barrack Available
 	; GO TO First NORMAL BARRACK
 	; Find First barrack $i
 	Local $Firstbarrack = 0, $i = 1
@@ -2234,7 +2234,24 @@ Func GoesToFirstBarrack()
 
 EndFunc   ;==>GoesToFirstBarrack
 
-Func DeleteQueueTroops($getBarrackCapacity = True)
+Func GoesToFirstDarkBarrack() ; Go To the First Dark Barrack Available
+
+	If IsTrainPage() Then
+		; $Trainavailable = [1, 0, 1, 1, 1, 1, 0, 0, 0]
+		If $Trainavailable[5] = 1 Then
+			Click($btnpos[5][0], $btnpos[5][1], 1, $iDelayTrain5, "#0336") ; Click on tab and go to last barrack
+			If _Sleep(1000) Then Return
+		Else
+			Click($btnpos[6][0], $btnpos[6][1], 1, $iDelayTrain5, "#0336") ; Click on tab and go to last barrack
+			If _Sleep(1000) Then Return
+		EndIf
+	Else
+		Setlog(" ERROR YOU ARE NOT IN TRAIN PAGE!!!", $COLOR_RED)
+	EndIf
+
+EndFunc   ;==>GoesToFirstDarkBarrack
+
+Func DeleteQueueTroops($getBarrackCapacity = True) ; Delete Queue Troops on Normal Barracks
 
 	If $IsDontRemove = 0 Then SetLog(" »» Deleting Queued Troops!!", $COLOR_PURPLE)
 	$brrNum = 0
@@ -2267,15 +2284,15 @@ Func DeleteQueueTroops($getBarrackCapacity = True)
 		EndIf
 
 		If $IsDontRemove = 0 Then
-		While Not _ColorCheck(_GetPixelColor(593, 200 + $midOffsetY, True), Hex(0xD0D0C0, 6), 20) ; while not disappears  green arrow
-			;Setlog("While 3")
-			If Not (IsTrainPage()) Then Return ;exit if no train page
-			Click(568, 177 + $midOffsetY, 10, $isldTrainITDelay, "#0284") ; Remove Troops in training
-			$icount += 1
-			If $RunState = False Then Return
-			If $icount = 20 Then ExitLoop
-		WEnd
-		If $debugsetlogTrain = 1 And $icount = 100 Then SetLog("Train warning 7", $COLOR_PURPLE)
+			While Not _ColorCheck(_GetPixelColor(593, 200 + $midOffsetY, True), Hex(0xD0D0C0, 6), 20) ; while not disappears  green arrow
+				;Setlog("While 3")
+				If Not (IsTrainPage()) Then Return ;exit if no train page
+				Click(568, 177 + $midOffsetY, 10, $isldTrainITDelay, "#0284") ; Remove Troops in training
+				$icount += 1
+				If $RunState = False Then Return
+				If $icount = 20 Then ExitLoop
+			WEnd
+			If $debugsetlogTrain = 1 And $icount = 100 Then SetLog("Train warning 7", $COLOR_PURPLE)
 		EndIf
 
 		If Not (IsTrainPage()) Then Return
@@ -2286,7 +2303,7 @@ Func DeleteQueueTroops($getBarrackCapacity = True)
 
 EndFunc   ;==>DeleteQueueTroops
 
-Func DeleteQueueDarkTroops($getBarrackCapacity = True)
+Func DeleteQueueDarkTroops($getBarrackCapacity = True) ; Delete Queue Troops on Dark Barracks
 
 	If $numDarkBarracks = 0 Then Return
 
@@ -2325,14 +2342,14 @@ Func DeleteQueueDarkTroops($getBarrackCapacity = True)
 		EndIf
 
 		If $IsDontRemove = 0 Then
-		While Not _ColorCheck(_GetPixelColor(599, 202 + $midOffsetY, True), Hex(0xD0D0C0, 6), 20) ; while not disappears  green arrow
-			If Not (IsTrainPage()) Then Return ;exit if no train page
-			Click(568, 177 + $midOffsetY, 10, 0, "#0287") ; Remove Troops in training
-			$icount += 1
-			If $icount = 100 Then ExitLoop
-			If $RunState = False Then Return
-		WEnd
-		If $debugsetlogTrain = 1 And $icount = 100 Then SetLog("Train warning 9", $COLOR_PURPLE)
+			While Not _ColorCheck(_GetPixelColor(599, 202 + $midOffsetY, True), Hex(0xD0D0C0, 6), 20) ; while not disappears  green arrow
+				If Not (IsTrainPage()) Then Return ;exit if no train page
+				Click(568, 177 + $midOffsetY, 10, 0, "#0287") ; Remove Troops in training
+				$icount += 1
+				If $icount = 100 Then ExitLoop
+				If $RunState = False Then Return
+			WEnd
+			If $debugsetlogTrain = 1 And $icount = 100 Then SetLog("Train warning 9", $COLOR_PURPLE)
 		EndIf
 
 		$icount = 0
@@ -2343,36 +2360,44 @@ Func DeleteQueueDarkTroops($getBarrackCapacity = True)
 
 EndFunc   ;==>DeleteQueueDarkTroops
 
-Func getBarrackCapacity($x_start, $y_start) ; Get Barrack capacity on each Barrack window
+Func getBarrackCapacity($x_start, $y_start) ; Get Barrack Capacity on each Barrack window
 
 	Local $Result = ""
 	Local $aGetBarrackSize = 0
 	Local $aGetBarrackCapacity = 0
+	Local $BarrackCapByLevel[15] = [20, 25, 30, 35, 40, 45, 50, 55, 60, 70, 75, 80, 85, 90, 100]
 
 	For $waiting = 0 To 10
-		$Result = getOcrAndCapture("coc-BCapacity", $x_start, $y_start, 60, 17, True)
+		If getReceivedTroops(162, 200) = False Then
+			$Result = getOcrAndCapture("coc-BCapacity", $x_start, $y_start, 60, 17, True)
 
-		If IsString($Result) <> "" And IsString($Result) <> " " Then
-			$aGetBarrackSize = StringSplit($Result, "#")
-			If $aGetBarrackSize[0] >= 2 Then
-				$aGetBarrackCapacity = Number($aGetBarrackSize[2])
-				ExitLoop
+			If IsString($Result) <> "" And IsString($Result) <> " " Then
+				$aGetBarrackSize = StringSplit($Result, "#")
+				If $aGetBarrackSize[0] >= 2 Then
+					$aGetBarrackCapacity = Number($aGetBarrackSize[2])
+				Else
+					SetLog("Error Reading the Barrack Capacity", $COLOR_RED)
+					$aGetBarrackCapacity = 0
+				EndIf
 			Else
-				SetLog("Error Reading the Barrack Capacity", $COLOR_RED)
+				If $waiting = 10 Then SetLog("Error Reading the Barrack Capacity", $COLOR_RED)
 				$aGetBarrackCapacity = 0
 			EndIf
+			If _Sleep(500) Then Return
 		Else
-			If $waiting = 10 Then SetLog("Error Reading the Barrack Capacity", $COLOR_RED)
-			$aGetBarrackCapacity = 0
+			If $waiting = 1 Then Setlog("You have received castle troops! Wait 5's...")
+			If _Sleep($iDelayTrain8) Then Return
 		EndIf
-		If _Sleep(500) Then Return
+		For $c = 0 To 14
+			If $aGetBarrackCapacity = $BarrackCapByLevel[$c] Then ExitLoop (2)
+		Next
 	Next
 
 	Return $aGetBarrackCapacity
 
 EndFunc   ;==>getBarrackCapacity
 
-Func CheckBarrackBoost($checkTrainPage = True, $showlog = False, $CNormalBarrack = True, $CDarkBarrack = False)
+Func CheckBarrackBoost($checkTrainPage = True, $showlog = False, $CNormalBarrack = True, $CDarkBarrack = False) ; Check with Pixel Color what barrack was boosted
 
 	If $checkTrainPage = True Then
 		If IsTrainPage(False) = False Then openArmyOverview()
@@ -2422,7 +2447,7 @@ Func CheckBarrackBoost($checkTrainPage = True, $showlog = False, $CNormalBarrack
 
 EndFunc   ;==>CheckBarrackBoost
 
-Func IIf($Condition, $IfTrue, $IfFalse)
+Func IIf($Condition, $IfTrue, $IfFalse) ; Func used on CheckBarrackBoost()
 	If $Condition = True Then
 		Return $IfTrue
 	Else
@@ -2430,7 +2455,7 @@ Func IIf($Condition, $IfTrue, $IfFalse)
 	EndIf
 EndFunc   ;==>IIf
 
-Func GoesToArmyOverViewWindow()
+Func GoesToArmyOverViewWindow() ; Go To Army OverView Window
 
 	;GO TO ArmyOver View Window
 	Click($btnpos[0][0], $btnpos[0][1], 1, $iDelayTrain5, "#0336") ; Click on tab and go to last barrack
@@ -2449,7 +2474,7 @@ Func GoesToArmyOverViewWindow()
 
 EndFunc   ;==>GoesToArmyOverViewWindow
 
-Func getBarrackArmy($x_start, $y_start) ; Get Barrack capacity on each Barrack window
+Func getBarrackArmy($x_start, $y_start) ; Get Troops Capacity after train on each Barrack window
 
 	Local $Result = ""
 	Local $aGetBarrackSize
@@ -2485,7 +2510,7 @@ Func getBarrackArmy($x_start, $y_start) ; Get Barrack capacity on each Barrack w
 
 EndFunc   ;==>getBarrackArmy
 
-Func getBarracksTotalTime($x_start, $y_start) ; Gets quantity of troops in training
+Func getBarracksTotalTime($x_start, $y_start) ; Get Total Time on each Barrack Window
 
 	Local $Result = ""
 	Local $aGetTime
@@ -2586,7 +2611,7 @@ Func getBarracksRemaingBoostTime($x_start, $y_start) ;  -> Gets Remaning Boost T
 
 EndFunc   ;==>getBarracksRemaingBoostTime
 
-Func VerifyRemainBoostTime($BRNum)
+Func VerifyRemainBoostTime($BRNum) ; Check with OCR the remain Boost Time on Selected Normal Barrack
 
 	If IsTrainPage() Then ClickP($aAway, 2, 0)
 	If _Sleep($iDelayTrain2) Then Return
@@ -2606,7 +2631,7 @@ Func VerifyRemainBoostTime($BRNum)
 	ClickP($aAway, 2, 0)
 EndFunc   ;==>VerifyRemainBoostTime
 
-Func VerifyRemainDarkBoostTime($BRNum)
+Func VerifyRemainDarkBoostTime($BRNum) ; Check with OCR the remain Boost Time on Selected Dark Barrack
 	If IsTrainPage() Then ClickP($aAway, 2, 0)
 	If _Sleep($iDelayTrain2) Then Return
 
@@ -2626,7 +2651,7 @@ Func VerifyRemainDarkBoostTime($BRNum)
 
 EndFunc   ;==>VerifyRemainDarkBoostTime
 
-Func CheckBarrackStatus($checkTrainPage = True, $showlog = False, $CNormalBarrack = True, $CDarkBarrack = False)
+Func CheckBarrackStatus($checkTrainPage = True, $showlog = False, $CNormalBarrack = True, $CDarkBarrack = False) ; Check with Pixel Color The Barrack Status ( working or not )
 
 	If $checkTrainPage = True Then
 		If IsTrainPage(False) = False Then openArmyOverview()
@@ -2675,20 +2700,15 @@ Func CheckBarrackStatus($checkTrainPage = True, $showlog = False, $CNormalBarrac
 
 EndFunc   ;==>CheckBarrackStatus
 
-Func RunFirstAndDeleteQueuedTroops()
+Func RunFirstAndDeleteQueuedTroops() ; Delete Queued troops on First Run , to prevent any unnecessary troop after the first donateCC routine
 
+	Local $IsDontRemove = 0
 	openArmyOverview()
 
 	If WaitforPixel(762, 328 + $midOffsetY, 763, 329 + $midOffsetY, Hex(0xF18439, 6), 10, 10) Then
 		If $debugsetlogTrain = 1 Then SetLog("Wait for ArmyOverView Window", $COLOR_PURPLE)
 		If IsTrainPage() Then BarracksStatus(True)
 	EndIf
-
-	; When First Start to reset variable
-	If $numBarracksAvaiables > UBound($BarrackCapacity) Then SetLog(" » Now you have More barracks available!")
-	If $numBarracksAvaiables < UBound($BarrackCapacity) Then SetLog(" » Now you have Less barracks available!")
-	If $numDarkBarracksAvaiables > UBound($DarkBarrackCapacity) Then SetLog(" » Now you have More Dark barracks available!")
-	If $numDarkBarracksAvaiables < UBound($DarkBarrackCapacity) Then SetLog(" » Now you have Less Dark barracks available!")
 
 	; Redim the Global Variable to existent num Barracks Available , Reset and fill it in DeleteQueueTroops()
 	ReDim $BarrackCapacity[$numBarracksAvaiables]
@@ -2715,10 +2735,8 @@ Func RunFirstAndDeleteQueuedTroops()
 	; Lets delete the previous queued troops
 	GoesToFirstBarrack()
 	If _Sleep($iDelayTrain3) Then Return ; ---> can be made with WaitforPixel()
-	If $debugsetlogTrain = 1 Then Setlog("Deleting Queue Troops")
-	DeleteQueueTroops(False)
-	If $debugsetlogTrain = 1 Then Setlog("Deleting Queue DarkTroops")
-	DeleteQueueDarkTroops(False)
+	DeleteQueueTroops(True)
+	DeleteQueueDarkTroops(True)
 	If $iChkDontRemove = 1 Then
 		Setlog("Activate Don't Remove Barrack!", $COLOR_RED)
 		$IsDontRemove = 1
@@ -2729,10 +2747,10 @@ Func RunFirstAndDeleteQueuedTroops()
 
 EndFunc   ;==>RunFirstAndDeleteQueuedTroops
 
-Func getReceivedTroops($x_start, $y_start) ;  -> Gets Remaning Boost Time from the Button
+Func getReceivedTroops($x_start, $y_start) ; Check if 'you received Castle Troops from' , will proceed with a Sleep until the message disappear
 	Local $Result = ""
 
-	$Result = getOcrAndCapture("coc-DonTroops", $x_start, $y_start, 100, 25, True) ; X = 162  Y = 200
+	$Result = getOcrAndCapture("coc-DonTroops", $x_start, $y_start, 120, 27, True) ; X = 162  Y = 200
 
 	If IsString($Result) <> "" Or IsString($Result) <> " " Then
 		If StringInStr($Result, "you") Then ; If exist Minutes or only Seconds

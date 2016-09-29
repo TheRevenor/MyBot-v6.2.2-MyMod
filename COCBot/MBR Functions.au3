@@ -121,7 +121,8 @@
 #include "functions\CreateArmy\TrainIt.au3"
 
 ; New Train System
-#include "functions\CreateArmy\TrainBoosted.au3"
+#include "functions\CreateArmy\RecalculateTrain.au3"
+#include "functions\Image Search\TestEQDeploy.au3"
 
 #include "functions\Image Search\ImageSearch.au3"
 #include "functions\Image Search\checkDeadBase.au3"
@@ -301,3 +302,6 @@
 
 ; Upgrade Management - Added by MMHK
 #include "functions\Mod\UpgradeManagement\UpgradesMgmt.au3"
+
+; DeleteTroopsInArmyOverview - Added by TheRevenor
+#include "functions\Mod\DeletedTroops\DeleteTroopsInArmyOverview.au3"

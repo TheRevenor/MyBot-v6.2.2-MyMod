@@ -107,11 +107,11 @@ Func IsWaitforSpellsActive()
 		$bMatchModeEnabled = False
 		Switch $i
 			Case $DB
-				$bMatchModeEnabled = ($iDBcheck = 1)
+				If $iDBcheck = 1 Then $bMatchModeEnabled = True
 			Case $LB
-				$bMatchModeEnabled = ($iABcheck = 1)
+				If $iABcheck = 1 Then $bMatchModeEnabled = True
 			Case $TS
-				$bMatchModeEnabled = ($iTScheck = 1)
+				If $iTScheck = 1 Then $bMatchModeEnabled = True
 		EndSwitch
 		If $bMatchModeEnabled And $iEnableSpellsWait[$i] = 1 Then
 			If $debugsetlogTrain = 1 Or $debugsetlog = 1 Then Setlog("IsWaitforSpellsActive = True", $COLOR_PURPLE)
@@ -142,11 +142,11 @@ Func IsWaitforHeroesActive()
 		$bMatchModeEnabled = False
 		Switch $i
 			Case $DB
-				$bMatchModeEnabled = ($iDBcheck = 1)
+				If $iDBcheck = 1 Then $bMatchModeEnabled = True
 			Case $LB
-				$bMatchModeEnabled = ($iABcheck = 1)
+				If $iABcheck = 1 Then $bMatchModeEnabled = True
 			Case $TS
-				$bMatchModeEnabled = ($iTScheck = 1)
+				If $iTScheck = 1 Then $bMatchModeEnabled = True
 		EndSwitch
 		If $bMatchModeEnabled And ($iHeroWait[$i] > $HERO_NOHERO And (BitAND($iHeroAttack[$i], $iHeroWait[$i]) = $iHeroWait[$i])) Then
 			If $debugsetlogTrain = 1 Or $debugsetlog = 1 Then Setlog("IsWaitforHeroesActive = True", $COLOR_PURPLE)

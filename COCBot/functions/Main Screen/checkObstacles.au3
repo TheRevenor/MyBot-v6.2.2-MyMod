@@ -165,6 +165,15 @@ Func checkObstacles() ;Checks if something is in the way for mainscreen
 		If _Sleep($iDelaycheckObstacles1) Then Return
 		Return False
 	EndIf
+	If _ColorCheck(_GetPixelColor(586, 372), Hex(0xF5F5F5, 6), 20) Then
+		If $debugSetlog = 1 Then SetLog("Found Window Account", $COLOR_RED)
+		PureClickP($aAway, 1, 0, "#0000") ;Click away
+		Sleep(1000)
+		PureClickP($aAway, 1, 0, "#0000") ;Click away
+		$MinorObstacle = True
+		If _Sleep($iDelaycheckObstacles1) Then Return
+		Return False
+	EndIf
 	If _CheckPixel($aIsMainGrayed, $bNoCapturePixel) Then
 		PureClickP($aAway, 1, 0, "#0133") ;Click away If things are open
 		If _Sleep(1000) Then Return

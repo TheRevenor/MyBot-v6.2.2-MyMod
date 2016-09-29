@@ -237,6 +237,9 @@ Local $x = $xStart +  160 + 5, $y = $yStart +  75 + 25
 		$lblPercentTotal = GUICtrlCreateLabel("x", $x + 260, $y, -1, -1)
 		; Don't Empty Barracks Mode =======================
 		$y -= 27
+		$chkDeleteTroops = GUICtrlCreateCheckbox("Deleted Wrong Troops!!",$x - 158, $y - 23, -1, -1) ; Delete Troops In Army Overview
+			_GUICtrlSetTip(-1, GetTranslated(612, 20, "Deleted Wrong Troops in Army Overview before train troops"))
+			GUICtrlSetState(-1, $GUI_UNCHECKED)
 		$chkDontRemove = GUICtrlCreateCheckbox("Don't Empty Barracks", $x - 158, $y, -1, -1)
 			$txtTip ="The bot will not remove existing troops in the barracks when training."
 			_GUICtrlSetTip(-1, $txtTip)

@@ -327,6 +327,8 @@ Func UpgradeValue($inum, $bRepeat = False) ;function to find the value and type 
 				Return False
 
 		EndSelect
+		
+		If StringInStr($aUpgrades[$inum][4],"Warden") > 0 Then $aUpgrades[$inum][3] = "Elixir"
 
 		; Failsafe fix for upgrade value read problems if needed.
 		If $aUpgrades[$inum][3] <> "" And $bOopsFlag = True And $bRepeat = False Then ;check if upgrade type value to not waste time and for text read oops flag

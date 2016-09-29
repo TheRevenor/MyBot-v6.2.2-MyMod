@@ -346,6 +346,7 @@ Func MultiFarming()
 		$ichkMultyFarming = 1
 		GUICtrlSetState($Account, $GUI_ENABLE)
 		GUICtrlSetState($lblmultyAcc, $GUI_ENABLE)
+		GUICtrlSetState($chkMultyWithBoost, $GUI_ENABLE)
 		For $i = $grpControls To $cmbHoursStop
 			GUICtrlSetState($i, $GUI_DISABLE)
 		Next
@@ -356,6 +357,8 @@ Func MultiFarming()
 		$ichkMultyFarming = 0
 		GUICtrlSetState($Account, $GUI_DISABLE)
 		GUICtrlSetState($lblmultyAcc, $GUI_DISABLE)
+		GUICtrlSetState($chkMultyWithBoost, $GUI_UNCHECKED)
+		GUICtrlSetState($chkMultyWithBoost, $GUI_DISABLE)
 		For $i = $grpControls To $cmbHoursStop
 			GUICtrlSetState($i, $GUI_ENABLE)
 		Next
