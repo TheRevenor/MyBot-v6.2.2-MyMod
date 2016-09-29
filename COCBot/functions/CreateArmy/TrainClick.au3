@@ -42,9 +42,9 @@ Func TrainClick($x, $y, $iTimes, $iSpeed, $aWatchSpot, $aLootSpot, $sdebugtxt, $
 						ExitLoop
 					EndIf
 					If $iUseRandomClick = 0 then
-						PureClick($x, $y) ;Click once.
+						PureClick($x, $y, 1, $iSpeed) ;Click once.
 					Else
-						PureClickR($TypeTroops, $x, $y) ;Click once.
+						PureClickR($TypeTroops, $x, $y, 1, $iSpeed) ;Click once.
 					EndIf
 					If _Sleep($iSpeed, False) Then ExitLoop
 				Next
@@ -60,9 +60,9 @@ Func TrainClick($x, $y, $iTimes, $iSpeed, $aWatchSpot, $aLootSpot, $sdebugtxt, $
 					Return
 				EndIf
 				If $iUseRandomClick = 0 then
-					PureClick($x, $y, $iTimes) ;Click $iTimes.
+					PureClick($x, $y, $iTimes, $iSpeed) ;Click $iTimes.
 				Else
-					PureClickR($TypeTroops, $x, $y, $iTimes) ;Click $iTimes.
+					PureClickR($TypeTroops, $x, $y, $iTimes, $iSpeed) ;Click $iTimes.
 				EndIf
 				If _Sleep($iSpeed, False) Then Return
 			EndIf
@@ -79,9 +79,9 @@ Func TrainClick($x, $y, $iTimes, $iSpeed, $aWatchSpot, $aLootSpot, $sdebugtxt, $
 			EndIf
 
 			If $iUseRandomClick = 0 then
-				PureClick($x, $y)
+				PureClick($x, $y, 1, $iSpeed)
 			Else
-				PureClickR($TypeTroops, $x, $y)
+				PureClickR($TypeTroops, $x, $y, 1, $iSpeed)
 			EndIF
 
 			If _Sleep($iSpeed, False) Then Return

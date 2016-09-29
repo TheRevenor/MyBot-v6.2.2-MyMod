@@ -166,13 +166,13 @@ Func DeployTHNormal($iAtEachSpot, $iNbOfSpots)
 		Case 0 ;UL
 			For $num = 0 To $iAtEachSpot - 1
 				For $i = $THi - 1 To $THi - 1 + Ceiling(($iNbOfSpots - 1) / 2)
-					$aThx = 25 - $i * 19
-					$aThy = 314 + $i * 14
+					$aThx = 25 - $i * 16
+					$aThy = 314 + $i * 12
 				Next
 
 				For $ii = $THi - 1 To $THi - 1 + ($iNbOfSpots - 1)
-					$aThx = 25 + $ii * 19
-					$aThy = 314 - $ii * 14
+					$aThx = 25 + $ii * 16
+					$aThy = 314 - $ii * 12
 					If CheckOneStar(0, False, False) Then Return
 					If IsAttackPage() Then Click(Random($aThx - 5, $aThx + 5, 1), Random($aThy - 5, $aThy + 5, 1), 1, 0, "#0019")
 					If _Sleep(Random(20, 40, 1)) Then Return
@@ -181,13 +181,13 @@ Func DeployTHNormal($iAtEachSpot, $iNbOfSpots)
 		Case 1 ;LL
 			For $num = 0 To $iAtEachSpot - 1
 				For $i = $THi To $THi + Ceiling(($iNbOfSpots - 1) / 2)
-					$aThx = 25 - $i * 19
-					$aThy = 314 - $i * 14
+					$aThx = 25 - $i * 16
+					$aThy = 314 - $i * 12
 				Next
 
 				For $ii = $THi To $THi + ($iNbOfSpots - 1)
-					$aThx = 25 + $ii * 19
-					$aThy = 314 + $ii * 14
+					$aThx = 25 + $ii * 16
+					$aThy = 314 + $ii * 12
 					If CheckOneStar(0, False, False) Then Return
 					If IsAttackPage() Then Click(Random($aThx - 5, $aThx + 5, 1), Random($aThy - 5, $aThy + 5, 1), 1, 0, "#0020")
 					If _Sleep(Random(20, 40, 1)) Then Return
@@ -196,13 +196,13 @@ Func DeployTHNormal($iAtEachSpot, $iNbOfSpots)
 		Case 2 ;UR
 			For $num = 0 To $iAtEachSpot - 1
 				For $i = $THi To $THi + Ceiling(($iNbOfSpots - 1) / 2)
-					$aThx = 830 + $i * 19
-					$aThy = 314 + $i * 14
+					$aThx = 830 + $i * 16
+					$aThy = 314 + $i * 12
 				Next
 
 				For $ii = $THi To $THi + ($iNbOfSpots - 1)
-					$aThx = 830 - $ii * 19
-					$aThy = 314 - $ii * 14
+					$aThx = 830 - $ii * 16
+					$aThy = 314 - $ii * 12
 					If CheckOneStar(0, False, False) Then Return
 					If IsAttackPage() Then Click(Random($aThx - 5, $aThx + 5, 1), Random($aThy - 5, $aThy + 5, 1), 1, 0, "#0021")
 					If _Sleep(Random(20, 40, 1)) Then Return
@@ -211,13 +211,13 @@ Func DeployTHNormal($iAtEachSpot, $iNbOfSpots)
 		Case 3 ;LR
 			For $num = 0 To $iAtEachSpot - 1
 				For $i = $THi + 1 To $THi + 1 + Ceiling(($iNbOfSpots - 1) / 2)
-					$aThx = 830 + $i * 19
-					$aThy = 314 - $i * 14
+					$aThx = 830 + $i * 16
+					$aThy = 314 - $i * 12
 				Next
 
 				For $ii = $THi + 1 To $THi + 1 + ($iNbOfSpots - 1)
-					$aThx = 830 - $ii * 19
-					$aThy = 314 + $ii * 14
+					$aThx = 830 - $ii * 16
+					$aThy = 314 + $ii * 12
 					If CheckOneStar(0, False, False) Then Return
 					If IsAttackPage() Then Click(Random($aThx - 5, $aThx + 5, 1), Random($aThy - 5, $aThy + 5, 1), 1, 0, "#0022")
 					If _Sleep(Random(20, 40, 1)) Then Return
@@ -241,13 +241,13 @@ Func SpellTHGrid($S)
 		If $THi <= 15 Or $THside = 0 Or $THside = 2 Then
 			Switch $THside
 				Case 0
-					CastSpell($S, 114 + $THi * 19 + Ceiling(-2 * 19), 359 - $THi * 14 + Ceiling(-2 * 14))
+					CastSpell($S, 114 + $THi * 16 + Ceiling(-2 * 16), 359 - $THi * 12 + Ceiling(-2 * 12))
 				Case 1
-					CastSpell($S, 117 + $THi * 19 + Ceiling(-2 * 19), 268 + $THi * 14 - Floor(-2 * 14))
+					CastSpell($S, 117 + $THi * 16 + Ceiling(-2 * 16), 268 + $THi * 12 - Floor(-2 * 12))
 				Case 2
-					CastSpell($S, 743 - $THi * 19 - Floor(-2 * 19), 358 - $THi * 14 + Ceiling(-2 * 14))
+					CastSpell($S, 743 - $THi * 16 - Floor(-2 * 16), 358 - $THi * 12 + Ceiling(-2 * 12))
 				Case 3
-					CastSpell($S, 742 - $THi * 19 - Floor(-2 * 19), 268 + $THi * 14 - Floor(-2 * 14))
+					CastSpell($S, 742 - $THi * 16 - Floor(-2 * 16), 268 + $THi * 12 - Floor(-2 * 12))
 			EndSwitch
 		EndIf
 

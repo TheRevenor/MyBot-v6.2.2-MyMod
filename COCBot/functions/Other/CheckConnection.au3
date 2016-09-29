@@ -33,19 +33,19 @@ If GUICtrlRead($chkConnection) = $GUI_CHECKED Then
 		Else
 			$i = 0
 		EndIf
-		Sleep(5000)
+		Sleep(4500)
 	WEnd
 Else
-	;$ichkConnection = 0
 	If $debugsetlog = 1 Then Setlog("Check Internet Connections skip", $COLOR_PURPLE)
 	Return ; exit func if no checkmarks
 EndIf
 ; If the script gets here, we missed 5 pings - take action.
 If $ping = 0 Then
 	If $AndroidEmbedded = True Then
-		AndroidEmbed(Not $AndroidEmbedded)
+		btnEmbed()
+		;AndroidEmbed(Not $AndroidEmbedded)
 	EndIf
-	If _Sleep(4000) Then Return
+	If _Sleep(5000) Then Return
 	CloseAndroid()	 ; Close Emulator
 	If _Sleep(4000) Then Return
 	SetLog("Waiting Internet Connection..", $COLOR_BLUE)

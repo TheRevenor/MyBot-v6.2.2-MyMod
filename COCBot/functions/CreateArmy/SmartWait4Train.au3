@@ -268,7 +268,7 @@ Func SmartWait4Train()
 
 	ElseIf $ichkCloseWaitTrain = 1 And $iTrainWaitTime <= 120 Then
 		Setlog("Waiting time < 2.00 Minutes, Not Close CoC Just Wait!", $COLOR_BLUE)
-		Setlog("Waiting time= " & StringFormat("%.2f", $iTrainWaitTime / 60) & " Minutes", $COLOR_BLUE)
+		Setlog("Waiting time = " & StringFormat("%.2f", $iTrainWaitTime / 60) & " Minutes", $COLOR_BLUE)
 		; Just wait without close the CoC
 		;WaitnOpenCoC($iTrainWaitTime * 1000, True, False)
 		_SleepStatus($iTrainWaitTime * 1000)

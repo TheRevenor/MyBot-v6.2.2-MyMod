@@ -42,11 +42,17 @@ Func DonateCC($Check = False)
 	; Global $aTimeTrain[0] = Remain Troops train time , minutes
 	; Global $aTimeTrain[1] = Spells remain time , minutes
 	; Global $aTimeTrain[2] = Remain time to Heroes recover , minutes
-	If $ichkMultyFarming = 0 Or $ichkSwitchDonate = 0 Then
+	If $ichkBotStop = 0 Or $ichkMultyFarming = 0 Or $ichkSwitchDonate = 0 Then
 		If ($FirstStart = False And (IsWaitforSpellsActive() And $aTimeTrain[1] < 5) Or (IsWaitforHeroesActive() And $aTimeTrain[2] < 5)) And _
 			($CurCamp >= ($TotalCamp * $fulltroop / 100) * .90) And $CommandStop = -1 Then
-			If $debugSetlog = 1 Then Setlog("Total troops >90%, Skipped..", $COLOR_PURPLE)
+			If $debugSetlog = 1 Then Setlog(" » Total troops >90%, Skip Donation..", $COLOR_PURPLE)
 			Return ; skip donate if >90% full troop AND Spells OR Heroes are almost Made/Recovered
+		Else
+			If $FirstStart = False And IsWaitforSpellsActive() = False And IsWaitforHeroesActive() = False And _
+				($CurCamp >= ($TotalCamp * $fulltroop / 100) * .90) And $CommandStop = -1 Then
+				If $debugsetlog = 1 Then Setlog(" » Total troops >90%, Skip Donation..", $COLOR_PURPLE)
+				Return ; skip donate if >90% full troop AND Spells OR Heroes are almost Made/Recovered
+			EndIf
 		EndIf
 	EndIf
 
@@ -688,7 +694,7 @@ Func DonateTroopType($Type, $Quant = 0, $Custom = False, $bDonateAll = False)
 
 							Click(365 + ($Slot * 68), $DonationWindowY + 100 + $YComp, 1, $iDelayDonateCC3, "#0175")
 							DonatedTroop($Type)
-                            If $CommandStop = 3 then
+                            If $CommandStop = 3 Then
                                 $CommandStop = 0
                                 $fullArmy = False
                             EndIf
@@ -744,7 +750,7 @@ Func DonateTroopType($Type, $Quant = 0, $Custom = False, $bDonateAll = False)
 
 							Click(365 + ($Slot * 68), $DonationWindowY + 100 + $YComp, 1, $iDelayDonateCC3, "#0175")
 							DonatedTroop($Type)
-                            If $CommandStop = 3 then
+                            If $CommandStop = 3 Then
                                 $CommandStop = 0
                                 $fullArmy = False
                             EndIf
@@ -840,10 +846,6 @@ Func DonateTroopType($Type, $Quant = 0, $Custom = False, $bDonateAll = False)
 			If $debugOCRdonate = 0 Then
 				Click(365 + ($Slot * 68), $DonationWindowY + 100 + $YComp, $iDonSpellsQuantity, $iDelayDonateCC3, "#0600")
 				DonatedSpell($Type)
-                If $CommandStop = 3 then
-					$CommandStop = 0
-                    $fullArmy = False
-                EndIf
 			EndIf
 
 			$bDonate = True

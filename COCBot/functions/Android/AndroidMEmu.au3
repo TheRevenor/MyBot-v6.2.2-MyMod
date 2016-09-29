@@ -97,6 +97,7 @@ Func GetMEmuPath()
 		 EndIf
 	  EndIf
    EndIf
+   $MEmu_Path = StringReplace($MEmu_Path, "\\", "\")
    Return $MEmu_Path
 EndFunc
 
@@ -246,6 +247,8 @@ Func SetScreenMEmu()
    $cmdOutput = LaunchConsole($__VBoxManage_Path, "guestproperty set " & $AndroidInstance & " is_customed_resolution 1", $process_killed)
    ; Set dpi
    $cmdOutput = LaunchConsole($__VBoxManage_Path, "guestproperty set " & $AndroidInstance & " vbox_dpi 160", $process_killed)
+   ; Set Win Scaling
+   $cmdOutput = LaunchConsole($__VBoxManage_Path, "guestproperty set " & $AndroidInstance & " win_scaling_percent 100", $process_killed)
 
    Return True
 

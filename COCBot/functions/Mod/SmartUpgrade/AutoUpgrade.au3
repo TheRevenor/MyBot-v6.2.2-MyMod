@@ -57,7 +57,7 @@ Func clickUpgrade()
 				searchZeros(0, 76, 860, 106)
 				If $zerosHere = 1 Then
 					$zerosHere = 0
-					randomClick(335, 94, 50)
+					ClickF(335, 94, 50)
 					randomSleep(1500)
 					launchUpgradeProcess()
 				Else
@@ -87,7 +87,7 @@ Func clickUpgrade()
 				searchZeros(0, 106, 860, 136)
 				If $zerosHere = 1 Then
 					$zerosHere = 0
-					randomClick(335, 123, 50)
+					ClickF(335, 123, 50)
 					randomSleep(1500)
 					launchUpgradeProcess()
 				Else
@@ -117,7 +117,7 @@ Func clickUpgrade()
 				searchZeros(0, 136, 860, 166)
 				If $zerosHere = 1 Then
 					$zerosHere = 0
-					randomClick(335, 151, 50)
+					ClickF(335, 151, 50)
 					randomSleep(1500)
 					launchUpgradeProcess()
 				Else
@@ -147,7 +147,7 @@ Func clickUpgrade()
 				searchZeros(0, 166, 860, 196)
 				If $zerosHere = 1 Then
 					$zerosHere = 0
-					randomClick(335, 181, 50)
+					ClickF(335, 181, 50)
 					randomSleep(1500)
 					launchUpgradeProcess()
 				Else
@@ -177,7 +177,7 @@ Func clickUpgrade()
 				searchZeros(0, 196, 860, 226)
 				If $zerosHere = 1 Then
 					$zerosHere = 0
-					randomClick(335, 208, 50)
+					ClickF(335, 208, 50)
 					randomSleep(1500)
 					launchUpgradeProcess()
 				Else
@@ -200,7 +200,7 @@ EndFunc   ;==>clickUpgrade
 Func openUpgradeTab()
 
 	If _ColorCheck(_GetPixelColor(275, 15, True), "E8E8E0", 20) = True Then
-		randomClick(275, 15)
+		ClickF(275, 15)
 		randomSleep(1500)
 	Else
 		Setlog("Error when trying to open Builders menu...", $COLOR_RED)
@@ -377,7 +377,7 @@ EndFunc   ;==>checkIgnoreUpgrade
 
 Func openUpgradeWindow()
 
-	randomClick($upgradeX, $upgradeY)
+	ClickF($upgradeX, $upgradeY)
 	$upgradeX = 0
 	$upgradeY = 0
 	randomSleep(1500)
@@ -494,9 +494,9 @@ Func launchUpgrade()
 
 	updateSmartUpgradeLog()
 	If StringInStr($sBldgText, "Barbar") Or StringInStr($sBldgText, "Queen") Or StringInStr($sBldgText, "Warden") Then ; search for heros, which have a different place for upgrade button
-		randomClick(710, 560)
+		ClickF(710, 560)
 	Else
-		randomClick(480, 520)
+		ClickF(480, 520)
 	EndIf
 	randomSleep(1500)
 
@@ -654,18 +654,6 @@ Func chkIgnoreDColl()
 	EndIf
 EndFunc   ;==>chkIgnoreDColl
 
-Func randomClick($x, $y, $xradius = 4, $yradius = 4)
-
-	$xmin = $x - $xradius
-	$xmax = $x + $xradius
-	$ymin = $y - $yradius
-	$ymax = $y + $yradius
-	If $xmin <= 0 Then $xmin = $x
-	If $ymin <= 0 Then $ymin = $y
-	Click(Random($xmin, $xmax), Random($ymin, $ymax))
-
-EndFunc   ;==>randomClick
-
 Func randomSleep($SleepTime, $Range = 0)
 
 	If $Range = 0 Then $Range = Round($SleepTime / 5)
@@ -673,6 +661,18 @@ Func randomSleep($SleepTime, $Range = 0)
 	$SleepMax = $SleepTime + $Range
 	$SleepTimeF = Random($SleepMin, $SleepMax)
 	If $DebugClick = 1 Then Setlog("Default sleep : " & $SleepTime & " - Random sleep : " & $SleepTimeF, $COLOR_ORANGE)
-	Sleep(Random($SleepTimeF))
+	_Sleep($SleepTimeF)
 
 EndFunc   ;==>randomSleep
+
+Func ClickF($x, $y, $times = 1, $speed = 0, $debugtxt = "")
+
+	$xmin = $x - 4
+	$xmax = $x + 4
+	$ymin = $y - 4
+	$ymax = $y + 4
+	$xclick = Random($xmin, $xmax)
+	$yclick = Random($ymin, $ymax)
+	Click($xclick, $yclick, $times, $speed, $debugtxt)
+
+EndFunc   ;==>ClickF

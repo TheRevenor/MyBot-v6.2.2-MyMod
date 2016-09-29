@@ -60,7 +60,7 @@ Global $aTabControlsBot[4] = [$hGUI_BOT_TAB, $hGUI_BOT_TAB_ITEM1, $hGUI_BOT_TAB_
 Global $aTabControlsMOD[5] = [$hGUI_MOD_TAB, $hGUI_MOD_TAB_ITEM1, $hGUI_MOD_TAB_ITEM2, $hGUI_MOD_TAB_ITEM3, $hGUI_MOD_TAB_ITEM4]
 Global $aTabControlsStats[4] = [$hGUI_STATS_TAB, $hGUI_STATS_TAB_ITEM1, $hGUI_STATS_TAB_ITEM2, $hGUI_STATS_TAB_ITEM3]
 
-Global $aAlwaysEnabledControls[15] = [$chkUpdatingWhenMinimized, $chkHideWhenMinimized, $chkDebugClick, $chkDebugSetlog, $chkDebugOcr, $chkDebugImageSave, $chkdebugBuildingPos, $chkdebugTrain, $chkdebugOCRDonate,$btnTestTrain, $btnTestDonateCC, $btnTestAttackBar, $btnTestClickDrag, $btnTestImage, $btnEagle]
+Global $aAlwaysEnabledControls[16] = [$chkUpdatingWhenMinimized, $chkHideWhenMinimized, $chkDebugClick, $chkDebugSetlog, $chkDebugOcr, $chkDebugImageSave, $chkdebugBuildingPos, $chkdebugTrain, $chkdebugOCRDonate,$btnTestTrain, $btnTestDonateCC, $btnTestAttackBar, $btnTestClickDrag, $btnTestImage, $btnEagle, $btnEQDeploy]
 
 Global $frmBot_WNDPROC = 0
 
@@ -432,6 +432,8 @@ Func GUIControl_WM_COMMAND($hWind, $iMsg, $wParam, $lParam)
 			btnTestImage()
 		Case $btnEagle
 			btnEagle()
+		Case $btnEQDeploy
+			TestEQDeploy()
 	EndSwitch
 
 	$TogglePauseAllowed = $wasAllowed
