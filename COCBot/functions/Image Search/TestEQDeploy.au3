@@ -7,6 +7,7 @@ Func TestEQDeploy()
 	DirCreate($subDirectory)
 
 	Local $TestEQDeployTimer = TimerInit()
+	Local $TestEQDeployFinalTimer = TimerInit()
 
 	; Earthquake Spell 4 tile radius , and so the diameter length would be 8
 	; Tile x = 16px and y = 12px
@@ -30,6 +31,8 @@ Func TestEQDeploy()
 	Local $hPenRED = _GDIPlus_PenCreate(0xFFFF0000, 2) ; Create a pencil Color FF0000/RED
 	Local $hPenWHITE = _GDIPlus_PenCreate(0xFFFFFFFF, 2) ; Create a pencil Color FFFFF/WHITE
 	Local $hPenGREEN = _GDIPlus_PenCreate(0xFF00FF00, 2) ; Create a pencil Color 00FF00/LIME
+	Local $hPenBLUE = _GDIPlus_PenCreate(0xFF2D49FF, 2) ; Create a pencil Color 2D49FF/BLUE
+	Local $hPenYELLOW = _GDIPlus_PenCreate(0xFFffff00, 2) ; Create a pencil Color ffff00/YELLOW
 
 	; Let's detect the TH
 	Local $result, $listPixelByLevel, $pixelWithLevel, $level, $pixelStr, $TH[2]
@@ -278,20 +281,38 @@ Func TestEQDeploy()
 	_GDIPlus_GraphicsDrawRect($hGraphic, $x, $y, $TileX, $TileY, $hPenRED)
 	_GDIPlus_GraphicsDrawString($hGraphic, "|Walls|", $x + 10, $y + 10, "Verdana", 15)
 
-	$TestEQDeployTimer = TimerInit()
+	If Pixel_Distance($x, $y, $x1, $y1) > 60 Then
+		$TestEQDeployTimer = TimerInit()
 
-	Local $FinalPixelWithDistance = GetWalls($x - 20 , $y - 20 , $TileX + 40 , $TileY + 40)
-	Setlog("Time Taken|Walls detection: " & Round(TimerDiff($TestEQDeployTimer) / 1000, 2) & "'s") ; Time taken
+		Local $THlevel = $level
 
-	For $i = 0 To UBound($FinalPixelWithDistance) - 1
-		_GDIPlus_GraphicsDrawRect($hGraphic, $FinalPixelWithDistance[$i][0] - 2, $FinalPixelWithDistance[$i][0] - 2, 4, 4, $hPenWHITE)
-	Next
+		Local $FinalWallsPixelWithDistance
+		$FinalWallsPixelWithDistance = GetWalls($x, $y, $x + $TileX, $y + $TileY, $THlevel)
+		Setlog(" $FinalWallsPixelWithDistance | Rows; " & UBound($FinalWallsPixelWithDistance, $UBOUND_ROWS))
+		Setlog("Time Taken|Walls detection: " & Round(TimerDiff($TestEQDeployTimer) / 1000, 2) & "'s") ; Time taken
+
+		For $i = 0 To UBound($FinalWallsPixelWithDistance) - 1
+			_GDIPlus_GraphicsDrawRect($hGraphic, $FinalWallsPixelWithDistance[$i][0] - 2, $FinalWallsPixelWithDistance[$i][1] - 2, 4, 4, $hPenWHITE)
+		Next
+
+		Local $PixelNearBuild = PixelNearest($FinalWallsPixelWithDistance, $TH)
+		_GDIPlus_GraphicsDrawRect($hGraphic, $PixelNearBuild[0] - 3, $PixelNearBuild[1] - 3, 6, 6, $hPenBLUE)
+
+		Local $radius = 60 ; 60px are the EQ radius
+		Local $PixelToDeploy = PixelToDeployEQ($FinalWallsPixelWithDistance, $PixelNearBuild, $radius)
+		Setlog("$PixelToDeploy: " & $PixelToDeploy[0] & "-" & $PixelToDeploy[1])
+		_GDIPlus_GraphicsDrawRect($hGraphic, $PixelToDeploy[0] - 3, $PixelToDeploy[1] - 3, 6, 6, $hPenYELLOW)
+	EndIf
+
+	Setlog("Time Taken|ALL FUNCTION: " & Round(TimerDiff($TestEQDeployFinalTimer) / 1000, 2) & "'s") ; Time taken
 
 	; Clean up resources
 	_GDIPlus_ImageSaveToFile($editedImage, $subDirectory & "\" & $fileName)
 	_GDIPlus_PenDispose($hPenRED)
 	_GDIPlus_PenDispose($hPenWHITE)
 	_GDIPlus_PenDispose($hPenGREEN)
+	_GDIPlus_PenDispose($hPenBLUE)
+	_GDIPlus_PenDispose($hPenYELLOW)
 	_GDIPlus_GraphicsDispose($hGraphic)
 
 	; Lets Open the folder
@@ -355,15 +376,45 @@ Func Imgloc2MBR($string)
 
 EndFunc   ;==>Imgloc2MBR
 
-Func GetWalls($x, $y, $x1, $y2)
+Func GetWalls($x, $y, $x1, $y2, $THlevel)
+
+	Local $IniX = $x
+	Local $IniY = $y
+	Local $aResult[1][6], $aCoordArray[0][0], $aCoords, $aCoordsSplit, $aValue
+	Local $directory = @ScriptDir & "\images\Resources\Walls"
+	Local $Redlines = "FV"
+
+	Local $minLevel = 0
+	Local $maxLevel = 0
+
+	Switch $THlevel
+		Case 0 To 6
+			$minLevel = 3
+			$maxLevel = 6
+		Case 7
+			$minLevel = 4
+			$maxLevel = 7
+		Case 8
+			$minLevel = 5
+			$maxLevel = 8
+		Case 9
+			$minLevel = 6
+			$maxLevel = 10
+		Case 10
+			$minLevel = 6
+			$maxLevel = 10
+		Case 11
+			$minLevel = 7
+			$maxLevel = 11
+		Case Else
+			$minLevel = 0
+			$maxLevel = 11
+	EndSwitch
 
 	; Capture the screen for comparison
 	_CaptureRegion2($x, $y, $x1, $y2)
 
-	Local $aResult[1][6], $aCoordArray[0][0], $aCoords, $aCoordsSplit, $aValue
-	Local $directory = @ScriptDir & "\images\Resources\Walls"
-
-	Local $res = DllCall($hImgLib, "str", "SearchMultipleTilesBetweenLevels", "handle", $hHBitmap2, "str", $directory, "str", "DCD", "Int", 0, "str", "", "Int", 0, "Int", 10000)
+	$res = DllCall($hImgLib, "str", "SearchMultipleTilesBetweenLevels", "handle", $hHBitmap2, "str", $directory, "str", "FV", "Int", 0, "str", $Redlines, "Int", $minLevel, "Int", $maxLevel)
 
 	If $res[0] <> "" Then
 		; Get the keys for the dictionary item.
@@ -385,15 +436,15 @@ Func GetWalls($x, $y, $x1, $y2)
 			$aValue = returnPropertyValue($aKeys[$i], "objectpoints")
 			$aCoords = StringSplit($aValue, "|", $STR_NOCOUNT)
 			ReDim $aCoordArray[UBound($aCoords)][2]
-
+			SetLog("$aResult[$i][0]|filename : " & $aResult[$i][0])
 			; Loop through the found coords
 			For $j = 0 To UBound($aCoords) - 1
 				; Split the coords into an array
 				$aCoordsSplit = StringSplit($aCoords[$j], ",", $STR_NOCOUNT)
 				If UBound($aCoordsSplit) = 2 Then
 					; Store the coords into a two dimensional array
-					$aCoordArray[$j][0] = $aCoordsSplit[0] + $x; X coord.
-					$aCoordArray[$j][1] = $aCoordsSplit[1] + $y; Y coord.
+					$aCoordArray[$j][0] = $aCoordsSplit[0] + $IniX ; X coord.
+					$aCoordArray[$j][1] = $aCoordsSplit[1] + $IniY ; Y coord.
 				EndIf
 			Next
 
@@ -402,9 +453,9 @@ Func GetWalls($x, $y, $x1, $y2)
 		Next
 	EndIf
 
-	Setlog(" GetWalls | Distance ")
-	Local $temp , $FinalResult[1][2]
-	Local $z  = 0
+	Local $temp
+	Local $FinalResult[1][2]
+	Local $z = 0
 
 	For $i = 0 To UBound($aResult) - 1
 		$temp = $aResult[$i][5]
@@ -412,33 +463,129 @@ Func GetWalls($x, $y, $x1, $y2)
 			$FinalResult[$z][0] = $temp[$x][0]
 			$FinalResult[$z][1] = $temp[$x][1]
 			$z += 1
-			ReDim $FinalResult[$z][2]
+			If $i = (UBound($aResult) - 1) And $x = (UBound($temp) - 1) Then ExitLoop (2)
+			ReDim $FinalResult[$z + 1][2]
 		Next
 	Next
 
+	_ArraySort($FinalResult, 1, 0, 0, 0)
+
 	Setlog(" »" & UBound($FinalResult) & " Walls Detected!")
 
-	Setlog(" GetWalls | Distance II ")
-	Local $FinalPixelWithDistance[1][2]
-	$z = 0
-	If UBound($FinalResult) > 1 Then
-		For $i = 0 To UBound($FinalResult) - 1
-			For $x = 0 To UBound($FinalResult) - 1 Step -1
-				Local $aDistance = Pixel_Distance($FinalResult[$i][0], $FinalResult[$i][0], $FinalResult[$x][0], $FinalResult[$x][0])
-				If  $aDistance <= 60 and $aDistance >= 30 Then
-					$FinalPixelWithDistance[$z][0] = $FinalResult[$i][0]
-					$FinalPixelWithDistance[$z][1] = $FinalResult[$i][1]
-					$z += 1
-					ReDim $FinalPixelWithDistance[$z][2]
-				EndIf
-			Next
-		Next
+	Return $FinalResult ; will be a 2D array $FinalPixelWithDistance[$i][2] with X = $FinalPixelWithDistance[$i][0] and Y = $FinalPixelWithDistance[$i][1]
+EndFunc   ;==>GetWalls
+
+Func PixelNearest($aArrayPoints, $center) ; $aArrayPoints 2D  ,  $Center 1D
+
+	Setlog("Initial PixelNearest")
+
+	Local $mindist = 860 ; Highest Value on Emulator
+	Local $MinPixel[3]
+	Local $Distance = 860 ; Highest Value on Emulator
+
+	For $i = 0 To UBound($aArrayPoints) - 1
+		If $aArrayPoints[$i][0] = $center[0] And $aArrayPoints[$i][1] = $center[1] Then
+			$Distance = 0
+		Else
+			$Distance = Ceiling(Sqrt(($aArrayPoints[$i][0] - $center[0]) ^ 2 + ($aArrayPoints[$i][1] - $center[1]) ^ 2))
+		EndIf
+		If $Distance < $mindist Then
+			$mindist = $Distance
+			$MinPixel[0] = $aArrayPoints[$i][0]
+			$MinPixel[1] = $aArrayPoints[$i][1]
+			$MinPixel[2] = $mindist
+		EndIf
+	Next
+
+	; Will Return an Array 3D with Coordinates and Distance
+	Setlog("End PixelNearest")
+	If $mindist <> 860 Then Return $MinPixel
+	If $mindist = 860 Then Return -1
+
+EndFunc   ;==>PixelNearest
+
+Func PixelToDeployEQ($aArrayPoints, $WallNearBuilding, $radius) ; $aArrayPoints 2D  ,  $radius = 60px , $WallNearBuilding  1D
+
+	Setlog("Initial PixelToDeployEQ")
+	Local $MinPixel[1][3]
+	Local $Distance = 860 ; Highest Value on Emulator
+	Local $z = 0
+
+	Local $PixelNearest[2] = [0, 0]
+	Local $Pixelfarest[2] = [0, 0]
+	Local $Pixelfarest2[2] = [0, 0]
+	Local $PixelToDeploy[2] = [0, 0]
+
+	Setlog("Initial PixelToDeployEQ 2")
+	If UBound($aArrayPoints) < 2 Then Return $PixelToDeploy
+
+	Setlog("Initial PixelToDeployEQ 3")
+	For $i = 0 To UBound($aArrayPoints) - 1
+		If $aArrayPoints[$i][0] = $WallNearBuilding[0] And $aArrayPoints[$i][1] = $WallNearBuilding[1] Then
+			$Distance = 0
+		Else
+			$Distance = Ceiling(Sqrt(($aArrayPoints[$i][0] - $WallNearBuilding[0]) ^ 2 + ($aArrayPoints[$i][1] - $WallNearBuilding[1]) ^ 2))
+		EndIf
+		If $Distance < $radius Then
+			$MinPixel[$z][0] = $aArrayPoints[$i][0]
+			$MinPixel[$z][1] = $aArrayPoints[$i][1]
+			$MinPixel[$z][2] = $Distance
+			$z += 1
+			If $i = UBound($aArrayPoints) - 1 Then ExitLoop
+			ReDim $MinPixel[$z + 1][3]
+		EndIf
+	Next
+
+	Setlog("Initial PixelToDeployEQ 4")
+	Local $MAX = _ArrayMaxIndex($MinPixel, 1, 0, 0, 2)
+	Local $MIN = _ArrayMinIndex($MinPixel, 1, 0, 0, 2)
+
+	Setlog("Initial PixelToDeployEQ 5")
+	If UBound($MinPixel) > 1 Then
+
+		Setlog("Initial PixelToDeployEQ 6")
+		$PixelNearest[0] = $MinPixel[$MIN][0]
+		$PixelNearest[1] = $MinPixel[$MIN][1]
+		Setlog("$PixelNearest: " & $PixelNearest[0] & "-" & $PixelNearest[1])
+		$Pixelfarest[0] = $MinPixel[$MAX][0]
+		$Pixelfarest[1] = $MinPixel[$MAX][1]
+		Setlog("$Pixelfarest: " & $Pixelfarest[0] & "-" & $Pixelfarest[1])
+		$PixelToDeploy[0] = Ceiling(Abs($PixelNearest[0] - $Pixelfarest[0]) / 2)
+		$PixelToDeploy[1] = Ceiling(Abs($PixelNearest[1] - $Pixelfarest[1]) / 2)
+		Setlog("$PixelToDeploy: " & $PixelToDeploy[0] & "-" & $PixelToDeploy[1])
+
+		Setlog("Initial PixelToDeployEQ 7")
+		If $PixelNearest[0] > $Pixelfarest[0] And $PixelNearest[1] < $Pixelfarest[1] Then ; Top Rifht Of The Near Pixel
+			$x = $PixelNearest[0] - $PixelToDeploy[0]
+			$y = $PixelNearest[1] + $PixelToDeploy[1]
+		ElseIf $PixelNearest[0] < $Pixelfarest[0] And $PixelNearest[1] < $Pixelfarest[1] Then ; Top Left Of The Near Pixel
+			$x = $PixelNearest[0] + $PixelToDeploy[0]
+			$y = $PixelNearest[1] + $PixelToDeploy[1]
+		ElseIf $PixelNearest[0] > $Pixelfarest[0] And $PixelNearest[1] > $Pixelfarest[1] Then ; Bottom Right The Near Pixel
+			$x = $PixelNearest[0] - $PixelToDeploy[0]
+			$y = $PixelNearest[1] - $PixelToDeploy[1]
+		ElseIf $PixelNearest[0] < $Pixelfarest[0] And $PixelNearest[1] > $Pixelfarest[1] Then ; Bottom Left Of The Near Pixel
+			$x = $PixelNearest[0] + $PixelToDeploy[0]
+			$y = $PixelNearest[1] - $PixelToDeploy[1]
+		Else
+			$x = $PixelNearest[0]
+			$y = $PixelNearest[1]
+		EndIf
+
+		$Pixelfarest2[0] = $x
+		$Pixelfarest2[1] = $y
+
+		Setlog("$Pixelfarest2: " & $Pixelfarest2[0] & "-" & $Pixelfarest2[1])
+		Return $Pixelfarest2
 	Else
-		$FinalPixelWithDistance[0][0] = $FinalResult[0][0]
-		$FinalPixelWithDistance[0][1] = $FinalResult[0][1]
+		$Pixelfarest2[0] = $MinPixel[0][0]
+		$Pixelfarest2[1] = $MinPixel[0][1]
+		Setlog("$Pixelfarest2   : " & $Pixelfarest2[0] & "-" & $Pixelfarest2[1])
+		Return $Pixelfarest2
 	EndIf
 
-	Setlog(" »" & UBound($FinalPixelWithDistance) & " Walls with 60px distance!")
 
-	Return $FinalPixelWithDistance ; will be a 2D array $FinalPixelWithDistance[$i][2] with X = $FinalPixelWithDistance[$i][0] and Y = $FinalPixelWithDistance[$i][1]
-EndFunc   ;==>GetWalls
+EndFunc   ;==>PixelToDeployEQ
+
+
+

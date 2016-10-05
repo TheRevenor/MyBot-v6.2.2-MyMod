@@ -27,7 +27,7 @@ Func TrainIt($troopKind, $howMuch = 1, $iSleep = 400)
 				If IsArray($FullName) Then
 					Local $RNDName = GetRNDName($troopKind)
 					If IsArray($RNDName) Then
-						TrainClickP($pos, $howMuch, $isldTrainITDelay, $FullName, $GemName, "#0266", $RNDName)
+						TrainClickP($pos, $howMuch, $iSleep, $FullName, $GemName, "#0266", $RNDName)
 						If _Sleep($iSleep) Then Return False
 						If $OutOfElixir = 1 Then
 							For $i = 0 To UBound($TroopDarkName) - 1

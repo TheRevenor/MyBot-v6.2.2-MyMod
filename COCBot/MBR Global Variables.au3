@@ -454,6 +454,7 @@ Global $eIcnStrategies = $eIcnBlank
 Global $sLogPath ; `Will create a new log file every time the start button is pressed
 Global $sAttackLogPath ; `Will create a new log file every time the start button is pressed
 Global $hLogFileHandle
+Global $hLogFileTrain
 Global $hAttackLogFileHandle
 Global $iCmbLog = 0
 Global $Restart = False
@@ -920,6 +921,7 @@ Global $InitBoostTimeDark[2][2] = [[0, 0], [0, 0]]
 Global $BarrackTimeRemain[4]
 Global $DarkBarrackTimeRemain[2]
 Global $ichkWASCloseWaitEnable = 0
+Global $ichkWASCloseWaitEnable2 = 0
 Global $LetsSortNB = False
 Global $LetsSortDB = False
 

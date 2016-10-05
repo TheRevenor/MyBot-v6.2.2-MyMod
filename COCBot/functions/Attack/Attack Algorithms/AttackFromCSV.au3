@@ -39,23 +39,23 @@ Global $PixelBottomRightDOWNDropLine
 
 
 Global $ExternalArea[8][3] = [ _
-		[15, 336, "LEFT"], _
-		[836, 336, "RIGHT"], _
-		[432, 29, "TOP"], _
-		[432, 648, "BOTTOM"], _
-		[15 + (432 - 15) / 2, 29 + (336 - 29) / 2, "TOP-LEFT"], _
-		[432 + (836 - 432) / 2, 29 + (336 - 29) / 2, "TOP-RIGHT"], _
-		[15 + (432 - 15) / 2, 336 + (648 - 336) / 2, "BOTTOM-LEFT"], _
-		[432 + (836 - 432) / 2, 336 + (648 - 336) / 2, "BOTTOM-RIGHT"] _
+		[15, 338, "LEFT"], _
+		[836, 338, "RIGHT"], _
+		[430, 29, "TOP"], _
+		[430, 642, "BOTTOM"], _
+		[15 + (430 - 15) / 2, 29 + (338 - 29) / 2, "TOP-LEFT"], _
+		[430 + (836 - 430) / 2, 29 + (338 - 29) / 2, "TOP-RIGHT"], _
+		[15 + (430 - 15) / 2, 338 + (642 - 338) / 2, "BOTTOM-LEFT"], _
+		[430 + (836 - 430) / 2, 338 + (642 - 338) / 2, "BOTTOM-RIGHT"] _
 		]
-Global $InternalArea[8][3] = [[73, 336, "LEFT"], _
-		[783, 336, "RIGHT"], _
-		[432, 68, "TOP"], _
-		[432, 603, "BOTTOM"], _
-		[73 + (432 - 73) / 2, 68 + (336 - 68) / 2, "TOP-LEFT"], _
-		[432 + (783 - 432) / 2, 68 + (336 - 68) / 2, "TOP-RIGHT"], _
-		[73 + (432 - 73) / 2, 336 + (603 - 336) / 2, "BOTTOM-LEFT"], _
-		[432 + (783 - 432) / 2, 336 + (603 - 336) / 2, "BOTTOM-RIGHT"] _
+Global $InternalArea[8][3] = [[73, 338, "LEFT"], _
+		[785, 338, "RIGHT"], _
+		[430, 70, "TOP"], _
+		[430, 603, "BOTTOM"], _
+		[73 + (430 - 73) / 2, 68 + (338 - 68) / 2, "TOP-LEFT"], _
+		[430 + (785 - 430) / 2, 68 + (338 - 68) / 2, "TOP-RIGHT"], _
+		[73 + (430 - 73) / 2, 338 + (603 - 338) / 2, "BOTTOM-LEFT"], _
+		[430 + (785 - 430) / 2, 338 + (603 - 338) / 2, "BOTTOM-RIGHT"] _
 		]
 
 
@@ -373,10 +373,10 @@ Func ParseAndMakeDropLines($MAINSIDE)
 	Local $hTimer = TimerInit()
 
 	;If $MAINSIDE = "BOTTOM-RIGHT" Then
-		If UBound($PixelBottomRight) < 10 Then
+		CleanRedArea($PixelBottomRight)
+		If UBound($PixelBottomRight) < 20 Then
 			$PixelBottomRight = _GetVectorOutZone($eVectorRightBottom)
 		EndIf
-		CleanRedArea($PixelBottomRight)
 		debugAttackCSV("RedArea cleaned")
 		debugAttackCSV("	[" & UBound($PixelBottomRight) & "] pixels BottomRight")
 		$PixelBottomRightDropLine = MakeDropLine($PixelBottomRight, StringSplit($InternalArea[3][0] & "-" & $InternalArea[3][1] + 20, "-", $STR_NOCOUNT), StringSplit($InternalArea[1][0] + 30 & "-" & $InternalArea[1][1], "-", $STR_NOCOUNT))
@@ -401,10 +401,10 @@ Func ParseAndMakeDropLines($MAINSIDE)
 	;EndIf
 
 	;If $MAINSIDE = "TOP-RIGHT" Then
-		If UBound($PixelTopRight) < 10 Then
+		CleanRedArea($PixelTopRight)
+		If UBound($PixelTopRight) < 20 Then
 			$PixelTopRight = _GetVectorOutZone($eVectorRightTop)
 		EndIf
-		CleanRedArea($PixelTopRight)
 		debugAttackCSV("RedArea cleaned")
 		debugAttackCSV("	[" & UBound($PixelTopRight) & "] pixels TopRight")
 		$PixelTopRightDropLine = MakeDropLine($PixelTopRight, StringSplit($InternalArea[2][0] & "-" & $InternalArea[2][1] - 25, "-", $STR_NOCOUNT), StringSplit($InternalArea[1][0] + 30 & "-" & $InternalArea[1][1], "-", $STR_NOCOUNT))
@@ -429,10 +429,10 @@ Func ParseAndMakeDropLines($MAINSIDE)
 	;EndIf
 
 	;If $MAINSIDE = "TOP-LEFT" Then
-		If UBound($PixelTopLeft) < 10 Then
+		CleanRedArea($PixelTopLeft)
+		If UBound($PixelTopLeft) < 20 Then
 			$PixelTopLeft = _GetVectorOutZone($eVectorLeftTop)
 		EndIf
-		CleanRedArea($PixelTopLeft)
 		debugAttackCSV("RedArea cleaned")
 		debugAttackCSV("	[" & UBound($PixelTopLeft) & "] pixels TopLeft")
 		$PixelTopLeftDropLine = MakeDropLine($PixelTopLeft, StringSplit($InternalArea[0][0] - 30 & "-" & $InternalArea[0][1], "-", $STR_NOCOUNT), StringSplit($InternalArea[2][0] & "-" & $InternalArea[2][1] - 25, "-", $STR_NOCOUNT))
@@ -457,10 +457,10 @@ Func ParseAndMakeDropLines($MAINSIDE)
 	;EndIf
 
 	;If $MAINSIDE = "BOTTOM-LEFT" Then
-		If UBound($PixelBottomLeft) < 10 Then
+		CleanRedArea($PixelBottomLeft)
+		If UBound($PixelBottomLeft) < 20 Then
 			$PixelBottomLeft = _GetVectorOutZone($eVectorLeftBottom)
 		EndIf
-		CleanRedArea($PixelBottomLeft)
 		debugAttackCSV("RedArea cleaned")
 		debugAttackCSV("	[" & UBound($PixelBottomLeft) & "] pixels BottomLeft")
 		$PixelBottomLeftDropLine = MakeDropLine($PixelBottomLeft, StringSplit($InternalArea[0][0] - 30 & "-" & $InternalArea[0][1], "-", $STR_NOCOUNT), StringSplit($InternalArea[3][0] & "-" & $InternalArea[3][1] + 20, "-", $STR_NOCOUNT))

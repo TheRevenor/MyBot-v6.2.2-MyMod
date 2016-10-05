@@ -29,10 +29,20 @@ Func BoostBarracks()
 	If $numBarracksAvaiables = 0 Then
 		openArmyOverview()
 		BarracksStatus()
+		If _Sleep($iDelaycheckArmyCamp4) Then Return
+		ResetBarracksvariables(False)
 	EndIf
 
 	If $numBarracksAvaiables = 0 Then Return
-	If isEnoughBarracksesAlreadyBoosted() = True Then Return ; Exit function if Number of already boosted barracks is equal to Number of barrackses to boost
+
+	If ($numBarracksAvaiables <> UBound($InitBoostTime)) Or ($numDarkBarracksAvaiables <> UBound($InitBoostTimeDark)) Then
+		ResetBarracksvariables(True)
+		If _Sleep($iDelaycheckArmyCamp4) Then Return
+		Return
+	ElseIf isEnoughBarracksesAlreadyBoosted() = True Then
+		If _Sleep($iDelaycheckArmyCamp4) Then Return
+		Return ; Exit function if Number of already boosted barracks is equal to Number of barrackses to boost
+	EndIf
 
 	SetLog("Boost Barracks started...", $COLOR_BLUE)
 	If _Sleep($iDelaycheckArmyCamp1) Then Return
@@ -218,12 +228,12 @@ Func BoostDarkBarracks()
 		If $btnStatus = True Then
 			If IsGemWindowOpen("", "", True) = True Then ; If Gem Window Was Open, Then Click On GREEN Button And Boost Barrack
 				If IsBoostedSuccessfully($i, True) = True Then
-				$InitBoostTimeDark[$i - 1][0] = 1
-				$InitBoostTimeDark[$i - 1][1] = TimerInit()
-				$totalPossibleBoostTimesDARK -= 1
-				$totalPossibleBoostBarracksesDARK -= 1
-				WorksWithBoostedBarrackses("DARK")
-				SetLog("Dark Barrack nº: " & $i & " Boosted Successfully.", $COLOR_GREEN)
+					$InitBoostTimeDark[$i - 1][0] = 1
+					$InitBoostTimeDark[$i - 1][1] = TimerInit()
+					$totalPossibleBoostTimesDARK -= 1
+					$totalPossibleBoostBarracksesDARK -= 1
+					WorksWithBoostedBarrackses("DARK")
+					SetLog("Dark Barrack nº: " & $i & " Boosted Successfully.", $COLOR_GREEN)
 				EndIf
 				If IsFinishedBoostForThisCycleDARK() = True Then
 					If $icmbBoostDarkBarracks >= 1 Then $icmbBoostDarkBarracks -= 1

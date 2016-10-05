@@ -23,7 +23,7 @@
 
 	_CaptureRegion()
 
-Local $hBMP_Cropped = _GDIPlus_BitmapCloneArea($hBitmap, 0, 0,  200, 18)
+Local $hBMP_Cropped = _GDIPlus_BitmapCloneArea($hBitmap, 50, 0,  140, 18)
 Local $hHBMP_Cropped = _GDIPlus_BitmapCreateHBITMAPFromBitmap($hBMP_Cropped)
 
 If  Not FileExists(@ScriptDir & "\images\Multyfarming\main.bmp") Then
@@ -222,7 +222,7 @@ EndFunc
 
 	_CaptureRegion()
 
-	Local $hBMP_Cropped = _GDIPlus_BitmapCloneArea($hBitmap, 0, 0,  200, 18)
+	Local $hBMP_Cropped = _GDIPlus_BitmapCloneArea($hBitmap, 50, 0,  140, 18)
 	Local $hHBMP_Cropped = _GDIPlus_BitmapCreateHBITMAPFromBitmap($hBMP_Cropped)
 
 	if Not FileExists(@ScriptDir & "\images\Multyfarming\" & $CheckAccountID & ".bmp") Then

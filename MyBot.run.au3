@@ -37,7 +37,7 @@ Local $hBotLaunchTime = TimerInit()
 
 Global $sGitHubModOwner = "TheRevenor"
 Global $sGitHubModRepo = "MyBot-v6.2.2-MyMod"
-Global $sGitHubModLatestReleaseTag = "v2.0.5"
+Global $sGitHubModLatestReleaseTag = "v2.0.6"
 Global $sModSupportUrl = "https://mybot.run/forums/index.php?/topic/22790-v621-mod-therevenor-03-09-2016"
 
 $sBotVersion = "v6.2.2" ;~ Don't add more here, but below. Version can't be longer than vX.y.z because it it also use on Checkversion()
@@ -337,7 +337,7 @@ Func runBot() ;Bot that runs everything in order
 			Train()
 			_Sleep($iDelayRunBot3)
 				If $Restart = True Then ContinueLoop
-			Local $aRndFuncList[4] = ['Laboratory', 'UpgradeHeroes', 'UpgradeBuilding', 'SmartUpgrade']
+			Local $aRndFuncList[3] = ['Laboratory', 'UpgradeHeroes', 'UpgradeBuilding']
 			While 1
 				If $RunState = False Then Return
 				If $Restart = True Then ContinueLoop 2 ; must be level 2 due to loop-in-loop
@@ -353,6 +353,8 @@ Func runBot() ;Bot that runs everything in order
 				If checkAndroidTimeLag() = True Then ContinueLoop 2 ; must be level 2 due to loop-in-loop
 			WEnd
 				If $RunState = False Then Return
+			SmartUpgrade()
+			_Sleep($iDelayRunBot3)
 				If $Restart = True Then ContinueLoop
 			If IsSearchAttackEnabled() Then  ; If attack scheduled has attack disabled now, stop wall upgrades, and attack.
 				$iNbrOfWallsUpped = 0
@@ -576,9 +578,8 @@ Func Idle() ;Sequence that runs until Full Army
 		If ($CommandStop = 3 Or $CommandStop = 0) Then
             getArmyCapacity(True, False)
             CheckOverviewFullArmy(False, False)  ; use true parameter to open train overview window
-            getArmyTroopCount(False, False)
 			getArmyHeroCount(False, False)
-			getArmySpellCount(False, True) ; use true parameter to close train overview window
+			getArmySpellCapacity(False, True) ; use true parameter to close train overview window
 			If _Sleep($iDelayIdle1) Then Return
 			If $fullArmy = False And $bTrainEnabled = True Then
 				SetLog("Army Camp and Barracks are not full, Training Continues...", $COLOR_ORANGE)
@@ -827,9 +828,6 @@ Func _RunFunction($action)
 			_Sleep($iDelayRunBot3)
 		Case "UpgradeBuilding"
 			UpgradeBuilding()
-			_Sleep($iDelayRunBot3)
-		Case "SmartUpgrade"
-			SmartUpgrade()
 			_Sleep($iDelayRunBot3)
 		Case ""
 			SetDebugLog("Function call doesn't support empty string, please review array size", $COLOR_RED)

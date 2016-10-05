@@ -30,6 +30,8 @@ Func getArmyHeroCount($bOpenArmyWindow = False, $bCloseArmyWindow = False)
 		If _Sleep($iDelaycheckArmyCamp5) Then Return
 	EndIf
 
+	If $iTownHallLevel < 7 Then Return
+	
 	$iHeroAvailable = $HERO_NOHERO ; Reset hero available data
 	$bFullArmyHero = False
 	Local $debugArmyHeroCount = 0 ; local debug flag

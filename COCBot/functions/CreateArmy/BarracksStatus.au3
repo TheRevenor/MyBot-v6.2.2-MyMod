@@ -137,3 +137,54 @@ Func BarracksStatus($showlog = False)
 	EndIf
 
 EndFunc   ;==>BarracksStatus
+
+
+Func ResetBarracksvariables($OpenArmyWindow = False)
+
+	;OPEN ARMY OVERVIEW WITH NEW BUTTON
+	If $OpenArmyWindow Then
+		If openArmyOverview() = False Then Return;
+
+		If WaitforPixel(762, 328 + $midOffsetY, 763, 329 + $midOffsetY, Hex(0xF18439, 6), 10, 10) Then
+			If $debugsetlogTrain = 1 Then SetLog("Wait for ArmyOverView Window", $COLOR_PURPLE)
+			If IsTrainPage() Then BarracksStatus(False)
+		EndIf
+		If _Sleep($iDelayTrain1) Then Return
+	EndIf
+
+	If $numBarracksAvaiables > UBound($InitBoostTime) Then SetLog(" » Now you have More barracks available!")
+	If $numBarracksAvaiables < UBound($InitBoostTime) Then SetLog(" » Now you have Less barracks available!")
+	If $numDarkBarracksAvaiables > UBound($InitBoostTimeDark) Then SetLog(" » Now you have More Dark barracks available!")
+	If $numDarkBarracksAvaiables < UBound($InitBoostTimeDark) Then SetLog(" » Now you have Less Dark barracks available!")
+
+	; Redim the Global Variable to existent num Barracks Available , Reset and fill it in DeleteQueueTroops()
+	ReDim $BarrackCapacity[$numBarracksAvaiables]
+	ReDim $BarrackTimeRemain[$numBarracksAvaiables]
+	ReDim $InitBoostTime[$numBarracksAvaiables][2]
+	For $i = 0 To $numBarracksAvaiables - 1
+		$BarrackCapacity[$i] = 0
+		$BarrackTimeRemain[$i] = 0
+		$InitBoostTime[$i][0] = 0
+		$InitBoostTime[$i][1] = 0
+	Next
+
+	; Redim the Global Variable to existent num Dark Barracks Available , Reset and fill it in DeleteQueueTroops()
+	ReDim $DarkBarrackCapacity[$numDarkBarracksAvaiables]
+	ReDim $DarkBarrackTimeRemain[$numDarkBarracksAvaiables]
+	ReDim $InitBoostTimeDark[$numDarkBarracksAvaiables][2]
+	For $i = 0 To $numDarkBarracksAvaiables - 1
+		$DarkBarrackCapacity[$i] = 0
+		$DarkBarrackTimeRemain[$i] = 0
+		$InitBoostTimeDark[$i][0] = 0
+		$InitBoostTimeDark[$i][1] = 0
+	Next
+
+	; Lets delete the previous queued troops
+	GoesToFirstBarrack()
+	If _Sleep($iDelayTrain3) Then Return ; ---> can be made with WaitforPixel()
+	If $debugsetlogTrain = 1 Then Setlog("Deleting Queue Troops")
+	DeleteQueueTroops()
+	If $debugsetlogTrain = 1 Then Setlog("Deleting Queue DarkTroops")
+	DeleteQueueDarkTroops()
+
+EndFunc   ;==>ResetBarracksvariables

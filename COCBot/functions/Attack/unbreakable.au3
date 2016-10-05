@@ -37,6 +37,8 @@ Func Unbreakable()
 			SetLog(">>> Programmer Humor, You shouldn't ever see this message, RUN! <<<", $COLOR_PURPLE)
 	EndSwitch
 
+	getArmyCapacity(True, True)  ; use true parameter to open/close train overview window
+
 	Select
 		Case $iChkTrophyAtkDead = 1 ; If attack dead bases during trophy drop is enabled then make sure we have at least 70% full army
 			If ($CurCamp <= ($TotalCamp * 70 / 100)) Then

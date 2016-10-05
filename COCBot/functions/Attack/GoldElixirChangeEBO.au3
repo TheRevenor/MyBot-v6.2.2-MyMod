@@ -103,6 +103,7 @@ Func GoldElixirChangeEBO()
 			SetLog("detected [G]: " & $Gold2 & " [E]: " & $Elixir2 & " [DE]: " & $DarkElixir2 & " |  Exit now ", $COLOR_BLUE)
 		Else
 			SetLog("detected [G]: " & $Gold2 & " [E]: " & $Elixir2 & " [DE]: " & $DarkElixir2 & " |  Exit in " & StringReplace(StringFormat("%2i", $txtDiff), "-", "") & " sec.", $COLOR_BLUE)
+			OverallDamage(50, True)
 		EndIf
 
 		;CALCULATE RESOURCE CHANGES

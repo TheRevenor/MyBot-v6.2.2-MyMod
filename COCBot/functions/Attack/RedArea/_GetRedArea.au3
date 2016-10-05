@@ -148,18 +148,21 @@ EndFunc   ;==>_GetRedArea
 
 Func GetImgLoc2MBR()
 
-	Local $directory = @ScriptDir & "\images\WeakBase\Eagle"
-	Local $return = returnHighestLevelSingleMatch($directory)
+	Local $SingleCocDiamond = "ECD"
 
-	Local $AllPoints = StringSplit($return[6], "|", $STR_NOCOUNT)
+	_CaptureRegion2()
+	Local $return = DllCall($pImgLib, "str", "SearchRedLines", "handle", $hHBitmap2, "str", $SingleCocDiamond)
+
+	Local $AllPoints = StringSplit($return[0], "|", $STR_NOCOUNT)
+	If $debugRedArea = 1 then Setlog("RedLines Detection String: " & $return[0])
+	Setlog("RedLines Detection Points: " & UBound($AllPoints))
 	Local $EachPoint[UBound($AllPoints)][2]
 	Local $_PixelTopLeft, $_PixelBottomLeft, $_PixelBottomRight, $_PixelTopRight
 
-	For $i = 0 To UBound($AllPoints) - 1
+	For $i = 0 To UBound($AllPoints) -1
 		Local $temp = StringSplit($AllPoints[$i], ",", $STR_NOCOUNT)
 		$EachPoint[$i][0] = Number($temp[0])
 		$EachPoint[$i][1] = Number($temp[1])
-		; Setlog(" $EachPoint[0]: " & $EachPoint[$i][0] & " | $EachPoint[1]: " & $EachPoint[$i][1])
 	Next
 
 	_ArraySort($EachPoint, 0, 0, 0, 0)
@@ -187,7 +190,7 @@ Func GetImgLoc2MBR()
 
 	Local $NewRedLineString = $_PixelTopLeft & "#" & $_PixelBottomLeft & "#" & $_PixelBottomRight & "#" & $_PixelTopRight
 
-	;Setlog(" »» NEW REDlines Imgloc: " & $NewRedLineString)
+	If $debugRedArea = 1 then Setlog(" »» NEW REDlines Imgloc: " & $NewRedLineString)
 
 	Return $NewRedLineString
 

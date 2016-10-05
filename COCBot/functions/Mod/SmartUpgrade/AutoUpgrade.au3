@@ -667,12 +667,17 @@ EndFunc   ;==>randomSleep
 
 Func ClickF($x, $y, $times = 1, $speed = 0, $debugtxt = "")
 
-	$xmin = $x - 4
-	$xmax = $x + 4
-	$ymin = $y - 4
-	$ymax = $y + 4
+; !!! Not original function but randomization calculation which is linked to original function renamed FClick !!!
+; !!! Still compatible with all original function parameters !!!
+
+	$xmin = $x - 3
+	$xmax = $x + 3
+	$ymin = $y - 3
+	$ymax = $y + 3
 	$xclick = Random($xmin, $xmax)
 	$yclick = Random($ymin, $ymax)
+	If $xclick < 0 Or $xclick > 860 Then $xclick = $x ; Out Of Screen protection
+	If $yclick < 0 Or $yclick > 680 + ($bottomOffsetY) Then $yclick = $y ; Out Of Screen protection
 	Click($xclick, $yclick, $times, $speed, $debugtxt)
 
 EndFunc   ;==>ClickF

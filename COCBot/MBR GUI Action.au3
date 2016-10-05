@@ -147,6 +147,8 @@ Func BotStop()
 		$Restart = True
 		FileClose($hLogFileHandle)
 		$hLogFileHandle = ""
+		FileClose($hLogFileTrain)
+		$hLogFileTrain = ""
 		FileClose($hAttackLogFileHandle)
 		$hAttackLogFileHandle = ""
 	Else

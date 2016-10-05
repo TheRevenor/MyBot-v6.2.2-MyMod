@@ -295,7 +295,48 @@ Func UpgradeNormal($inum)
 
 				Return True
 			EndIf
-		Else
+		ElseIf _ColorCheck(_GetPixelColor(721, 118 + $midOffsetY, True), Hex(0xDF0408, 6), 20) Then ; Check if the building Upgrade window is open, FOR WARDEN
+			If _ColorCheck(_GetPixelColor(459, 490 + $midOffsetY, True), Hex(0xE70A12, 6), 20) And _ColorCheck(_GetPixelColor(459, 494 + $midOffsetY), Hex(0xE70A12, 6), 20) And _
+					_ColorCheck(_GetPixelColor(459, 498 + $midOffsetY, True), Hex(0xE70A12, 6), 20) Then ; Check for Red Zero = means not enough loot!
+
+				SetLog("Upgrade Fail #" & $inum + 1 & " " & $aUpgrades[$inum][4] & ", No Loot!", $COLOR_RED)
+
+				ClickP($aAway, 2, 0, "#0298") ;Click Away
+				Return False
+			Else
+				Click(670, 510 + $midOffsetY, 1, 0, "#0299") ; Click upgrade buttton
+				If _Sleep($iDelayUpgradeNormal3) Then Return
+				If $debugImageSave = 1 Then DebugImageSave("UpgradeRegBtn2")
+				If _ColorCheck(_GetPixelColor(573, 256 + $midOffsetY, True), Hex(0xE1090E, 6), 20) Then ; Redundant Safety Check if the use Gem window opens
+					SetLog("Upgrade Fail #" & $inum + 1 & " " & $aUpgrades[$inum][4] & " No Loot!", $COLOR_RED)
+					ClickP($aAway, 2, 0, "#0300") ;Click Away to close windows
+					Return False
+				EndIf
+				SetLog("Upgrade #" & $inum + 1 & " " & $aUpgrades[$inum][4] & " started", $COLOR_GREEN)
+				GUICtrlSetImage($picUpgradeStatus[$inum], $pIconLib, $eIcnGreenLight) ; Change GUI upgrade status to done
+				$ipicUpgradeStatus[$inum] = $eIcnGreenLight ; Change GUI upgrade status to done
+				GUICtrlSetData($txtUpgradeValue[$inum], -($aUpgrades[$inum][2])) ; Show Negative Upgrade value in GUI
+				;$itxtUpgradeValue[$inum] = -($aUpgrades[$inum][2]) ; Show Negative Upgrade value in GUI
+				GUICtrlSetData($txtUpgradeLevel[$inum], $aUpgrades[$inum][5] & "+") ; Set GUI level to match $aUpgrades variable
+				$itxtUpgradeLevel[$inum] = $aUpgrades[$inum][5] & "+" ; Set GUI level to match $aUpgrades variable
+				If $ichkUpgrdeRepeat[$inum] = 0 Then ; Check for repeat upgrade
+					GUICtrlSetState($chkbxUpgrade[$inum], $GUI_UNCHECKED) ; Change upgrade selection box to unchecked
+					$ichkbxUpgrade[$inum] = 0 ; Change upgrade selection box to unchecked
+					$aUpgrades[$inum][0] = -1 ;Reset $UpGrade position coordinate variable to blank to show its completed
+					$aUpgrades[$inum][1] = -1
+					$aUpgrades[$inum][3] = "" ; Reset loot type
+					GUICtrlSetData($txtUpgradeLevel[$inum], $aUpgrades[$inum][5] & "+") ; Set GUI level to match $aUpgrades variable
+					$aUpgrades[$inum][5] = $aUpgrades[$inum][5] & "+" ; Set GUI level to match $aUpgrades variable
+				ElseIf $ichkUpgrdeRepeat[$inum] = 1 Then
+					GUICtrlSetState($chkbxUpgrade[$inum], $GUI_CHECKED) ; Ensure upgrade selection box is checked
+					$ichkbxUpgrade[$inum] = 1 ; Ensure upgrade selection box is checked
+				EndIf
+				ClickP($aAway, 2, 0, "#0301") ;Click Away to close windows
+				If _Sleep($iDelayUpgradeNormal3) Then Return ; Wait for window to close
+
+				Return True
+			EndIf
+		Else	; Upgrade window not open, or at least not detected as open upgrade window
 			Setlog("Upgrade #" & $inum + 1 & " window open fail", $COLOR_RED)
 			ClickP($aAway, 2, 0, "#0302") ;Click Away
 		EndIf

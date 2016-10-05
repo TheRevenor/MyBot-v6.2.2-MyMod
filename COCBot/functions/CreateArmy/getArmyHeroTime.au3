@@ -38,6 +38,8 @@ Func getArmyHeroTime($HeroType, $bOpenArmyWindow = False, $bCloseArmyWindow = Fa
 		If _Sleep($iDelaycheckArmyCamp5) Then Return
 	EndIf
 
+	If $iTownHallLevel < 7 Then Return
+	
 	Local $iRemainTrainHeroTimer = 0
 	Local $sResult
 	Local $iResultHeroes[3] = ["", "", ""] ; array to hold all remaining regen time read via OCR
